@@ -1,0 +1,29 @@
+postparc:
+    resource: "@PostparcBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+    #schemes:  [https]
+
+fos_js_routing:
+    resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
+    #schemes:  [https]
+
+_bazinga_jstranslation:
+    resource: "@BazingaJsTranslationBundle/Resources/config/routing/routing.yml"
+    #schemes:  [https]
+
+app.swagger_ui:
+    path: /api/doc
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+
+#REST
+rest :
+  type : rest
+  resource : "routing_rest.yml"
+  prefix : /api
+
+

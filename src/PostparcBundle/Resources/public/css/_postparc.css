@@ -1,0 +1,78 @@
+/*
+Error: Undefined variable: "$gray-lighter".
+        on line 38 of /home/philg/public_html/postparcv2/src/PostparcBundle/Resources/public/sass/_postparc.scss
+
+33:         }
+34:     }
+35: }
+36:
+37: body.signin {
+38:     background-color: lighten($gray-lighter, 3%);
+39: }
+40:
+41: //   /$$$$$$$  /$$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$
+42: //  | $$__  $$| $$__  $$ /$$__  $$| $$$ | $$| $$__  $$
+43: //  | $$  \ $$| $$  \ $$| $$  \ $$| $$$$| $$| $$  \ $$
+
+Backtrace:
+/home/philg/public_html/postparcv2/src/PostparcBundle/Resources/public/sass/_postparc.scss:38
+/usr/lib/ruby/vendor_ruby/sass/script/tree/variable.rb:49:in `_perform'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/node.rb:58:in `perform'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:173:in `perform_arg'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:124:in `block in _perform'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:124:in `each'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:124:in `each_with_index'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:124:in `each'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:124:in `map'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:124:in `_perform'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/node.rb:58:in `perform'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:397:in `visit_prop'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:160:in `block in visit'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:79:in `block in with_base'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:115:in `with_frame'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:79:in `with_base'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:160:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:433:in `block (2 levels) in visit_rule'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:433:in `map'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:433:in `block in visit_rule'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:181:in `with_environment'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:431:in `visit_rule'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:160:in `block in visit'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:79:in `block in with_base'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:115:in `with_frame'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:79:in `with_base'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:160:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:52:in `map'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:52:in `visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:169:in `block in visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:181:in `with_environment'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:168:in `visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `block in visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:188:in `visit_root'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:159:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:8:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/root_node.rb:36:in `css_tree'
+/usr/lib/ruby/vendor_ruby/sass/tree/root_node.rb:20:in `render'
+/usr/lib/ruby/vendor_ruby/sass/engine.rb:281:in `render'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:494:in `update_stylesheet'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:209:in `each'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:294:in `watch'
+/usr/lib/ruby/vendor_ruby/compass/sass_compiler.rb:46:in `watch!'
+/usr/lib/ruby/vendor_ruby/compass/commands/watch_project.rb:41:in `perform'
+/usr/lib/ruby/vendor_ruby/compass/commands/base.rb:18:in `execute'
+/usr/lib/ruby/vendor_ruby/compass/commands/project_base.rb:19:in `execute'
+/usr/lib/ruby/vendor_ruby/compass/exec/sub_command_ui.rb:43:in `perform!'
+/usr/lib/ruby/vendor_ruby/compass/exec/sub_command_ui.rb:15:in `run!'
+/usr/bin/compass:30:in `block in <main>'
+/usr/bin/compass:44:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: Undefined variable: \"$gray-lighter\".\A         on line 38 of /home/philg/public_html/postparcv2/src/PostparcBundle/Resources/public/sass/_postparc.scss\A \A 33:         }\A 34:     }\A 35: }\A 36: \A 37: body.signin {\A 38:     background-color: lighten($gray-lighter, 3%);\A 39: }\A 40: \A 41: //   /$$$$$$$  /$$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$\A 42: //  | $$__  $$| $$__  $$ /$$__  $$| $$$ | $$| $$__  $$\A 43: //  | $$  \ $$| $$  \ $$| $$  \ $$| $$$$| $$| $$  \ $$"; }

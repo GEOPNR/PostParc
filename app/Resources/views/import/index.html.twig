@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Import.index'|trans}}
+{% endblock title %}
+{% block body %}
+   <h1>{{'Import.index'|trans}}</h1>
+
+   <div class="alert alert-warning">
+      <div class="row">
+         <div class="col-md-1">
+            <i class="fa-solid fa-exclamation-triangle fa-4x" aria-hidden="true"></i>
+         </div>
+         <div class="col-md-11">
+            {{ 'Import.messages.warningMessage'|trans()|raw }}
+         </div>
+      </div>
+   </div>
+   {%  if isExecute %}
+      <div class="bs-callout bs-callout-info">
+         <h4>Résultat de l'import: </h4>
+         <div style="background-color: black;">
+            {{ returnCommandContent|raw }}
+         </div>
+         <br/>
+         <a href="{{ path('import_index') }}" class="btn btn-primary"> Nouvel Import</a>
+      </div>
+   {% else  %}
+      <div class="bs-callout bs-callout-info">
+         <i class="fa-solid fa-exclamation-triangle" aria-hidden="true"></i> <strong>{{ 'Import.messages.fileFormat'|trans() }}</strong>
+         <br/>
+         <a href="{{  asset('importModels/visu_import.ods') }}" target="_blank">{{ 'Import.messages.filesImportExplanations'|trans() }}</a>
+      </div>
+      {{ form_start(form) }}
+      <div class="bs-callout">
+         {{ form_row(form.searchCityByCP) }}
+      </div>
+      <div class="bs-callout">
+         {{ form_row(form.persons) }}
+      </div>
+      <div class="bs-callout">
+         {{ form_row(form.organizations) }}
+      </div>
+      <div class="bs-callout">
+         {{ form_row(form.pfos) }}
+      </div>
+      {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+         <div class="bs-callout">
+            {{ form_row(form.representations) }}
+         </div>
+      {%  endif %}
+      {{ form_end(form) }}
+   {% endif  %}
+{% endblock %}

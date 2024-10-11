@@ -1,0 +1,11 @@
+{% if territories|length >0 %}
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <p><strong>{{'warning'|trans}} !</strong><br/>{{'Territory.flash.territoryExistingWithSameName'|trans}} :</p>
+    <ul>
+    {% for territory in territories %}
+        <li><a target="_new" href="{{ path('territory_edit',{'id': territory.id}) }}">{{ territory }}</a>  ( <a href="mailto:{{ territory.createdBy.email }}">{{ territory.createdBy }}</a> )</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}

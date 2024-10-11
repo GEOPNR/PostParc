@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'MailStats.label'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'MailStats.label'|trans}}</h1>
+   {% if detailedStats|length == 0 %}
+      <div class="alert alert-warning" role="alert">{{'MailStats.messages.no_Stats'|trans}}</div>
+   {% else %}
+      <div id="mailStatChart" style="height: 250px;"></div>
+      <h3>{{'MailStats.detailedStats'|trans}}</h3>
+      <div class="sf_admin_list no-more-tables">
+         <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+               <tr>
+                  <th>{{'MailStats.fields.date'|trans}}</th>
+                  <th>{{'MailStats.fields.createdBy'|trans}}</th>
+                  <th>{{'MailStats.fields.sender'|trans}}</th>
+                  <th>{{'MailStats.fields.subject'|trans}}</th>
+                  <th>{{'MailStats.fields.nbEmailInSelection'|trans}}</th>
+                  <th>{{'MailStats.fields.openedRatio'|trans}}</th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for stat in detailedStats %}
+                  <tr>
+                     <td>{{stat.date|localizeddate()}}</td>
+                     <td>{{stat.createdBy}}</td>
+                     <td>{{stat.sender}}</td>
+                     <td>{{stat.subject}}</td>
+                     <td class="text-center">{{stat.nbEmail}}</td>
+                     <td>{% if stat.token %}
+                        {%  set percent =  (stat.nbOpenedEmail*100/stat.nbEmail)|round %}
+                        <div class="progress">
+                           <div class="progress-bar" role="progressbar" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percent }}%;min-width:2em;">
+                              {{ percent }}%
+                           </div>
+                        </div>
+                        {% endif %}
+                        </td>
+                        <td><div class="btn-group">{% include 'mailStats/mailStatsSendResume.html.twig' with {'stat': stat} %}</div></td>
+                     </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+               <div class="navigation text-center">
+                  {{ knp_pagination_render(detailedStats) }}
+               </div>
+               {% endif %}
+                  {% endblock body %}
+
+                     {% if detailedStats|length > 0 %}
+                         {% block stylesheets %}
+                             {{ parent() }}
+                             <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+                         {% endblock stylesheets %}
+
+                         {% block javascripts %}
+                             {{ parent() }}
+                             <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+                             <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+                             <script type="text/javascript">
+                              {% set domainArray = [] %}
+                                 Morris.Bar({
+                                    element: 'mailStatChart',
+
+                                    data: [{% for year, monthStat in stats %}
+                              {% for month, stat in monthStat %}
+                                       {
+                                          y: '{{month ~ '-'~ year}}',                    {% for domain, nbMail in stat %}
+                                 {% if domain not in domainArray %}
+                                    {% set domainArray = domainArray|merge([domain]) %}
+                                 {% endif %}
+                                             '{{domain}}':{{nbMail}},
+                              {% endfor  %}
+                                       },
+                              {% endfor  %}
+                                 {% endfor  %}
+                                       ],
+                                       xkey: 'y',
+                                       ykeys: [{% for domain in domainArray %}
+                                    {% if not loop.first %},{% endif %} '{{domain}}'{% endfor %}
+                                          ],
+                                          labels: [{% for domain in domainArray %}
+                                       {% if not loop.first %},{% endif %} '{{domain}}'{% endfor %}
+                                             ],
+                                             stacked: true,
+                                             resize: true
+                                          });
+                                       </script>
+                                       {% endblock javascripts %}
+                                          {% endif %}

@@ -1,0 +1,235 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{'Selection.export.label'|trans}}
+{% endblock title %}
+
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig %}
+    {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+            <h1>{{'Selection.export.label'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-15"><i class="fa-solid fa-question-circle"></i></a></h1>
+                    {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '15'})) }}
+        </div>
+    </div>
+    <div id="sf_admin_content">
+        {% if nbElements > 0 %}
+            <div class="bs-callout bs-callout-info">
+                <p>{{'Selection.export.first_message'|trans({'%nbItems%': nbElements })|raw }}</p>
+                <form method="post" action="{{path('selection_export_execute')}}" class="form-inline">
+
+                <a href="javascript:void(0);" id="showHidedetailledCoordinateListLink" class="btn btn-info btn-xs"><i class="far fa-list-alt"></i> {{ 'Selection.export.actions.showDetailledCoorinatesList'|trans() }}</a>
+                <div id="detailledCoordinateListBlock" style="display:none;">
+                    {% if nbElements > 1000  %}
+                        <div class="alert alert-info" role="alert">
+                            {{ 'Selection.export.coordinateOverrideInfosExeedMessage'|trans }}
+                        </div>
+                    {% endif %}    
+                    <table class="table table-striped table-condensed table-responsive table-hover">
+                        {% for entityType, coordinatesDetails in selectionDataCoordinatesDetails %}
+                            {%  for objectId, infos in coordinatesDetails %}                            
+                                <tr id="{{entityType}}-{{objectId}}">                                
+                                    <td>{{ infos['label'] }}</td>
+                                    <td>{{ infos['coordinate']}}</td>
+                                    {% if nbElements < 1000  %}
+                                    <td>
+                                        <input type="hidden" name="coordinateOverrideInfos[{{entityType}}][{{objectId}}]" value="{% if infos['coordinate'] %}{{ infos['coordinate'].id}}{%  endif %}"/> 
+                                        <a href="javascript:void(0);" data-label="{{ infos['label'] }}" data-selectedValues="{% if infos['coordinate'] %}{{ infos['coordinate'].id}}{%  endif %}" data-type="{{entityType}}" data-id="{{objectId}}" class="changeCoordinateInExportSelectionModule btn btn-default btn-xs">
+                                            <i class="fa-solid fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {%  endfor %}
+                        {%  endfor %}    
+                    </table>
+                    
+                </div>
+
+
+
+                <p>Choix des champs à exporter : <a href="javascript:void(0)" class="btn btn-default btn-xs" id="unCheckAll">{{'actions.unCheckAll'|trans() }}</a></p>
+                
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{'Selection.export.person_options'|trans}}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% for key, option in exportOptions['person'] %}
+                                        {% if ( (key|replace({'person[':'',']':''} )) not in personnalFieldsRestriction ) %}
+                                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{'Selection.export.organization_options'|trans}}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% for key, option in exportOptions['organization'] %}
+                                        <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{'Selection.export.pfo_options'|trans}}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% for key, option in exportOptions['pfo'] %}
+                                        <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+                            <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">{{'Selection.export.representation_options'|trans}}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% for key, option in exportOptions['representation'] %}
+                                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+
+
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Options :</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% for key, option in exportOptions['options'] %}
+                                        <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" > {{option}}<br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{'Selection.export.coordinate_options'|trans}}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% for key, option in exportOptions['coordinate'] %}
+                                        <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> {# row #}
+
+                    <div id="sf_admin_footer">
+                        <div class="col-xs-12 col-sm-6 col-md-12">
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-caret-square-down"></i>&nbsp;Exporter ma sélection</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-12">
+                    <div class="alert alert-warning" role="alert">{{'flash.emptySelection'|trans}}</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock body %}
+
+{% block javascripts %}
+    {{parent()}}
+    <script type="text/javascript">
+
+
+        $("#showHidedetailledCoordinateListLink").click(function () {
+        $("#detailledCoordinateListBlock").slideToggle('fast');
+        });
+        $(document).ready(function ($, event) {
+            validateSelectedCoordinates();
+            changeCoordinateInExportSelectionModule();
+        });
+        $(document).ajaxComplete(function () {
+            validateSelectedCoordinates();
+            changeCoordinateInExportSelectionModule();
+        });
+        function changeCoordinateInExportSelectionModule() {
+            $(".changeCoordinateInExportSelectionModule").click(function () {
+                var id = $(this).data('id');
+                var type = $(this).data('type');
+                var selectedValues = $(this).data('selectedvalues');
+                var label = $(this).data('label');
+                if (type) {
+                $.ajax({
+                url: Routing.generate('ajax_getCoordinateSelectForSelectionExportmodule'),
+                        type: "POST",
+                        async: true, // Mode asynchrone
+                        dataType: "json",
+                        data: {
+                            'id': id,
+                            'type': type,
+                            'selectedValues': selectedValues,
+                            'label': label
+                        },
+                        complete: function (response) {
+                        console.log('complete : ' + response.responseText);
+                                $('#' + type + '-' + id).html(response.responseText);
+                        },
+                        success: function (response) {
+                        console.log('success : ' + response);
+                        },
+                        error: function (response) {
+                        console.log('error : ' + response);
+                        }
+                });
+            }
+            event.preventDefault();
+                    return false;
+            });
+        }
+
+        function validateSelectedCoordinates() {
+            $(".validateSelectedCoordinates").click(function () {
+                var selector = $(this).data('selector');
+                // get selected values
+                var selectDom = document.getElementById(selector);
+                var newCoordinateLabel = selectDom.options[selectDom.selectedIndex].text;
+                var newCoordinateValue = selectDom.options[selectDom.selectedIndex].value;
+                $("#edit-button-" + selector).data('selectedvalues',newCoordinateValue);
+                // replace hidden field
+                $('#hidden-field-' + selector).val(newCoordinateValue);
+                // replace select
+                $('#' + selector).replaceWith(newCoordinateLabel);
+                // remove save button
+                $('#save-button-' + selector).remove();
+                $('#edit-button-' + selector).removeClass('hidden');
+                event.preventDefault();
+                return false;
+            });
+        }
+
+    </script>
+{% endblock javascripts %}

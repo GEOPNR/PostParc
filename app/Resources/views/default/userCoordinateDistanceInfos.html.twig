@@ -1,0 +1,8 @@
+{% if userCoordinateDistance %}
+    <br/>
+    <i class="fa-solid fa-map" aria-hidden="true"></i>&nbsp;{{userCoordinateDistance.distanceText}}
+    <br/>
+    <i class="fa-solid fa-clock" aria-hidden="true"></i>&nbsp;{{userCoordinateDistance.durationText}}
+    <br/>
+    <a href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{userCoordinateDistance.user.coordinate.coordinate}}%3B{{userCoordinateDistance.coordinate.coordinate}}" target=blank">{{'itinerary'|trans()}}</a>
+{% endif  %}

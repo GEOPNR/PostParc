@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+{% block title %}
+    {{'QrCodeStat.list'|trans}}
+{% endblock title %}
+{% block body %}
+
+    {% set currentPath = app.request.requesturi %}
+    {% set getParamsSeparator = "?" %}
+    {% if "?" in currentPath %}
+        {% set getParamsSeparator = "&" %}
+    {% endif %}
+                           
+    <div class="nav-list-actions col-md-3 pull-right">
+        <ul>
+            <li><a class="sf-admin-filters-toggle btn btn-default active"><i class="fa-solid fa-filter"></i><span class="libelle">&nbsp;{{'sorts'|trans}}</span></a></li>
+            <li><a class="btn btn-default" href="{{currentPath ~ getParamsSeparator }}exportXls=1"><i class="fa-solid fa-file-export"></i><span class="libelle">&nbsp;{{'actions.export'|trans}}</span></a></li>
+        </ul>
+    </div>
+
+    <h1>{{'QrCodeStat.list'|trans}}
+        <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{stats|length}}</span> {{'results'|trans}}</small>
+    </h1>
+
+    <div class="sf-admin-filters" {% if( app.request.session.has("QrCodeStatFilter") and app.request.session.get("QrCodeStatFilter")|length ) %} style="display:block;" {% endif %}>
+        {{ form_start(search_form) }}
+        <div class="form-group form-action pull-right">
+            <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+            <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+        </div>
+        {{ form_widget(search_form) }}
+        {{ form_end(search_form) }}
+    </div>
+
+    {% include 'default/selectResultsPerPage.html.twig'  %}
+
+    <div class="sf_admin_list scrollable_list no-more-tables">
+        <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+                <tr>
+
+                    <th>{{ knp_pagination_sortable(pagination, 'QrCodeStat.field.completeName'|trans(), 's.completeName') }}</th>
+                    <th>{{ knp_pagination_sortable(pagination, 'Nb', 'nb') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scanQrcodeStat in stats %}
+                    <tr>
+                        <td>{{ scanQrcodeStat.completeName }}</td>
+                        <td>{{ scanQrcodeStat.nb }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

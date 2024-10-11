@@ -1,0 +1,185 @@
+<script type="text/javascript">
+        jQuery(document).ready(function($, event) {
+            {# ***************   PERSON ****************************** #}
+            /* persons autocomplete*/
+            $('#addPersonsToEvent').select2({
+                width: '90%',
+                ajax: {
+                  url: Routing.generate('autocomplete_person_for_event',{eventId: {{event.id}} }),
+                  dataType: 'json',
+                  delay: 250,
+                  data: function (params) {
+                      return {
+                          q: params.term, // search term
+                      };
+                  },
+                  processResults: function (data) {
+                    return {
+                      results: data.items
+                    };
+                  }
+              },
+              placeholder: {
+                  id: "",
+                  placeholder: "  "
+              },
+              allowClear: true,
+              language: "fr",
+              dropdownAutoWidth: true,
+              minimumInputLength: 1
+            });
+            
+            // soumission ajout personnes
+            $('#addPersonsToEventSubmitButton').click(function() {
+                var selections = $('#addPersonsToEvent').select2('data');
+                var eventId = {{ event.id }};
+                if(selections.length) {
+                    ids = [];                
+                    for (i = 0; i < selections.length; i++) {
+                        ids.push(selections[i].id);
+                    }
+                    // appel url pour ajout                    
+                    $.ajax({
+                        url: Routing.generate('event_addPersons',{id: {{event.id}} }),
+                        data: {
+                           format: 'json',
+                           ids: JSON.stringify(ids)
+                        },
+                        
+                        success: function(data) {                            
+                               reloadPage('persons');                   
+                            },
+                        type: 'POST'
+                     });
+                }     
+            });
+            
+            {# ***************   PFO ****************************** #}
+            /* pfos autocomplete*/
+            $('#addPfosToEvent').select2({
+                width: '90%',
+                ajax: {
+                  url: Routing.generate('autocomplete_pfo_for_event',{eventId: {{event.id}} }),
+                  dataType: 'json',
+                  delay: 250,
+                  data: function (params) {
+                      return {
+                          q: params.term, // search term
+                      };
+                  },
+                  processResults: function (data) {
+                    return {
+                      results: data.items
+                    };
+                  }
+              },
+              placeholder: {
+                  id: "",
+                  placeholder: "  "
+              },
+              allowClear: true,
+              language: "fr",
+              dropdownAutoWidth: true,
+              minimumInputLength: 1
+            
+            });
+            
+            // soumission ajout personnes
+            $('#addPfosToEventSubmitButton').click(function() {
+                var selections = $('#addPfosToEvent').select2('data');
+                var eventId = {{ event.id }};
+                if(selections.length) {
+                    ids = [];                
+                    for (i = 0; i < selections.length; i++) {
+                        ids.push(selections[i].id);
+                    }
+                    // appel url pour ajout                    
+                    $.ajax({
+                        url: Routing.generate('event_addPfos',{id: {{event.id}} }),
+                        data: {
+                           format: 'json',
+                           ids: JSON.stringify(ids)
+                        },
+                        
+                        success: function(data) {                            
+                               //location.reload();
+                               reloadPage('pfos');
+                            },
+                        type: 'POST'
+                     });
+                }     
+            });
+            
+            {# ***************   Representation ****************************** #}
+            /* Representation autocomplete*/
+            $('#addRepresentationsToEvent').select2({
+                width: '90%',
+                ajax: {
+                    url: Routing.generate('autocomplete_representation_for_event',{eventId: {{event.id}} }),
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search term
+                        };
+                    },
+                    processResults: function (data) {
+                      return {
+                        results: data.items
+                      };
+                    }
+                },
+                placeholder: {
+                    id: "",
+                    placeholder: "  "
+                },
+                allowClear: true,
+                language: "fr",
+                dropdownAutoWidth: true,
+                minimumInputLength: 1
+            
+            });
+            
+            // soumission ajout personnes
+            $('#addRepresentationsToEventSubmitButton').click(function() {
+                var selections = $('#addRepresentationsToEvent').select2('data');
+                var eventId = {{ event.id }};
+                if(selections.length) {
+                    ids = [];                
+                    for (i = 0; i < selections.length; i++) {
+                        ids.push(selections[i].id);
+                    }
+                    // appel url pour ajout                    
+                    $.ajax({
+                        url: Routing.generate('event_addRepresentations',{id: {{event.id}} }),
+                        data: {
+                           format: 'json',
+                           ids: JSON.stringify(ids)
+                        },
+                        
+                        success: function(data) {                            
+                               reloadPage('representations');                      
+                            },
+                        type: 'POST'
+                     });
+                }     
+            });
+            
+            function reloadPage(activeTab){
+                var url      = window.location.href;
+                if (url.indexOf("?") >= 0){
+                    if (url.indexOf("activeTab") >= 0){
+                        var regEx = /([?&]activeTab)=([^#&]*)/g;
+                        url = url.replace(regEx, '$1='+activeTab);
+                    }else{
+                        url = url + '&activeTab=' + activeTab;
+                    }
+                    
+                }else{
+                    url = url + '?activeTab=' + activeTab;
+                }
+                window.location.replace(url);
+            }
+            
+        });
+    </script>

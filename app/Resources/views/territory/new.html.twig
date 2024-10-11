@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Territory.new'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'Territory.new'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-19"><i class="fa-solid fa-question-circle"></i></a></h1>
+         {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '19'})) }}
+   <div id="sf_admin_bar">
+      <div class="suggestionsBox bg-warning" id="suggestions" style="display: none;">
+         <div class="suggestionList" id="autoSuggestionsList"></div>
+      </div>
+   </div>
+   {{ form_start(form) }}
+   
+   {{ form_widget(form) }}
+   <div class="btn-group form-actions">
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('territory_index')}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+      </a>
+      <input type="submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+      <input type="submit" class="btn btn-info" name="createAndContinue" value="{{'actions.createAndContinue'|trans()}}">
+   </div>
+   {{ form_end(form) }}
+
+{% endblock %}
+
+{% block javascripts %}
+   {{ parent() }}
+   <script type="text/javascript">
+       $( "#territory_name" ).keyup(function() {
+            if ($('#territory_name').val().length< 4) {
+            $('#suggestions').hide();
+
+            } else {
+                $.post("{{ path('ajax_checkListTerritory') }}", {search: ""+$('#territory_name').val()+""}, function(data){
+                    if(data.length >0) {
+                        $('#suggestions').show();
+                        $('#autoSuggestionsList').html(data);
+                    }else{
+                        $('#suggestions').hide();
+                        $('#autoSuggestionsList').html('');
+                    }
+
+                });
+            }
+        });
+   </script>
+{% endblock javascripts %}

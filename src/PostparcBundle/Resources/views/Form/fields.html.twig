@@ -1,0 +1,92 @@
+{% block vich_file_row -%}
+    {% set force_error = true %}
+    {{- block('form_row') }}
+{%- endblock %}
+
+{% block vich_file_widget %}
+{% spaceless %}
+    <div class="vich-file">
+
+        <div style="visibility:hidden;">{{ form_widget(form.file) }}</div>
+        {{object}}
+        {% if form.delete is defined %}
+        {{ form_row(form.delete) }}
+        {% endif %}
+
+        {% if download_uri is defined and download_uri %}
+        <a href="{{ download_uri }}">{{ 'download'|trans({}, 'VichUploaderBundle') }}  </a>
+        {% endif %}
+    </div>
+{% endspaceless %}
+{% endblock %}
+
+{% block vich_image_row -%}
+    {% set force_error = true %}
+    {{- block('form_row') }}
+{%- endblock %}
+
+{% block vich_image_widget %}
+{% spaceless %}
+    <div class="vich-image">
+        {{ form_widget(form.file) }}
+        {% if form.delete is defined %}
+        {{ form_row(form.delete) }}
+        {% endif %}
+
+        {% if download_uri is defined and download_uri %}
+         <a href="{{ download_uri }}"><img src="{{ download_uri }}" alt="" /></a>
+        {% endif %}
+        {% if show_download_link and download_uri is defined and download_uri%}
+        <a href="{{ download_uri }}">{{ 'download'|trans({}, 'VichUploaderBundle') }}</a>
+        {% endif %}
+    </div>
+{% endspaceless %}
+{% endblock %}
+
+{% block form_row %}
+    <div class="form-group">
+        {{ form_label(form, label|default(null)) }}
+        {#{{ block('form_help') }}#}
+        {{ block('form_addon') }}
+        {{ form_errors(form) }}
+        {{ form_widget(form) }}
+    </div>
+{% endblock form_row %}
+
+{% block form_addon %}
+    {% spaceless %}
+        {% if attr.prepend is defined and attr.prepend is not empty %}
+            {% set prepend = attr.prepend %}
+        {% endif %}
+        {% if attr.append is defined and attr.append is not empty %}
+            {% set append = attr.append %}
+        {% endif %}
+        {% if attr.link is defined and attr.link is not empty %}
+            {% set link = attr.link %}
+        {% endif %}
+
+        {% if (prepend is defined and prepend) or (append is defined and append)  %}
+            <div class="input-group">
+                {% if prepend is defined and prepend %}
+                    <div class="input-group-addon">
+                        {% if link is defined and link and form.vars.value %}
+                            <a target="_blank" href="{{ form.vars.value }}" title="{{ form.vars.label }}">{{ prepend|trans|raw }}</a>
+                        {% else %}
+                            {{ prepend|trans|raw }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {{ form_widget(form) }}
+                {% if append is defined and append %}
+                    <div class="input-group-addon">
+                        {% if link is defined and link and form.vars.value %}
+                            <a target="_blank" href="{{ form.vars.value }}" title="{{ form.vars.label }}">{{ append|trans|raw }}</a>
+                        {% else %}
+                            {{ append|trans|raw }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_addon %}

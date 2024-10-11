@@ -1,0 +1,39 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#eventAlertResume-{{eventAlert.id}}">
+   <i class="fa-solid fa-info"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="eventAlertResume-{{eventAlert.id}}" tabindex="-1" role="dialog" aria-labelledby="eventAlertResumeModalLabel-{{eventAlert.id}}" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="eventAlertResumeModalLabel-{{eventAlert.id}}">{{'EventAlert.modalResume.title'|trans()}}</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <dl>
+               <dt>{{'EventAlert.field.event'|trans()}}</dt>
+               <dd>{{eventAlert.event}}</dd>
+               <dt>{{'EventAlert.field.name'|trans()}}</dt>
+               <dd>{{eventAlert}}</dd>
+               <dt>{{'EventAlert.field.effectiveDate'|trans()}}</dt>
+               <dd>{% if eventAlert.isManualAlert %} {{'EventAlert.field.isManualAlert'|trans()}} {% else %}{{eventAlert.effectiveDate|localizeddate()}}{% endif %}</dd>
+               <dt>{{'EventAlert.field.sendedDate'|trans()}}</dt>
+               <dd>{{eventAlert.sendedDate|localizeddate()}}</dd>
+               <dt>{{'EventAlert.field.sendMethod'|trans()}}</dt>
+               <dd>{% if eventAlert.isSendedManualy%} {{'EventAlert.sendMethods.manual'|trans()}} {% else %} {{'EventAlert.sendMethods.automatique'|trans()}} {% endif %}</dd>
+               <dt>{{'EventAlert.field.recipientEmails'|trans()}} <span class="label label-pill label-success">{{ eventAlert.recipientEmails|length() }}</span></dt>
+               <dd>{{ eventAlert.recipientEmails|join(', ')}}</dd>
+               <dt>{{'EventAlert.field.rejectedEmails'|trans()}} <span class="label label-pill label-danger">{{ eventAlert.rejectedEmails|length() }}</span></dt>
+               <dd>{{ eventAlert.rejectedEmails|join(', ')}}</dd>
+            </dl>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+         </div>
+      </div>
+   </div>
+</div>

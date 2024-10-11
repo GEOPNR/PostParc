@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+
+{% block title %}
+   {{'SearchList.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+
+   <div class="nav-list-actions col-md-3 pull-right">
+      <ul>
+         {% if is_granted('ROLE_CONTRIBUTOR') %}
+            <li class="sf_admin_action_new">
+               <a class="btn btn-primary" href="{{path('searchList_new')}}"><i class="fa-solid fa-plus"></i><span class="libelle">&nbsp;{{'actions.new'|trans}}</span></a>
+            </li>
+         {% endif %}
+         <li><a class="sf-admin-filters-toggle btn btn-default active"><i class="fa-solid fa-filter"></i><span class="libelle">&nbsp;{{'sorts'|trans}}</span></a></li>
+      </ul>
+   </div>
+
+
+   <h1>{{'SearchList.list'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-12"><i class="fa-solid fa-question-circle"></i></a>
+      <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{pagination.getTotalItemCount}}</span> {{'results'|trans}}</small>
+   </h1>
+
+   {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '12'})) }}
+
+   <div class="sf-admin-filters" {% if( app.request.session.has("searchListFilter") and app.request.session.get("searchListFilter")|length ) %} style="display:block;" {% endif %}>
+      {{ form_start(search_form) }}
+      <div class="form-group form-action pull-right">
+         <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+         <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+      </div>
+      {{ form_widget(search_form) }}
+      {{ form_end(search_form) }}
+   </div>
+
+   <form action="{{path('searchList_batch')}}" method="post" >
+      <div class="sf-admin-batch-actions-choice">
+         <div class="form-group">
+            <label for="batch_action">{{'forSelection'|trans}}</label>
+            <select name="batch_action" class="form-control">
+               <option value="">{{'chooseAction'|trans}}</option>
+               <option value="batchDelete">{{'actions.delete'|trans}}</option>
+            </select>
+         </div>
+         <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+         {% include 'default/selectResultsPerPage.html.twig'  %}
+
+      </div>
+      <div class="sf_admin_list no-more-tables">
+         <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+               <tr>
+                  <th id="sf_admin_list_batch_actions">
+                     <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                  </th>
+                  <th>{{ knp_pagination_sortable(pagination, 'SearchList.field.name'|trans(), 'sl.name') }}</th>
+                  <th id="sf_admin_list_th_actions">{{'actions.actions'|trans}}</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for key, searchList in pagination %}
+                  <tr>
+                     <td>
+                        {% if is_granted('ROLE_CONTRIBUTOR') or app.user.id == searchList.createdBy.id %}
+                           <input type="checkbox" name="ids[]" value="{{ searchList.id }}" class="sf_admin_batch_checkbox">
+                        {% endif %}
+                     </td>
+                     <td>{{ searchList.name }}</td>
+                     <td>
+                        <div class="btn-group">
+                           <a href="{{ path('searchList_showResults', {'id': searchList.id}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'SearchList.showResults'|trans}}"><i class="fa-solid fa-eye"></i></a>
+                              {% if is_granted('ROLE_CONTRIBUTOR') or app.user.id == searchList.createdBy.id %}
+                              <a href="{{ path('searchList_showCriterias', {'id': searchList.id}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'SearchList.showCriterias'|trans}}"><i class="fa-solid fa-cogs"></i>
+                              </a>
+                              <a class="btn btn-default btn-xs" href="{{ path('searchList_edit', {'id': searchList.id}) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                                 <i class="fa-solid fa-pencil-alt"></i>
+                              </a>
+                              <a class="btn btn-default btn-xs delete-ajax-button" data-type="searchList" data-id="{{searchList.id}}" href="{{path('searchList_delete', {'id':searchList.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}" >
+                                 <i class="fa-solid fa-trash-alt"></i>
+                              </a>
+                              <a class="btn btn-default btn-xs" href="{{path('searchList_addToSelection', {'id':searchList.id })}}" data-toggle="tooltip" data-placement="right" title="{{'actions.addBasket'|trans}}" >
+                                 <i class="fa-solid fa-shopping-cart"></i>
+                              </a>
+
+                           {% endif %}
+                        </div>
+                     </td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </form>
+
+   <div class="navigation text-center">
+      {{ knp_pagination_render(pagination) }}
+   </div>
+
+{% endblock %}

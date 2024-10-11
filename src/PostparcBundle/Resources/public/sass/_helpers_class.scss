@@ -1,0 +1,112 @@
+/* ========================================================================*/
+/* ! HELPERS CLASS */
+/* ========================================================================*/
+
+
+/* --------------------------------------------*/
+/* ! CLASSIC LAYOUT CLASS */
+/*---------------------------------------------*/
+.inline-block {
+  display: inline-block;
+}
+
+/* ! LOOP THAT GENERATE MARGIN AND PADDING HELPERS CLASS */
+@for $index from 1 through 20 {
+    .mt-#{$index*5} {
+        margin-top: $index*5px !important;
+    }
+    .mb-#{$index*5} {
+        margin-bottom: $index*5px !important;
+    }
+    .mr-#{$index*5} {
+        margin-right: $index*5px !important;
+    }
+    .ml-#{$index*5} {
+        margin-left: $index*5px !important;
+    }
+    .pt-#{$index*5} {
+        padding-top: $index*5px !important;
+    }
+    .pb-#{$index*5} {
+        padding-bottom: $index*5px !important;
+    }
+    .pr-#{$index*5} {
+        padding-right: $index*5px !important;
+    }
+    .pl-#{$index*5} {
+        padding-left: $index*5px !important;
+    }
+    .m-#{$index*5} {
+        margin: $index*5px !important;
+    }
+    .p-#{$index*5} {
+        padding: $index*5px !important;
+    }
+}
+
+
+/* --------------------------------------------*/
+/* ! FLEX LAYOUT CLASS */
+/*---------------------------------------------*/
+.display-flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  @media screen and (max-width: $screen-xs-max) {
+    flex-direction: column;
+  }
+  &.flex-row {
+    @media screen and (max-width: $screen-xs-max) {
+      flex-directon: row;
+    }
+  }
+}
+
+@for $i from 1 through 9 {
+  .flex-container {
+    .flex-#{$i} {
+      flex: $i $i;
+    }
+  }
+}
+
+/* Align vertical */
+.flex-align-center {
+  align-items: center;
+}
+
+.vertical-center-child {
+  @extend .flex-align-center;
+}
+
+/* ! Align horizontal */
+.flex-justify-center {
+  justify-content: center;
+}
+
+/* ! items on start position */
+.flex-justify-start {
+  justify-content: flex-start;
+}
+
+/* ! items on end position */
+.flex-justify-end {
+  justify-content: flex-end;
+}
+
+/* ! Flex-wrap */
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* ! Flex-no-wrap */
+.flex-no-wrap {
+  flex-wrap : nowrap;
+}

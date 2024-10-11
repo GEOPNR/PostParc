@@ -1,0 +1,72 @@
+<script type="text/javascript">
+        jQuery(document).ready(function($, event) {
+            
+            $('#addNewRepresentationBtn').on('click', function(e) {  
+                $('#addNewRepresentationDiv').toggle('slow');
+            });
+            
+            {# ***************   PERSON ****************************** #}
+            /* persons autocomplete*/
+            $('#addRepresentationPersonToOrganization').select2({
+                width: '80%',
+                ajax: {
+                  url: Routing.generate('autocomplete_person'),
+                  dataType: 'json',
+                  delay: 250,
+                  data: function (params) {
+                      return {
+                          q: params.term, // search term
+                      };
+                  },
+                  processResults: function (data) {
+                    return {
+                      results: data.items
+                    };
+                  }
+              },
+              placeholder: {
+                  id: "",
+                  placeholder: "  "
+              },
+              allowClear: true,
+              language: "fr",
+              dropdownAutoWidth: true,
+              minimumInputLength: 1
+            });
+            
+            
+            
+            {# ***************   PFO ****************************** #}
+            /* pfos autocomplete*/
+            $('#addRepresentationPfoToOrganization').select2({
+                width: '80%',
+                ajax: {
+                  url: Routing.generate('autocomplete_pfo'),
+                  dataType: 'json',
+                  delay: 250,
+                  data: function (params) {
+                      return {
+                          q: params.term, // search term
+                      };
+                  },
+                  processResults: function (data) {
+                    return {
+                      results: data.items
+                    };
+                  }
+              },
+              placeholder: {
+                  id: "",
+                  placeholder: "  "
+              },
+              allowClear: true,
+              language: "fr",
+              dropdownAutoWidth: true,
+              minimumInputLength: 1
+            
+            });
+            
+
+            
+        });
+    </script>

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{'User.edit'|trans}} "{{user.username}}"
+{% endblock title %}
+
+{% block body %}
+    <h1>{{'User.edit'|trans}} "{{user.username}}"</h1>
+
+    {{ form_start(edit_form) }}
+
+        {{ form_row(edit_form.firstName) }}
+        {{ form_row(edit_form.lastName) }}
+        {{ form_row(edit_form.email) }}
+        {{ form_row(edit_form.username) }}
+        {{ form_row(edit_form.plainPassword) }}
+        {{ form_widget(edit_form) }}
+        <div class="btn-group form-actions addActionsOnTop">
+            <a class="btn btn-default" href="{{path('user_delete', {'id':user.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+                <i class="fa-solid fa-trash-alt"></i>
+            </a>
+            <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('user_index')}}">
+                <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+            </a>
+            <input type="submit" class="btn btn-primary" value="{{'actions.update'|trans()}}">
+        </div>
+    {{ form_end(edit_form) }}
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            $('#user_roles input[type="checkbox"]').on('change', function() {
+                $('#user_roles input[type="checkbox"]').not(this).prop('checked', false);
+            });
+        });
+   </script>
+{% endblock %}

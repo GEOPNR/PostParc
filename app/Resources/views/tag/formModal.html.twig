@@ -1,0 +1,57 @@
+<div class="modal fade" id="add-new-Tag-Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">{{'Tag.new'|trans()}}</h4>
+         </div>
+         <div class="modal-body">
+            <form id="form-modal-add-new-Tag" method="POST" actions="{{ path('ajax_add_new_tag') }}">
+               {{ form_widget(form) }}
+
+               {{ form_rest(form) }}
+               <input type="submit" id="add-new-tag-submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+            </form>
+         </div>
+
+         <div class="modal-footer">
+
+         </div>
+      </div>
+   </div>
+</div>
+
+<script type="text/javascript">
+
+   $("#form-modal-add-new-Tag").submit(function(event)
+   {
+      /* stop form from submitting normally */
+      if (!event)
+         var event = window.event;
+      event.preventDefault();
+
+      var url = '{{ path('ajax_add_new_tag') }}';
+      var posting = $.post(url, {
+         'tag[name]': $('#tag_name').val(),
+         'tag[parent]': $('#tag_parent').val(),
+         'tag[_token]': $('#tag__token').val()
+      });
+      posting.done(function(data) {
+         $('#add-new-Tag-Modal').modal('toggle');
+         var jsonArray = JSON.parse(data);
+         $('.ajax-add-new-tag').prepend("<option value='" + jsonArray.id + "' selected='selected'>" + jsonArray.name + "</option>");
+         // reload select2
+         $('.ajax-add-new-tag').select2();
+         // ajout alerte
+         var domAlert = "<div id=\"alert-box\"><div class=\"alert alert-success alert-dismissible alert-auto-hidden\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><div class=\"flash-success\">{{ 'flash.addSuccess'|trans() }}</div></div></div>";
+         $('#content').append(domAlert);
+         hideAlertMessage();
+         //$(".alert-auto-hidden").fadeTo(3000, 800).slideUp('slow', function(){
+         //    $(".alert-auto-hidden").alert('close');
+         //});
+      });
+
+   });
+
+</script>
+

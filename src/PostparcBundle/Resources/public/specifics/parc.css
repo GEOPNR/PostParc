@@ -1,0 +1,35 @@
+#form-signin h2 {
+  width: 80%;
+  margin: 0 auto 20px;
+}
+#header #toolbar #logo {
+  width: 214px;
+  height: 60px;
+}
+#header #toolbar #logo a {
+  line-height: 60px;
+}
+#header #toolbar #app-name {
+  line-height: 25px;
+  margin-left: 0px;
+}
+@media (max-width: 1200px) {
+  #header #toolbar #app-name {
+    display: none;
+  }
+}
+#header #toolbar #tools .nav {
+  margin-top: 10px;
+}
+.navbar-inverse {
+  background-color: #00936f;
+  border-color: #006a50;
+}
+.navbar-inverse .navbar-nav > li > a {
+  font-weight: 700;
+}
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+  background-color: #006a50;
+}

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{'Pfo.edit'|trans}} {%if pfo.person %}"{{pfo.person}}"{% endif %}
+{% endblock title %}
+
+{% block body %}
+    <h1>{{'Pfo.edit'|trans}} {%if pfo.person %}"{{pfo.person}}"{% endif %}</h1>
+    {% if person is defined %}
+    {% include 'default/updatedByDiv.html.twig' with {'object': person} %}
+    {% endif %}
+    {{ form_start(edit_form) }}
+        <div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+            <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+            {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+            {{ form_row(edit_form.isShared) }}
+            {{ form_row(edit_form.isEditableByOtherEntities) }}
+         </div>
+        {{ form_widget(edit_form) }}
+        <div class="btn-group form-actions addActionsOnTop">
+            {% if origin is not defined %}
+            {% set origin = '' %}
+            {% endif %}
+            <a class="btn btn-default" href="{{path('pfo_delete', {'id':pfo.id,'origin':origin })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+                <i class="fa-solid fa-trash-alt"></i>
+            </a>
+                
+            <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="
+            {% if origin == 'search' or not(pfo.organization) %}
+                {{ path('search') }}
+            {% else %}
+                {{ path('organization_show',{'id':pfo.organization.id}) }}
+            {% endif %}
+            ">
+                <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+            </a>
+            <input type="submit" class="btn btn-primary" value="{{'actions.edit'|trans()}}">
+        </div>
+    {{ form_end(edit_form) }}
+
+{% endblock %}
+
+{% block javascripts %}
+{{parent()}}
+<script type="text/javascript"  src="{{ asset('bundles/postparc/js/postparc-autocomplete.js') }}"></script>
+{% endblock %}

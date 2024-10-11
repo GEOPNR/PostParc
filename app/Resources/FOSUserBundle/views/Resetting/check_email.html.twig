@@ -1,0 +1,12 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block fos_user_content %}
+  <div id="form-signin">
+    {{ 'resetting.check_email'|trans({'%tokenLifetime%': tokenLifetime})|nl2br }}
+    <div class="text-center">
+      <br/><a href="{{path('homepage')}}" class="btn btn-primary" >{{ 'layout.login'|trans }}</a>
+    </div>
+  </div>
+{% endblock %}

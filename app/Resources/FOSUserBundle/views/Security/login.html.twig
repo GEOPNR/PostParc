@@ -1,0 +1,183 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block fos_user_content %}
+
+    <!-- login form -->
+    <div id="form-signin">
+        <h1>{{app_name}}</h1>
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <br/>
+        {% endif %}
+
+        {% if app.environment == 'demo' %}
+
+            <br/>
+            <form action="{{ path("fos_user_security_check") }}" method="POST" id="reader">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                <input type="hidden" id="username" name="_username" value="demo" />
+                <input type="hidden" id="password" name="_password" value="@demo!" />
+                {% if not ( app.request.cookies.has('demoPostparcAccessValidate') and app.request.cookies.get('demoPostparcAccessValidate') == 1) %}
+                    <input type="hidden" id="loginEmailSend" name="loginEmailSend" class="loginEmailSend">
+                    <input type="hidden" id="civilitySend" name="civilitySend" class="civilitySend">
+                    <input type="hidden" id="nameSend" name="nameSend" class="nameSend">
+                    <input type="hidden" id="informMeSend" name="informMeSend" class="informMeSend">
+                    <input type="hidden" id="structureSend" name="structureSend" class="structureSend">
+                    <input type="hidden" id="profilDemo" name="profilDemo" class="profilDemo">
+                    <input type="button" id="_submit" class="btn btn-primary btn-lg btn-block" name="_submit" value="Accès Lecteur" data-target="#confirm-submit" data-toggle="modal" data-form="reader"/>
+                {% else %}
+                    <input type="submit" id="_submit" class="btn btn-primary btn-lg btn-block" name="_submit" value="Accès Lecteur"/>
+                {% endif  %}
+            </form>
+            <br/>
+            <br/>
+            <form action="{{ path("fos_user_security_check") }}" method="POST" id="admin">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                <input type="hidden" id="username" name="_username" value="postparc" />
+                <input type="hidden" id="password" name="_password" value="@postparc!" />
+                {% if not ( app.request.cookies.has('demoPostparcAccessValidate') and app.request.cookies.get('demoPostparcAccessValidate') == 1) %}
+                    <input type="hidden" id="loginEmailSend" name="loginEmailSend" class="loginEmailSend">
+                    <input type="hidden" id="civilitySend" name="civilitySend" class="civilitySend">
+                    <input type="hidden" id="nameSend" name="nameSend" class="nameSend">
+                    <input type="hidden" id="informMeSend" name="informMeSend" class="informMeSend">
+                    <input type="hidden" id="structureSend" name="structureSend" class="structureSend">
+                    <input type="hidden" id="profilDemo" name="profilDemo" class="profilDemo">
+                    <input type="button" id="_submit" class="btn btn-primary btn-lg btn-block" name="_submit" value="Accès Administrateur" data-target="#confirm-submit" data-toggle="modal" data-form="admin"/>
+                {% else %}
+                    <input type="submit" id="_submit" class="btn btn-primary btn-lg btn-block" name="_submit" value="Accès Administrateur" />
+                {% endif %}
+            </form>
+            {% include 'promoModal.html.twig' %}
+
+            <div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+                <div class="modal-dialog">
+                    <div class="modal-content text-center">
+                        <div class="modal-header">
+                            <h1>Accès démonstration postparc</h1>
+                            <h3>A propos de vous&nbsp;<i class="fa fa-info-circle"></i></h3>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Afin de pouvoir accéder à la version de démonstration,<br/>merci de nous préciser qui vous êtes :
+                            </p>
+
+                            <!-- We display the details entered by the user here -->
+                            <div class="form-group">
+                                <select name="civility" id="civility" class="form-control">
+                                    <option value="madame">Madame</option>
+                                    <option value="monsieur">Monsieur</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="structure" id= "structure" class="form-control" placeholder="Nom de votre structure" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="name" id= "name" class="form-control" placeholder="Nom" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control" id="loginEmail" placeholder="Email" required>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="informMe" id="informMe" value="1"> M'informer des mises à jours et nouvelles fonctionnalités de postparc
+                                </label>
+                            </div>
+                            <div id="helpBlock" class="help-block alert alert-info">Votre adresse email ne sera ni publiée ni utilisée par des tiers.<br/>
+                                Elle nous permettra juste de vous recontacter éventuellement afin de recueillir vos retours sur postparc.</div>
+
+                            <h3>Une question / un avis ?</h3>
+                            <a href="tel:+974764786" alt="0974764786" title="0974764786" class="btn btn-lg btn-primary"><i class="fa fa-phone" aria-hidden="true"></i></a>
+                            <a href="mailto:postparc@probesys.com" alt="postparc@probesys.com" title="postparc@probesys.com" class="btn btn-lg btn-primary"><i class="fa fa-envelope" aria-hidden="true"></i></a>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-lg btn-block" data-dismiss="modal">Annuler</button>
+                            <a href="#" id="submitWithEmail" class="btn btn-primary btn-lg btn-block">Confirmer</a>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <form action="{{ path("fos_user_security_check") }}" method="POST">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                    <input type="text" placeholder="{{ 'security.login.username'|trans }}" class="form-control" id="username" name="_username" value="{{ last_username }}" required="required" />
+                    <input type="password" placeholder="{{ 'security.login.password'|trans }}"  class="form-control" id="password" name="_password" required="required" />
+                    <label class="checkbox">
+                        <input type="checkbox" id="remember_me" name="_remember_me" value="on" />{{ 'security.login.remember_me'|trans }}
+                    </label>
+                    <div class="text-right">
+                        <input type="submit" id="_submit" class="btn btn-primary btn-lg" name="_submit" value="{{ 'security.login.submit'|trans }}" />
+                    </div>
+                    <div class="forgot">
+                        <a href="{{path('fos_user_resetting_request')}}">{{ 'change_password.forgotten_password'|trans }}</a>
+                    </div>
+                </form>
+
+            {% endif %}
+        </div>
+
+
+
+    {% endblock fos_user_content %}
+
+    {% if app.environment == 'demo' and piwik is defined and piwik.enable==1 %}
+        {% block javascripts %}
+            {{ parent() }}
+            <script type="text/javascript">
+                $(document).ready(function($) {
+                    $('#promoModal').modal('show');
+                    $('#confirm-submit').on('show.bs.modal', function(e) {
+                        formID = e.relatedTarget.dataset.form;
+                        _paq.push(['trackEvent', 'Demo', 'openModalLogin', 'open']);
+                    });
+                    $('#submitWithEmail').click(function() {
+                        /* when the submit button in the modal is clicked, submit the form */
+                        if (isEmail($('#loginEmail').val())) {
+                            $('.loginEmailSend').val($('#loginEmail').val());
+                            $('.nameSend').val($('#name').val());
+                            $('.informMeSend').val($('#informMe').is(':checked'));
+                            $('.civilitySend').val($('#civility').val());
+                            $('.structureSend').val($('#structure').val());
+                            $('.profilDemo').val(formID);
+                            $('#' + formID).submit();
+                            _paq.push(['trackEvent', 'Demo', 'confirmLoginForm', 'confirm']);
+                        }
+                    });
+                    function isEmail(email) {
+                        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                        return regex.test(email);
+                    }
+                });
+            </script>
+
+            <!-- Piwik -->
+            <script type="text/javascript">
+                var _paq = _paq || [];
+                _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+                _paq.push(["setCookieDomain", "*.postparc.fr"]);
+                _paq.push(["setDomains", ["*.postparc.fr"]]);
+                _paq.push(['trackPageView']);
+                _paq.push(['enableLinkTracking']);
+                (function() {
+                    var u = "//{{piwik.piwirlUrl}}/";
+                    _paq.push(['setTrackerUrl', u + 'matomo.php']);
+                    _paq.push(['setSiteId', {{piwik.piwikSiteId}}]);
+                    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+                    g.type = 'text/javascript';
+                    g.async = true;
+                    g.defer = true;
+                    g.src = u + 'piwik.js';
+                    s.parentNode.insertBefore(g, s);
+                })();
+            </script>
+            <noscript><p><img src="//{{piwik.piwirlUrl}}/matomo.php?idsite={{piwik.piwikSiteId}};rec=1" style="border:0;" alt="" /></p></noscript>
+            <!-- End Piwik Code -->
+        {% endblock javascripts %}
+    {% endif %}

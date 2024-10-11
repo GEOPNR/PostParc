@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+
+{%  block stylesheets  %}
+    {{ parent()  }}
+    {%  set bgUrl = 'bundles/postparc/images/backgroundLogin/bg-bandeau-'~random(['01', '02', '03', '04', '05','06','07','08'])~'.jpg' %}
+    <style type="text/css">
+                <!--
+                #backgound-homepage{
+                    background: url({{ asset(bgUrl) }}) no-repeat;
+                    background-size:  100vw 30vh;
+                    width: 100vw;
+                    height: 30vh;
+                    margin-bottom: -150px;
+                }
+                -->
+                </style>
+{% endblock stylesheets %}
+
+{% block title %}
+    {{'welcome'|trans|capitalize}} {{app.user}}
+{% endblock title %}
+
+{% block header %}
+    {{ parent()  }}
+    <div id="backgound-homepage" ></div>
+{% endblock header %}
+
+{% block body %}
+
+
+
+    <h1 class="welcome">{{'welcome'|trans|capitalize}} {{app.user}}</h1>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa-solid fa-search"></i> {{'Homepage.quickSearch'|trans}}</h3>
+                </div>
+                <div class="panel-body">
+                    <form name="form"  method="post" action="{{path('search')}}" id="search-form">
+                        <div class="form-group">
+                            <label for="filterFullText">{{'Homepage.quickSearchLabel'|trans}}</label>
+                            <input class="form-control" type="text" id="filterFullText" name="filterFullText" title="{{'Search.label'|trans}}" >
+                            <input type="hidden" name="searchFromHomepage" value="1"/>
+                        </div>
+                        <input class="btn btn-primary" type="submit" name="submitbutton" id="submitbutton" value="{{'actions.search'|trans()}}">
+
+                    </form>
+                </div>
+            </div>
+                        
+            {# affichage quota de mail #}
+            {% if consumptionInfos|length > 0 %}            
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa-solid fa-battery-half" aria-hidden="true"></i> {{'MailStats.yourMailMonthQuota'|trans()}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="progress">
+                            <div class="progress-bar
+                                 {% if consumptionInfos.percentMail > 75 and consumptionInfos.percentMail < 90 %} progress-bar-warning {% endif %}
+                                 {% if consumptionInfos.percentMail >= 90  %} progress-bar-alert {% endif %}
+                                 "
+                                 role="progressbar" aria-valuenow="{{consumptionInfos.percentMail}}" aria-valuemin="0" aria-valuemax="100" style="width: {{consumptionInfos.percentMail}}%;" >
+                                {{consumptionInfos.percentMail}}%
+                                <span class="sr-only">{{consumptionInfos.percentMail}}%</span>
+                            </div>
+                        </div>
+                        <span class="label label-info">{{consumptionInfos.nbEmail}} / {{consumptionInfos.quota}}</span>
+                    </div>
+                </div>            
+            {% endif %}            
+
+        </div>
+
+        {% if searchLists|length > 0 %}
+            <div class="col-xs-12 col-sm-12 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa-solid fa-search-plus" aria-hidden="true"></i> {{'Homepage.yourSearchLists'|trans()}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="list-unstyled">
+                            {% for searchList in searchLists %}
+                                <li><a href="{{ path('searchList_showResults', {'id': searchList.id}) }}" ><small>{{ searchList.name }}</small></a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').use_event_module == true %}
+            {% if events|length > 0 %}
+                <div class="col-xs-12 col-sm-12 col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa-solid fa-calendar" aria-hidden="true"></i> {{'Homepage.yourFuturEvents'|trans()}}</h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-unstyled">
+                                {% for event in events %}
+                                    <li><a href="{{ path('event_show', {'id': event.id}) }}"> <small>{{ event.name }} ({{event.date|localizeddate()}})</small></a></li>
+                                    {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if eventAlerts|length > 0 %}
+                <div class="col-xs-12 col-sm-12 col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa-solid fa-bell" aria-hidden="true"></i> {{'Homepage.yourFuturEventAlerts'|trans()}}</h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-unstyled">
+                                {% for eventAlert in eventAlerts %}
+                                    <li>
+                                        <small>{{eventAlert.effectiveDate|date('d/m/Y')}}: <a href="#" data-toggle="modal" data-target="#eventAlertModal{{eventAlert.id}}">{% if eventAlert.name|length > 0 %} {{ eventAlert.name }} {% else %}{{ 'withoutTitle'|trans() }}{% endif %}</a></small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if favorites|length > 0 %}
+            <div class="col-xs-12 col-sm-12 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa-solid fa-star"></i> {{'yourfavorites'|trans()}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for class in favorites|keys|sort %}
+                            <dt>{{ ('favorites.'~class)|trans() }}</dt>
+                            {%  for favorite in favorites[class] %}
+                                <dd><a href="{{ path(class|lower~'_show', {'id': favorite.id}) }}">{{ favorite }}</a></dd>
+                                {% endfor %}
+                            {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+                
+        
+        
+    </div> {# div class row #}
+
+    {% include 'last_news.html.twig' %}
+    
+    {# mise en place des modals pour les eventalerts #}
+    {% if eventAlerts|length > 0 %}
+        {% for eventAlert in eventAlerts %}
+            <div class="modal fade" id="eventAlertModal{{eventAlert.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">M{% if eventAlert.name|length > 0 %} {{ eventAlert.name }} {% else %}{{ 'withoutTitle'|trans() }}{% endif %}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <dl>
+                                <dt>{{'Event.label'|trans()}}:</dt>
+                                <dd>{{ eventAlert.event.name }}<dd>
+                                <dt>{{'EventAlert.field.message'|trans()}}</dt>
+                                <dd>{{ eventAlert.message|raw }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+
+{% endblock %}

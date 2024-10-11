@@ -1,0 +1,19 @@
+{#{{ dump(coordinatesInfos) }}#}
+<td>{{ label }}</td>
+<td>
+    <input type="hidden" name="coordinateOverrideInfos[{{type}}][{{id}}]" id="hidden-field-{{randomId}}" value="{{selectedValues}}"/>    
+    <select class="form-control" id="{{randomId}}" multiple>
+        <option value=""></option>
+        
+        {% for coordinate in coordinatesInfos %}
+{#            {{ dump(coordinate) }}#}
+            <option value="{{ coordinate.id }}" {% if coordinate.id == selectedValues %} selected {% endif %}>{{ coordinate.label }}</option>
+        {% endfor %}
+    </select>
+</td>
+<td>
+    <a href="javascript:void(0);" class="validateSelectedCoordinates"  id="save-button-{{randomId}}" data-selector="{{ randomId }}" data-label="{{ label }}" data-type="{{type}}" data-id="{{id}}"><i class="fa-solid fa-save"></i></a>
+    <a href="javascript:void(0);" data-label="{{ label }}" id="edit-button-{{randomId}}" data-selectedValues="{{selectedValues}}" data-type="{{type}}" data-id="{{id}}" class="changeCoordinateInExportSelectionModule btn btn-default btn-xs hidden">
+      <i class="fa-solid fa-edit"></i>
+    </a>
+</td>

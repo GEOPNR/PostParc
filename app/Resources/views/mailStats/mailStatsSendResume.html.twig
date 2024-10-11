@@ -1,0 +1,55 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#statResume-{{stat.id}}">
+   <i class="fa-solid fa-info"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="statResume-{{stat.id}}" tabindex="-1" role="dialog" aria-labelledby="statResumeModalLabel-{{stat.id}}" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}">
+               <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="statResumeModalLabel-{{stat.id}}">{{'MailStats.modalResume.title'|trans()}}</h4>
+         </div>
+         <div class="modal-body">
+            <dl>
+               <dt>{{'MailStats.fields.date'|trans()}}</dt>
+               <dd>{{stat.date|localizeddate()}}</dd>
+               <dt>{{'MailStats.fields.createdBy'|trans}}</dt>
+               <dd>{{stat.createdBy}}</dd>
+               <dt>{{'MailStats.fields.sender'|trans()}}</dt>
+               <dd>{{stat.sender}}</dd>
+               <dt>{{'MailStats.fields.subject'|trans()}}</dt>
+               <dd>{{stat.subject}}</dd>
+               <dt>{{'sendMailMassifModule.fields.body'|trans()}}</dt>
+               <dd>{{stat.body|raw}}</dd>
+               <dt>{{'MailStats.fields.nbEmailInSelection'|trans()}}</dt>
+               <dd>{{stat.nbEmail}}</dd>
+               <dt>{{'MailStats.fields.nbOpenedEmail'|trans()}}</dt>
+               <dd>{% if stat.token %} {{stat.nbOpenedEmail}} {% else %} - {% endif %}</dd>
+               <dt>{{'MailStats.fields.openedRatio'|trans()}} ({{ stat.nbOpenedEmail }} / {{ stat.nbEmail }})</dt>
+               <dd>{% if stat.token %} 
+                   {%  set percent =  (stat.nbOpenedEmail*100/stat.nbEmail)|round %}
+                  <div class="progress">
+                     <div class="progress-bar" role="progressbar" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percent }}%;min-width:2em;">
+                        {{ percent }}%
+                     </div>
+                  </div> {% else %} - {% endif %}</dd>
+               <dt>{{'MailStats.fields.listMailSent'|trans()}} <span class="label label-pill label-success">{{ stat.recipientEmails|length() }}</span></dt>
+               <dd>{{ stat.recipientEmails|join(', ')}}</dd>
+               <dt>{{'MailStats.fields.listBadEmails'|trans()}} <span class="label label-pill label-danger">{{ stat.rejectedEmails|length() }}</span></dt>
+               <dd>{{ stat.rejectedEmails|join(', ')}}</dd>
+               {% if stat.token %}
+                 <dt>Stat token</dt>
+                 <dd>{{ stat.token }}</dd>
+               {% endif %}  
+            </dl>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+         </div>
+      </div>
+   </div>
+</div>

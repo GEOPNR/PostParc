@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Event.new'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'Event.new'|trans}}</h1>
+
+   {{ form_start(form) }}
+   <div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+      <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+            {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+            {{ form_row(form.isShared) }}
+            {{ form_row(form.isEditableByOtherEntities) }}
+   </div>
+   <div class="row">
+      <div class="col-md-6 col-sm-12">{{ form_row(form.eventType) }}</div>
+      <div class="col-md-6 col-sm-12">{{ form_row(form.frequency) }}</div>
+      <div class="col-md-6 col-sm-12">{{ form_row(form.date) }}</div>
+      <div class="col-md-6 col-sm-12">{{ form_row(form.duration) }}</div>
+      <div class="col-md-6 col-sm-12">{{ form_row(form.tags) }}</div>
+      <div class="col-md-6 col-sm-12">{{ form_row(form.nbPlace) }}</div>
+      <div class="col-md-6 col-sm-12">{{ form_row(form.organizators) }}</div>
+   </div>
+   <div class="row">
+      <div class="col-md-6 col-sm-12">
+         {{ form_row(form.image) }}
+      </div>
+      <div class="col-md-6 col-sm-12">
+         {{ form_row(form.organizations) }}
+      </div>
+
+   </div>
+   <div class="row">
+      <div class="col-md-12">{{ form_row(form.name) }}</div>
+      <div class="col-md-12">{{ form_row(form.description) }}</div>
+      <div class="col-md-12">{{ form_row(form.coordinate) }}</div>
+   </div>
+   {{ form_rest(form) }}
+
+   <div class="btn-group form-actions addActionsOnTop">
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('event_index')}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+      </a>
+      <input type="submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+      <input type="submit" class="btn btn-info" name="createAndContinue" value="{{'actions.createAndContinue'|trans()}}">
+   </div>
+   {{ form_end(form) }}
+
+{% endblock %}
+
+{% block javascripts %}
+   {{ parent() }}
+   {# masquage des champs cedex, tél, fax, facebook, tweeter #}
+   <script type="text/javascript">
+      $("#postparcbundle_event_coordinate_cedex").closest("div").css("display", "none");
+      $("#postparcbundle_event_coordinate_facebookAccount").closest("div").css("display", "none");
+      $("#postparcbundle_event_coordinate_twitterAccount").closest("div").css("display", "none");
+      $("#postparcbundle_event_coordinate_fax").closest("div").css("display", "none");
+      $("#postparcbundle_event_coordinate_phone").closest("div").css("display", "none");
+      $("#postparcbundle_event_coordinate_mobilePhone").closest("div").css("display", "none");
+   </script>
+{% endblock %}

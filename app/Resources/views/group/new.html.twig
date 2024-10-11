@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Group.new'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'Group.new'|trans}}</h1>
+
+   {{ form_start(form) }}
+
+   <div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+      <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+            {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+            {{ form_row(form.isShared) }}
+            {{ form_row(form.isEditableByOtherEntities) }}
+   </div>
+
+   {{ form_widget(form) }}
+
+   <div class="btn-group form-actions">
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('group_index')}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+      </a>
+      <input type="submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+      <input type="submit" class="btn btn-info" name="createAndContinue" value="{{'actions.createAndContinue'|trans()}}">
+   </div>
+   {{ form_end(form) }}
+
+{% endblock %}

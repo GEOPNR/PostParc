@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Gestion du nombre de résultats affichés par page</h1>
+
+    <div class="col-sm-12 col-md-12">
+
+        <p>Sélectionnez le nombre de résultats que vous souhaitez voir affichés par page :</p>
+
+        {% set values = [10, 25, 50, 100, 200, 500,1000,3000] %}        
+        <div class="btn-group" id="resultsPerPage" data-toggle="buttons">
+            {% for value in values %}
+            <label class="btn btn-default {% if value == resultsPerPage %} active {% else %} {% endif %}">
+                <input type="radio" name="options" id="option1">{{value}}
+            </label>
+            {% endfor %}
+        </div>
+        <a href="javascript:;" class="btn btn-primary btn-maj-rpp" >
+            <i class="fa-solid fa-refresh"></i>&nbsp;<span>{{'actions.update'|trans()}}</span>
+        </a>
+
+    </div>
+{% endblock %}

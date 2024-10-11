@@ -1,0 +1,3 @@
+<a href="javascript:void(0);"  data-id="{{ object.id }}" data-class="{{ object.getClassName() }}" class="favoriteButton btn btn-default btn-xs" title="{{'actions.addOrRemoveFavorites'|trans}}">
+    <i class="{% if app.user.favorites[object.getClassName()] is defined and object.id in app.user.favorites[object.getClassName()] %} fas {% else %} far {% endif %} fa-star" aria-hidden="true"></i>
+</a>

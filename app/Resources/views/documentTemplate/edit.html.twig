@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+   {{'DocumentTemplate.edit'|trans}} "{{documentTemplate.name}}"
+{% endblock title %}
+{% block body %}
+   <h1>{{'DocumentTemplate.edit'|trans}} "{{documentTemplate.name}}"</h1>
+   {% include 'default/updatedByDiv.html.twig' with {'object': documentTemplate} %}
+   {{ form_start(edit_form) }}
+
+   <div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+      <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+            {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+            {{ form_row(edit_form.isShared) }}
+            {{ form_row(edit_form.isEditableByOtherEntities) }}
+   </div>
+
+   <div class="row">
+      <div class="col-md-4">
+         {{ form_row(edit_form.isActive) }}
+      </div>
+      <div class="col-md-4">
+         {{ form_row(edit_form.mailable) }}
+      </div>
+      {%  if edit_form.isPrivate is defined %}
+        <div class="col-md-4">
+           {{ form_row(edit_form.isPrivate) }}
+        </div>
+      {% endif %}
+      <div class="col-md-6">
+         {{ form_row(edit_form.name) }}
+         {{ form_row(edit_form.description) }}
+      </div>
+      <div class="col-md-3">
+         {{ form_row(edit_form.marginTop) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+      <div class="col-md-3">
+         {{ form_row(edit_form.marginBottom) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+      <div class="col-md-3">
+         {{ form_row(edit_form.marginLeft) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+      <div class="col-md-3">
+         {{ form_row(edit_form.marginRight) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-md-6">
+         {{ form_row(edit_form.printFooter) }}
+         {{ form_row(edit_form.footer) }}
+      </div>
+      <div class="col-md-6">
+         {{ form_row(edit_form.printImage) }}
+         {% if documentTemplate.image %}
+            <img src="{{ asset(documentTemplate.getwebPath) }}" alt="{{documentTemplate.image}}" width="150px"/>
+         {% endif %}
+         {{ form_row(edit_form.image) }}
+         <p class="help-block">{{"DocumentTemplate.message.onlyPngFormatIsAllowed"|trans}}</p>
+         {{ form_row(edit_form.printImageAsBackground) }}
+      </div>
+   </div>
+   <hr/>
+   <div class="row">
+      <div class="col-md-8">
+         {{ form_row(edit_form.subject) }}
+         <p class="help-block">{{"DocumentTemplate.message.useOnlyForMassiveEmail"|trans}}</p>
+         {{ form_row(edit_form.body) }}
+         {#{{ form_row(edit_form.attachment) }}#}
+      </div>
+      <div class="col-md-4">
+         <div class="panel panel-default panel-vars">
+            <div class="panel-heading">
+               <i class="fa-solid fa-puzzle-piece"></i>&nbsp;<strong>{{'Variables'|trans}}</strong>
+            </div>
+            <ul>
+               {% for key, field in documentTemplate_availableFields %}
+                  <li>
+                     <div class="var">
+                        <div class="pull-left">
+                           <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[{{field}}]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                        </div>
+                        <div class="info">
+                           {{key|trans}} <small class="name">[[{{field}}]]</small>
+                        </div>
+                     </div>
+                  </li>
+               {% endfor %}
+            </ul>
+         </div>
+      </div>
+   </div>
+   <div class="btn-group form-actions addActionsOnTop">
+      <a class="btn btn-default" href="{{path('documentTemplate_delete', {'id':documentTemplate.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+         <i class="fa-solid fa-trash-alt"></i>
+      </a>
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('documentTemplate_index')}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+      </a>
+      <input type="submit" class="btn btn-primary" value="{{'actions.edit'|trans()}}">
+   </div>
+
+   {{ form_end(edit_form) }}
+   {#{{ elfinder_tinymce_init4('default', {'width':'900', 'height': '450', 'title':'FileExplorer'|trans} ) }}
+   {{ tinymce_init() }}#}
+{% endblock %}

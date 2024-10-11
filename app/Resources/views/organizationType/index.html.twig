@@ -1,0 +1,132 @@
+{% import _self as macros %}
+
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+
+{% block title %}
+{{'OrganizationType.list'|trans}}
+{% endblock title %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="{{ asset('bundles/postparc/css/jquery.treetable.css') }}" type="text/css" rel="stylesheet"/>
+{% endblock stylesheets %}
+{% block javascripts %}
+{{ parent() }}
+<script type="text/javascript" src="{{ asset('bundles/postparc/js/jquery.treetable.js')}}"></script>
+{% endblock javascripts %}
+
+{% block body %}
+<div id="sf_admin_container">
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <h1>{{'OrganizationType.list'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-16"><i class="fa-solid fa-question-circle"></i></a></h1>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="nav-list-actions">
+                <ul>
+                    <li class="sf_admin_action_new"><a class="btn btn-primary" href="{{ path('organizationType_new') }}"><i class="fa-solid fa-plus"></i><span class="libelle">&nbsp;{{'actions.new'|trans}}</span></a></li>
+	                <li><a class="sf-admin-filters-toggle btn btn-default"><i class="fa-solid fa-filter"></i><span class="libelle"> {{'sorts'|trans}}</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+     {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '16'})) }}
+    <div id="sf_admin_header">
+    </div>
+
+
+    <div id="sf_admin_bar">
+        <div class="sf-admin-filters" {% if( app.request.session.has("organizationTypeFilter") and app.request.session.get("organizationTypeFilter")|length ) %} style="display:block;" {% endif %}>
+            {{ form_start(search_form) }}
+            <div class="form-group form-action pull-right">
+                <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+                <button type="submit" name="filter_action" class="btn btn btn-success" value="filter">{{'actions.sort'|trans}}</button>
+            </div>
+            {{ form_widget(search_form) }}
+            {{ form_end(search_form) }}
+        </div>
+        <div class="btn-group pull-right">
+            {% if (app.user ) %}
+            <a class="btn btn-default" href="javascript:;" onclick="$('.myGroups').toggle();">{{'OrganizationType.actions.toggleMyOrganizationTypeAllOrganizationType'|trans}}</a>
+            {% endif %}
+            <a class="btn btn-default" href="javascript:;" onclick="jQuery('#postparcTree').treetable('expandAll'); return false;"><i class="fa-solid fa-plus-square"></i> {{'actions.unCollapseAll'|trans}}</a></li>
+            <a class="btn btn-default" href="javascript:;" onclick="jQuery('#postparcTree').treetable('collapseAll'); return false;"><i class="fa-solid fa-minus-square"></i> {{'actions.collapseAll'|trans}}</a></li>
+        </div>
+        <form action="{{ path('organizationType_batch') }}" method="post" >
+
+            <div class="sf-admin-batch-actions-choice">
+                <div class="form-group">
+                    <label for="batch_action">{{'forSelection'|trans}}</label>
+                    <select name="batch_action" class="form-control">
+                        <option value="">{{'chooseAction'|trans}}</option>
+                        <option value="batchDelete">{{'actions.delete'|trans}}</option>
+                    </select>
+                </div>
+                <input class="btn btn-default" type="submit" value="ok">
+
+            </div>
+            <div class="sf_admin_list no-more-tables">
+                <table class="table table-striped table-condensed table-responsive table-hover treetable" id="postparcTree">
+                    <thead>
+                        <tr>
+                            <th id="sf_admin_list_batch_actions">
+                                <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                            </th>
+                            <th>{{'OrganizationType.field.name'|trans}}</th>
+                            <th id="sf_admin_list_th_actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set parentId = 0 %}
+                        {% for node in htmlTree %}
+                            {{ macros.recursiveNodes(node, parentId) }}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                      <th colspan="6">{{ nbResults }} {% if nbResults > 1 %}{{'results'|trans}}{% else %}{{'result'|trans}}{% endif %}</th>
+                    </tr>
+                  </tfoot>
+                </table>
+
+
+</div>
+{% endblock %}
+
+{% macro recursiveNodes(node, parentId) %}
+
+    {% import _self as macros %}
+    <tr data-tt-id="{{node['id']}}" data-tt-parent-id="{{parentId}}" {% if (app.user and (app.user.id == node.creatorId)) %}class="myGroups"{% endif %}class="myGroups">
+        <td><input type="checkbox" name="ids[]" value="{{node['id']}}" class="sf_admin_batch_checkbox"></td>
+        <td class="sf_admin_text sf_admin_list_td_id">
+            {% if node['__children']|length %}
+               <span class="folder"><i class="fa-solid fa-folder"></i>
+               {% else %}
+                  <span class="file"><i class="fa-solid fa-file"></i>
+                  {% endif %}
+                  &nbsp;{{node['name']}}</span>
+         </td>
+        <td>
+            <div class="btn-group">
+                <a href="{{ path('organizationType_new_subOrganizationType', { 'id': node['id'] }) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" alt="{{'OrganizationType.actions.newsubOrganizationType'|trans}}" title="{{'OrganizationType.actions.newsubOrganizationType'|trans}}"><i class="fa-solid fa-plus"></i></a>
+                {% if node['__children']|length %}
+                <a href="JavaScript:;" onclick="sortBranch({{node['id']}})" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" alt="{{'actions.order'|trans}}" title="{{'actions.order'|trans}}"><i class="fa-solid fa-sort-alpha-asc"></i></a>
+                {% endif %}
+                {% if is_granted('ROLE_CONTRIBUTOR') %}
+                    <a class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}" href="{{ path('organizationType_edit', { 'id': node['id'] }) }}"><i class="fa-solid fa-pencil-alt"></i></a>
+                    <a class="btn btn-default btn-xs delete-ajax-button" data-type="organizationType" data-id="{{node['id']}}" href="{{ path('organizationType_delete', { 'id': node['id'] }) }}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}" ><i class="fa-solid fa-trash-alt"></i></a>
+
+                {% endif %}
+
+            </div>
+        </td>
+    </tr>
+        {% if node['__children']|length %}
+                {% set parentId = node['id'] %}
+                {% for child in node['__children'] %}
+                    {{ macros.recursiveNodes(child, parentId) }}
+                {% endfor %}
+        {% endif %}
+
+{% endmacro %}

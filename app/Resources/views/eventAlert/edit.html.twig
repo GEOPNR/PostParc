@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'EventAlert.edit'|trans}} "{{eventAlert}}"
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'EventAlert.edit'|trans}} "{{eventAlert}}"</h1>
+   {% include 'default/updatedByDiv.html.twig' with {'object': eventAlert} %}
+   {{ form_start(edit_form) }}
+   <div class="row">
+      {% if documentTemplates|length()>0 %}
+         <div class="bs-callout bs-callout-info col-md-12">
+            <div class="form-group">
+               <label for="documentTemplate" class="control-label">{{'sendMailMassifModule.actions.load_DocumentTemplate'|trans}}</label>
+               <select id="documentTemplate" name="documentTemplate" class="form-control">
+                  {% for documentTemplate in documentTemplates %}
+                     <option value="{{documentTemplate.id}}">{{documentTemplate}}</option>
+                  {% endfor %}
+               </select>
+            </div>
+            <a href="javascript:void(0)" class="btn btn-info" id="loadDocumentTemplateForEventAlert">Charger</a>
+         </div>
+      {% endif %}
+      <div class="col-md-8 col-sm-6">
+         {{ form_row(edit_form.name) }}
+         {{ form_row(edit_form.message) }}
+         {{ form_row(edit_form.mailFooter) }}
+         <div class="panel panel-warning">
+            <div class="panel-heading">
+               <i class="fa-solid fa-clock" aria-hidden="true"></i> <label class="control-label">{{ 'EventAlert.sendParameters'|trans() }}</label>
+            </div>
+            <div class="panel-body">
+               <div class="row form-group">
+                    <div class="col-md-6 ">
+                        {{ form_row(edit_form.senderName) }}
+                    </div>
+                    <div class="form-group col-md-6 ">
+                        {{ form_row(edit_form.senderEmail) }}
+                    </div>
+                </div>  
+               {{ form_row(edit_form.isManualAlert) }}
+               {{ form_row(edit_form.gap) }}
+               {{ form_row(edit_form.unit) }}
+               {{ form_row(edit_form.direction) }}
+               {{ form_row(edit_form.recipients) }}
+               {{ form_row(edit_form.addRGPDMessageForPerson) }}
+               {{ form_row(edit_form.onlyForConfirmedContact) }}
+               {{ form_row(edit_form.onlyForUnConfirmedContact) }}
+               {{ form_row(edit_form.limitToRecipiantsList) }}
+               <div class="row form-group">
+                   <div class="col-md-{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}4{% else %}6{% endif %}">
+                       {{ form_row(edit_form.eventAlertPersons) }}
+                   </div>
+                   <div class="col-md-{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}4{% else %}6{% endif %}">
+                       {{ form_row(edit_form.eventAlertPfos) }}
+                   </div>
+                   <div class="{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}col-md-4{% else %}d-none{% endif %}">
+                    {{ form_row(edit_form.eventAlertRepresentations) }}
+                   </div>
+               </div>   
+               {{ form_row(edit_form.isPrintOnInterface) }}
+            </div>
+         </div>
+
+
+      </div>
+      <div class="col-md-4 col-sm-6">
+
+         <div class="panel panel-default panel-vars">
+            <div class="panel-heading">
+               <i class="fa-solid fa-puzzle-piece"></i>&nbsp;<strong>{{'Variables'|trans}}</strong>
+            </div>
+            <div class="panel-body">
+               <ul>
+                  {% for key, field in documentTemplate_availableFields %}
+                     <li>
+                        <div class="var">
+                           <div class="pull-left">
+                              <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[{{field}}]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                           </div>
+                           <div class="info">
+                              {{key|trans}} <small class="name">[[{{field}}]]</small>
+                           </div>
+                        </div>
+                     </li>
+                  {% endfor %}
+                  {# add new variable for confirmation url #}
+                  <li>
+                     <div class="var">
+                        <div class="pull-left">
+                           <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[confirmation_url]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                        </div>
+                        <div class="info">
+                           {{'Event.confirmationUrl'|trans}} <small class="name">[[confirmation_url]]</small>
+                        </div>
+                     </div>
+                  </li>
+               </ul>
+            </div>
+         </div>
+
+         <div class="panel panel-default">
+            <div class="panel-heading">
+               <i class="fa-solid fa-file" aria-hidden="true"></i> <label class="control-label">{{'genericFields.attachments'|trans()}}</label>
+            </div>
+            <div class="panel-body">
+               <ul class="attachments" data-prototype="{{ form_widget(edit_form.attachments.vars.prototype)|e('html_attr') }}">
+                  {% for attachment in edit_form.attachments %}
+                     <li class="col-md-3 panel panel-default">{{ form_widget(attachment) }}</li>
+                     {% endfor %}
+               </ul>
+               {%  if edit_form.attachments|length %}
+                   <div class="alert alert-info">
+                        {{ 'Event.totalattachmentsSize'|trans() }} : {{ eventAlert.getAttachmentSizes() }}
+                   </div>
+               {% endif %}
+            </div>
+         </div>
+      </div>
+
+   </div>
+
+   <div class="btn-group form-actions addActionsOnTop">
+      {% if eventAlert.isSended !=  1 %}
+         <a class="btn btn-default" href="{{path('eventAlert_delete', {'id':eventAlert.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+            <i class="fa-solid fa-trash-alt"></i>
+         </a>
+      {% endif %}
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'EventAlert.actions.backToTheEvent'|trans()}}" data-container="body" href="{{path('event_show', {'id':eventAlert.event.id, 'activeTab': 'eventAlerts' })}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'EventAlert.actions.backToTheEvent'|trans()}}</span>
+      </a>
+      {% if eventAlert.isSended !=  1 %}
+         <input type="submit" class="btn btn-primary" value="{{'actions.edit'|trans()}}">
+      {% endif %}
+   </div>
+   {{ form_end(edit_form) }}
+
+{% endblock %}
+
+{% block javascripts %}
+   {{ parent() }}
+   <script type="text/javascript" src="{{ asset('bundles/postparc/js/attachments.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,338 @@
+{% extends 'base.html.twig' %}
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig %}
+    {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+{% block title %}{{'Search.label'|trans}}{% endblock title %}
+{% block body %}
+    {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '4'})) }} 
+    <form name="form" method="post" action="{{path('search')}}" id="search-form">
+        <div id="search" {% if searchParams.filterAdvancedSearch is defined and searchParams.filterAdvancedSearch==1 %}class="advanced"{% endif %}>
+            <div id="search-default" >
+                <div class="col-sm-5 nav-list-actions pull-right" style="min-height: 50px;">
+                    <ul>
+                        <li><a class="search-reset btn btn-default" id="search-reset" data-confirm="{{'actions.confirmDeleteSearchCriteria'|trans}}" href="{{path('clearSearchParams')}}">{{'Search.actions.clear_criteria'|trans}}</a></li>
+                        <li>
+                            <a href="#" class="btn btn-default search-switch">{{'AdvancedSearch.label'|trans}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <h1 class="sf-admin-title">{{'Search.label'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-4"><i class="fa-solid fa-question-circle"></i></a></h1>
+
+                <div class="row">
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="filterFullText" name="filterFullText" title="{{'Search.label'|trans}}" size="40" placeholder="{{'Search.data-placeholder.filterFullText'|trans}}" value={% if searchParams.q is defined %}"{{searchParams.q}}"{% else %}""{% endif %}>
+                        <input type="hidden" value="{% if searchParams.filterAdvancedSearch is defined %}{{searchParams.filterAdvancedSearch}}{% else %}0{% endif %}" id="filterAdvancedSearch" name="filterAdvancedSearch" />
+                    </div>
+                </div>
+            </div>
+            <div id="search-advanced" >
+                <div id="action_recherche">
+                    <div class="col-sm-5 nav-list-actions pull-right" style="min-height: 50px;">
+                        <ul>
+                            <li><a class="search-reset btn btn-default" id="search-reset" data-confirm="{{'actions.confirmDeleteSearchCriteria'|trans}}" href="{{path('clearSearchParams')}}">{{'Search.actions.clear_criteria'|trans}}</a></li>
+                            <li><a href="#" class="search-switch btn btn-default">{{'Search.label'|trans}}</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h1>{{'AdvancedSearch.label'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-4"><i class="fa-solid fa-question-circle"></i></a></h1>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterFunction">{{'AdvancedSearch.field.function'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.function'|trans}}." name="filterFunction[]" id="filterFunction" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.functions is defined %}
+                                    {% for function in searchParamsObjects.functions %}
+                                        <option value="{{function.id}}" selected>{{function.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterFunction_exclusion" id="filterFunction_exclusion" {% if searchParams.function_exclusion is defined and searchParams.function_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterservice">{{'AdvancedSearch.field.service'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.service'|trans}}." name="filterService[]" id="filterService" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.services is defined %}
+                                    {% for service in searchParamsObjects.services %}
+                                        <option value="{{service.id}}" selected>{{service.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterService_exclusion" id="filterService_exclusion" {% if searchParams.service_exclusion is defined and searchParams.service_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterOrganizationType">{{'AdvancedSearch.field.organizationType'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.organizationType'|trans}}." name="filterOrganizationType[]" id="filterOrganizationType" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.organizationsTypes is defined %}
+                                    {% for organizationsType in searchParamsObjects.organizationsTypes %}
+                                        <option value="{{organizationsType.id}}" selected>{{organizationsType.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterOrganizationType_exclusion" id="filterOrganizationType_exclusion" {% if searchParams.organizationType_exclusion is defined and searchParams.organizationType_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterOrganizationType_sub" {% if not(searchParams.organizationType_sub is defined) or (searchParams.organizationType_sub is defined and searchParams.organizationType_sub=='on') %}checked{% endif %}> {{'AdvancedSearch.subSearch.organizationType'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterOrganization">{{'AdvancedSearch.field.organization'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.organization'|trans}}." name="filterOrganization[]" id="filterOrganization" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.organizations is defined %}
+                                    {% for organization in searchParamsObjects.organizations %}
+                                        <option value="{{organization.id}}" selected>{{organization.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterOrganization_exclusion" id="filterOrganization_exclusion" {% if searchParams.organization_exclusion is defined and searchParams.organization_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterOrganization_includeOrganizationLinked" id="filterOrganization_includeOrganizationLinked" {% if searchParams.organization_includeOrganizationLinked is defined and searchParams.organization_includeOrganizationLinked=='on' %}checked{% endif %}> {{'AdvancedSearch.subSearch.includeOrganizationLinked'|trans}}
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterOrganization_includeSubServiceOrganizations" id="filterOrganization_includeSubServiceOrganizations" {% if not(searchParams.organization_includeSubServiceOrganizations is defined) or ( searchParams.organization_includeSubServiceOrganizations is defined and searchParams.organization_includeSubServiceOrganizations=='on') %}checked{% endif %}> {{'AdvancedSearch.subSearch.includeSubServiceOrganizations'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterTerritory">{{'AdvancedSearch.field.territory'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.territory'|trans}}." name="filterTerritory[]" id="filterTerritory" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.territories is defined %}
+                                    {% for territory in searchParamsObjects.territories %}
+                                        <option value="{{territory.id}}" selected>{{territory.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterTerritory_exclusion" id="filterTerritory_exclusion" {% if searchParams.territory_exclusion is defined and searchParams.territory_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="filterTerritory_sub" {% if not(searchParams.territory_sub is defined) or (searchParams.territory_sub is defined and searchParams.territory_sub=='on') %}checked{% endif %}> {{'AdvancedSearch.subSearch.territory'|trans}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterCity">{{'AdvancedSearch.field.city'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.city'|trans}}." name="filterCity[]" id="filterCity" multiple="true" class="form-control">
+                                {% if searchParamsObjects.cities is defined %}
+                                    {% for city in searchParamsObjects.cities %}
+                                        <option value="{{city.id}}" selected>{{city.getName()}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterCity_exclusion" id="filterCity_exclusion" {% if searchParams.city_exclusion is defined and searchParams.city_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                            <label for="filterDepartment">{{'AdvancedSearch.field.department'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.department'|trans}}." name="filterDepartment[]" id="filterDepartment" multiple="true" class="form-control">
+                                {% if searchParamsObjects.departments is defined %}
+                                    {% for id, name in searchParamsObjects.departments %}
+                                        <option value="{{id}}" selected>{{name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterDepartment_exclusion" id="filterCity_exclusion" {% if searchParams.department_exclusion is defined and searchParams.department_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterGroup">{{'AdvancedSearch.field.group'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.group'|trans}}." name="filterGroup[]" id="filterGroup" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.groups is defined %}
+                                    {% for group in searchParamsObjects.groups %}
+                                        <option value="{{group.id}}" selected>{{group.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterGroup_exclusion" id="filterGroup_exclusion" {% if searchParams.group_exclusion is defined and searchParams.group_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="filterGroup_sub" {% if not(searchParams.group_sub is defined) or (searchParams.group_sub is defined and searchParams.group_sub=='on') %}checked{% endif %}> {{'AdvancedSearch.subSearch.group'|trans}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterTag">{{'AdvancedSearch.field.tag'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.tag'|trans}}." name="filterTag[]" id="filterTag" multiple="true" class="form-control">
+                                {% if searchParamsObjects.tags is defined %}
+                                    {% for tag in searchParamsObjects.tags %}
+                                        <option value="{{tag.id}}" selected>{{tag.name}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterTag_exclusion" id="filterTag_exclusion" {% if searchParams.tag_exclusion is defined and searchParams.tag_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="filterTag_sub" {% if not(searchParams.tag_sub is defined) or (searchParams.tag_sub is defined and searchParams.tag_sub=='on') %}checked{% endif %}> {{'AdvancedSearch.subSearch.tag'|trans}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_event_module == true %}
+                        <div class="col-md-6">
+                            <hr>
+                            <div class="form-group">
+                                <label for="filterMandateType">{{'AdvancedSearch.field.mandateType'|trans}}</label><br>
+                                <select data-placeholder="{{'AdvancedSearch.data-placeholder.mandateType'|trans}}." name="filterMandateType[]" id="filterMandateType" multiple="true" class="form-control">
+                                    {% if searchParamsObjects.mandateTypes is defined %}
+                                        {% for mandateType in searchParamsObjects.mandateTypes %}
+                                            <option value="{{mandateType.id}}" selected>{{mandateType.name}}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="filterMandateType_exclusion" id="filterMandateType_exclusion" {% if searchParams.mandateType_exclusion is defined and searchParams.mandateType_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="filterMandateType_sub" {% if not(searchParams.mandateType_sub is defined) or (searchParams.mandateType_sub is defined and searchParams.mandateType_sub=='on') %}checked{% endif %}> {{'AdvancedSearch.subSearch.mandateType'|trans}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if ('profession' not in personnalFieldsRestriction ) %}
+                        <div class="col-md-6">
+                            <hr>
+                            <div class="form-group">
+                                <label for="filterTag">{{'AdvancedSearch.field.profession'|trans}}</label><br>
+                                <select data-placeholder="{{'AdvancedSearch.data-placeholder.profession'|trans}}." name="filterProfession[]" id="filterProfession" multiple="true" class="form-control">
+                                    {% if searchParamsObjects.professions is defined %}
+                                        {% for profession in searchParamsObjects.professions %}
+                                            <option value="{{profession.id}}" selected>{{profession.name}}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="filterProfession_exclusion" id="filterProfession_exclusion" {% if searchParams.profession_exclusion is defined and searchParams.profession_exclusion=='on' %}checked{% endif %}> {{'AdvancedSearch.searchByExclusion'|trans}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <hr>
+                        <div class="form-group">
+                            <label for="filterMaxUpdatedDate">{{'AdvancedSearch.field.maxUpdatedDate'|trans}}</label>
+                            <input type="text" class="form-control js-datepicker" name="filterMaxUpdatedDate" value="{% if searchParams.maxUpdatedDate is defined %}{{searchParams.maxUpdatedDate}}{% endif %}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="filterCreatedBy">{{'AdvancedSearch.field.createdBy'|trans}}</label><br>
+                            <select data-placeholder="{{'AdvancedSearch.data-placeholder.createdBy'|trans}}." name="filterCreatedBy[]" id="filterCreatedBy" multiple="true" class="form-control" >
+                                {% if searchParamsObjects.createdBys is defined %}
+                                    {% for createdBy in searchParamsObjects.createdBys %}
+                                        <option value="{{createdBy.id}}" selected>{{createdBy}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        
+                    </div>
+                    <div class="col-md-6">
+                        <hr>
+                        {% if isMultiInstance is defined and isMultiInstance == true %} 
+                            <div class="form-group">
+                                <label for="filterCreatedByEntities">{{'AdvancedSearch.field.createdByEntities'|trans}}</label><br>
+                                <select data-placeholder="{{'AdvancedSearch.data-placeholder.createdByEntities'|trans}}." name="filterCreatedByEntities[]" id="filterCreatedByEntities" multiple="true" class="form-control" >
+                                    {% if searchParamsObjects.createdByEntities is defined %}
+                                        {% for entity in searchParamsObjects.createdByEntities %}
+                                            <option value="{{entity.id}}" selected>{{entity}}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="filterObservation">{{'AdvancedSearch.field.observation'|trans}}</label>
+                            <textarea rows="4" cols="30" class="form-control" name="filterObservation" id="filterObservation">{% if searchParams.observation is defined %}{{searchParams.observation}}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <input class="btn btn-primary" type="submit" name="submitbutton" id="submitbutton" value="{{'actions.search'|trans()}}">
+    </form>
+    {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '4'})) }}
+
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/postparc/js/search.js')}}"></script>
+{% endblock javascripts %}

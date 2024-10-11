@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Selection.sendMailMassif.label'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <div class="row">
+      <div class="col-sm-12 col-md-8">
+         <h1>{{'Selection.sendMailMassif.label'|trans}}</h1>
+      </div>
+   </div>
+
+   <div id="sf_admin_content">
+      {% if nbElements > 0 %}
+          
+         
+         <div class="row">
+            {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').hideBlocSendWithSendingMailSoftware != true %} 
+            <div class="col-sm-12 col-md-{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_massiveMail %}6{% else %}12{% endif %}">
+               <div class="bs-callout bs-callout-info">
+                  <h4>{{'Selection.sendMailMassif.messages.send_by_user_soft'|trans}}</h4>
+                  <p>{{'Selection.sendMailMassif.messages.first_message'|trans({'%nbItems%': nbElements })|raw }}</p>
+                  <p>{{'Selection.sendMailMassif.messages.option_message'|trans }} :</p>
+                  <div class="btn-group">
+                     {# TO #}
+                     {% set emailString = '?to=' ~ app.user.email %}
+                     {% for email in emails %}
+                        {% set emailString = emailString ~ ';' ~ email %}
+                     {% endfor %}
+                     {% set emailString = emailString ~ '&body=Bonjour' %}
+                     <a href="mailto:{{emailString}}" class="btn btn-default"> {{ 'Selection.sendMailMassif.to'|trans }} (TO) </a>
+
+                     {# CC #}
+                     {% set emailString = '?to=' ~ app.user.email ~ '&cc=' %}
+                     {% for email in emails %}
+                        {% set emailString = emailString ~ ';' ~ email %}
+                     {% endfor %}
+                     {% set emailString = emailString ~ '&body=Bonjour' %}
+                     <a href="mailto:{{emailString}}" class="btn btn-default"> {{ 'Selection.sendMailMassif.cc'|trans }} (CC)</a>
+
+                     {# BCC #}
+                     {% set emailString = '?to=' ~ app.user.email ~ '&bcc=' %}
+                     {% for email in emails %}
+                        {% set emailString = emailString ~ ';' ~ email %}
+                     {% endfor %}
+                     {% set emailString = emailString ~ '&body=Bonjour' %}
+                     <a href="mailto:{{emailString}}" class="btn btn-default"> {{ 'Selection.sendMailMassif.bcc'|trans }} (BCC)</a>
+                  </div>
+
+                  <p>{{'Selection.sendMailMassif.messages.csv_message'|trans}} : <a class="btn btn-default" href="{{path('selection_exportCsvEmails')}}"><i class="fa-solid fa-external-link"></i>&nbsp;{{'Selection.sendMailMassif.export_emails'|trans }} </a>
+                  </p>
+               </div>
+            </div>
+            {% endif %}      
+            {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_massiveMail == true %}
+               <div class="col-sm-12 col-md-{% if app.session.get('currentEntityConfig').hideBlocSendWithSendingMailSoftware != true %}6{% else %}12{% endif %}">
+                  <div class="bs-callout bs-callout-info text-center">
+                     <h4>{{'Selection.sendMailMassif.messages.send_by_sendMailMassif_module'|trans}}</h4>
+                     <a class="btn btn-primary" href="{{path('mailMassiveModule_index')}}"><i class="fa fa-solid fa-paper-plane"></i>&nbsp;{{'Selection.sendMailMassif.sendMailMassif_module_access'|trans }}</a>
+                  </div>
+               </div>
+            {% endif %}
+         </div>
+         
+
+
+         {% if nbItemsWhitoutEmail > 0 %}
+            <div class="alert alert-warning bs-callout bs-callout-warning">
+               <div class="row">
+                  <div class="col-md-12 col-lg-8">
+                     <strong>{{'warning'|trans}} !</strong>
+                     <ul class="no-item">
+
+                        {% if itemsWhitoutEmail.persons is defined and itemsWhitoutEmail.persons|length  %}
+                           <li>
+                               <span class="label label-pill label-info">{{itemsWhitoutEmail.persons|length}}</span>  {{'Pfo.field.person'|trans}}(s) dans votre sélection n'ont pas d'adresse email
+                               <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmailPersons" aria-expanded="false" aria-controls="itemsWhitoutEmailPersons">Voir les personnes</a>
+                           <li/>
+                           <div class="collapse" id="itemsWhitoutEmailPersons">
+                               <div class="well">
+                                   <ul>
+                                   {% for personWithoutEmail in personWithoutEmails %}
+                                       {% set link = path('person_edit', {'id': personWithoutEmail.id}) %}
+                                       <li><a href="{{ link }}" target='_blank'>{{ personWithoutEmail }}</a></li>
+                                   {% endfor %}
+                                   </ul>
+                               </div>
+                           </div>
+                        {% endif %}
+
+                        {% if itemsWhitoutEmail.organizations is defined and itemsWhitoutEmail.organizations|length  %}
+                           <li>
+                              <span class="label label-pill label-info">{{itemsWhitoutEmail.organizations|length}}</span> {{'Pfo.field.organization'|trans}}(s) dans votre sélection n'ont pas d'adresse email
+                             <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmailOrganization" aria-expanded="false" aria-controls="itemsWhitoutEmailOrganization">Voir les organismes</a>
+                           <li/>
+                           <div class="collapse" id="itemsWhitoutEmailOrganization">
+                               <div class="well">
+                                   <ul>
+                                   {% for organizationWithoutEmail in organizationWithoutEmails %}
+                                      {% set link = path('organization_edit', {'id': organizationWithoutEmail.id}) %}
+                                      <li><a href="{{ link }}" target='_blank'>{{ organizationWithoutEmail }}</a></li>
+                                   {% endfor %}
+                                   </ul>
+                               </div>
+                           </div>
+                        {% endif %}
+
+                        {% if itemsWhitoutEmail.pfos is defined and itemsWhitoutEmail.pfos|length %}
+                           <li>
+                              <span class="label label-pill label-info">{{itemsWhitoutEmail.pfos|length}}</span> {% if itemsWhitoutEmail.pfos|length >1 %}{{'Pfo.labels'|trans}}{% else %}{{'Pfo.label'|trans}}{% endif %} dans votre sélection n'ont pas d'adresse email
+                              <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmail" aria-expanded="false" aria-controls="itemsWhitoutEmail">Voir les personnes</a>
+                           </li>
+                           <div class="collapse" id="itemsWhitoutEmail">
+                               <div class="well">
+                                   <ul>
+                                   {% for itemWhitoutEmail in itemsWhitoutEmail.pfos %}
+                                        {% set link = path('pfo_edit', {'id': itemWhitoutEmail.id}) %}
+                                       <li><a href="{{ link }}" target='_blank'>{{ itemWhitoutEmail }}</a></li>
+                                   {% endfor %}
+                                   </ul>
+                               </div>
+                           </div>
+                        {% endif %}
+                        {% if itemsWhitoutEmail.representations is defined and itemsWhitoutEmail.representations|length %}
+                           <li>
+                              <span class="label label-pill label-info">{{itemsWhitoutEmail.representations|length}}</span> {% if itemsWhitoutEmail.representations|length >1 %}{{'Representation.labels'|trans}}{% else %}{{'Representation.label'|trans}}{% endif %} dans votre sélection n'ont pas d'adresse email
+                            <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmailReps" aria-expanded="false" aria-controls="itemsWhitoutEmailReps">Voir les {{'Representation.label'|trans}}(s)</a>
+                            </li>
+                            <div class="collapse" id="itemsWhitoutEmailReps">
+                                <div class="well">
+                                    <ul>
+                                        {% for itemWhitoutEmail in itemsWhitoutEmail.representations %}
+                                            {% set link = path('representation_edit', {'id': itemWhitoutEmail.id}) %}
+                                            <li><a href="{{ link }}" target='_blank'>{{ itemWhitoutEmail }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <li><span class="label label-pill label-primary">{{nbItemsWhitoutEmail}}</span> étiquette(s) seront générées pour l'envoi postal</li>
+                     </ul>
+                  </div>
+
+                  <div class="col-md-12 col-lg-4" id="impressionOptionShowHide">
+                     <a href="javascript:void(0)" class="btn btn-default">{{'Selection.print.actions.showPrintoptions'|trans }} <i class="fa-solid fa-caret-square-down"></i></a>
+                  </div>
+               </div>
+               <form action="{{path('print_selection_withoutEmail_execute')}}" method="post" class="form-inline" role="form">
+                  {{ render(controller('PostparcBundle:Selection:getPrintOptions')) }}
+
+               </form>
+            </div>
+         {% endif %}
+
+         <div class="alert alert-info bs-callout bs-callout-info">
+            <p><strong>{{'help'|trans}} : </strong>{{'Selection.sendMailMassif.messages.list_mail'|trans }} ({{nbEmails}}) :
+            </p>
+            <div id="copyDiv">{% for email in emails %}{{email}}; {% endfor %}</div>
+            <p>
+               <button class="btn btn-primary" data-clipboard-action="copy" data-clipboard-target="#copyDiv" aria-label="emails copiés">{{'Selection.sendMailMassif.messages.copy_to_clipboard'|trans}}</button>
+            </p>
+         </div>
+         <div class="alert alert-success" id="copyDivSuccess" style="display:none;">{{'Selection.sendMailMassif.messages.copy_to_clipboard_success'|trans}}</div>
+      {% else %}
+         <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-12">
+               <div class="alert alert-warning" role="alert">{{'flash.emptySelection'|trans}}</div>
+            </div>
+         </div>
+      {% endif %}
+   </div>
+
+{% endblock body %}
+
+{% block javascripts %}
+   {{ parent() }}
+   <script type="text/javascript" src="{{ asset('bundles/postparc/js/node_modules/clipboard/dist/clipboard.min.js')}}"></script>
+
+{% endblock javascripts %}

@@ -1,0 +1,99 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+
+    role_hierarchy:
+        ROLE_USER_PLUS:      ROLE_USER
+        ROLE_CONTRIBUTOR:      ROLE_USER_PLUS
+        ROLE_CONTRIBUTOR_PLUS: ROLE_CONTRIBUTOR
+        ROLE_ADMIN:            ROLE_CONTRIBUTOR_PLUS
+        ROLE_ADMIN_MULTI_INSTANCE: [ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH]
+        ROLE_SUPER_ADMIN:      [ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH]
+
+    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    providers:
+        in_memory:
+            memory: ~
+        fos_userbundle:
+            id: fos_user.user_provider.username
+        auth_token_user_provider:
+            id: auth_token_user_provider
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api-doc:
+            pattern: ^/api/doc
+            security: false
+            anonymous: ~
+
+        event-confirmation:
+           pattern: ^/event/(confirmEventPresence|unconfirmEventPresence)/*
+           security: false
+           anonymous: ~
+           
+        vCard:
+            pattern: ^/vCard/*
+            security: false
+            anonymous: ~
+
+        rgpd-unsuscribe:
+           pattern: ^/rgpd/*
+           security: false
+           anonymous: ~
+           
+        email-opened:
+           pattern: ^/email-opened/*
+           security: false
+           anonymous: ~   
+           
+        api:
+            pattern: ^/api/*
+            stateless: true
+            simple_preauth:
+                authenticator: auth_token_authenticator
+            provider: auth_token_user_provider
+            anonymous: ~
+
+        main:
+            anonymous: ~
+
+            pattern: ^/
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+            logout:       true
+            anonymous:    true
+            logout_on_user_change: true
+            switch_user:
+                provider:   fos_userbundle
+            remember_me:
+                secret: "%secret%"
+                lifetime: 2232000
+                path:     /
+                # by default, the feature is enabled by checking a
+                # checkbox in the login form (see below), uncomment the
+                # following line to always enable it.
+                #always_remember_me: true
+
+    access_control:
+        - { path: ^/event/confirmEventPresence/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/event/unConfirmEventPresence/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/doc, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/auth-tokens, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/$, roles: ROLE_API }
+        - { path: ^/rgpd/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/imports, roles: ROLE_IMPORT }
+        - { path: ^/admin/, role: ROLE_ADMIN }
+        - { path: ^/, role: ROLE_USER }
+        - { path: ^/efconnect, role: ROLE_USER }
+        - { path: ^/elfinder, role: ROLE_USER }

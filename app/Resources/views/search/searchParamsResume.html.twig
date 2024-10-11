@@ -1,0 +1,213 @@
+<div id="sf_admin_bar">
+   <div class="bs-callout bs-callout-info">
+      <h3>{{'Search.criteria'|trans}}</h3>
+
+      <a href="javascript:;" id="searchCriteriaShowHide" ><small>{{ 'Search.showHideSearchCriteria'|trans() }}</small></a><br/>
+
+      <div class="filter-enum" id ="searchCriteriaBlock" style="display: none;">
+         {% set criteriaDelimter='' %}
+         {# q #}
+         {% if searchParams.q is defined  and searchParams.q!='' %}
+            {{criteriaDelimter|raw}}{{'Search.label'|trans}} :
+            <span>{{searchParams.q}}</span>
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# functions #}
+         {% if searchParamsObjects.functions is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.function'|trans}} :
+            {% for function in searchParamsObjects.functions %}
+               <span class="label label-danger">{{function.name}}</span>
+            {% endfor %}
+            {% if searchParams.function_exclusion is defined and searchParams.function_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# services #}
+         {% if searchParamsObjects.services is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.service'|trans}} :
+            {% for service in searchParamsObjects.services %}
+               <span class="label label-danger">{{service.name}}</span>
+            {% endfor %}
+            {% if searchParams.service_exclusion is defined and searchParams.service_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# organizationTypes #}
+         {% if searchParamsObjects.organizationTypes is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.organizationType'|trans}} :
+            {% for organizationType in searchParamsObjects.organizationTypes %}
+               <span class="label label-danger">{{organizationType.name}}</span>
+            {% endfor %}
+            {% if searchParams.organizationType_exclusion is defined and searchParams.organizationType_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% if searchParams.organizationType_sub is defined and searchParams.organizationType_sub == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.organizationType'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# organizations #}
+         {% if searchParamsObjects.organizations is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.organization'|trans}} :
+            {% for organization in searchParamsObjects.organizations %}
+               <span class="label label-danger">{{organization.name}}</span>
+            {% endfor %}
+            {% if searchParams.organization_exclusion is defined and searchParams.organization_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% if searchParams.organization_includeOrganizationLinked is defined and searchParams.organization_includeOrganizationLinked == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.includeOrganizationLinked'|trans}}</span>
+            {% endif %}
+            {% if searchParams.organization_includeSubServiceOrganizations is defined and searchParams.organization_includeSubServiceOrganizations == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.includeSubServiceOrganizations'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# cities #}
+         {% if searchParamsObjects.cities is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.city'|trans}} :
+            {% for city in searchParamsObjects.cities %}
+               <span class="label label-danger">{{city.getName()}}</span>
+            {% endfor %}
+            {% if searchParams.city_exclusion is defined and searchParams.city_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# departments #}
+         {% if searchParamsObjects.departments is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.department'|trans}} :
+            {% for department in searchParamsObjects.departments %}
+               <span class="label label-danger">{{department}}</span>
+            {% endfor %}
+            {% if searchParams.department_exclusion is defined and searchParams.department_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# groups #}
+         {% if searchParamsObjects.groups is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.group'|trans}} :
+            {% for group in searchParamsObjects.groups %}
+               <span class="label label-danger">{{group.name}}</span>
+            {% endfor %}
+            {% if searchParams.group_exclusion is defined and searchParams.group_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% if searchParams.group_sub is defined and searchParams.group_sub == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.group'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# territories #}
+         {% if searchParamsObjects.territories is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.territory'|trans}} :
+            {% for territory in searchParamsObjects.territories %}
+               <span class="label label-danger">{{territory.name}}</span>
+            {% endfor %}
+            {% if searchParams.territory_exclusion is defined and searchParams.territory_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% if searchParams.territory_sub is defined and searchParams.territory_sub == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.territory'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# tags #}
+         {% if searchParamsObjects.tags is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.tag'|trans}} :
+            {% for tag in searchParamsObjects.tags %}
+               <span class="label label-danger">{{tag.name}}</span>
+            {% endfor %}
+            {% if searchParams.tag_exclusion is defined and searchParams.tag_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% if searchParams.tag_sub is defined and searchParams.tag_sub == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.tag'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# professions #}
+         {% if searchParamsObjects.professions is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.profession'|trans}} :
+            {% for profession in searchParamsObjects.professions %}
+               <span class="label label-danger">{{profession.name}}</span>
+            {% endfor %}
+            {% if searchParams.profession_exclusion is defined and searchParams.profession_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# mandateTypes #}
+         {% if searchParamsObjects.mandateTypes is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.mandateType'|trans}} :
+            {% for mandateType in searchParamsObjects.mandateTypes %}
+               <span class="label label-danger">{{mandateType.name}}</span>
+            {% endfor %}
+            {% if searchParams.mandateType_exclusion is defined and searchParams.mandateType_exclusion == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.searchByExclusion'|trans}}</span>
+            {% endif %}
+            {% if searchParams.mandateType_sub is defined and searchParams.mandateType_sub == 'on' %}
+               <span class="label label-info">{{'AdvancedSearch.subSearch.mandateType'|trans}}</span>
+            {% endif %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# createdBy #}
+         {% if searchParamsObjects.createdBys is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.createdBy'|trans}} :
+            {% for createdBy in searchParamsObjects.createdBys %}
+               <span class="label label-danger">{{createdBy}}</span>
+            {% endfor %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# createdByEntities #}
+         {% if searchParamsObjects.createdByEntities is defined %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.createdByEntities'|trans}} :
+            {% for entity in searchParamsObjects.createdByEntities %}
+               <span class="label label-danger">{{entity}}</span>
+            {% endfor %}
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# maxUpdatedDate #}
+         {% if searchParams.maxUpdatedDate is defined and searchParams.maxUpdatedDate!='' %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.maxUpdatedDate'|trans}} :
+            <span class="label label-info">{{searchParams.maxUpdatedDate}}</span>
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+         {# observation #}
+         {% if searchParams.observation is defined and searchParams.observation!='' %}
+            {{criteriaDelimter|raw}}{{'AdvancedSearch.field.observation'|trans}} :
+            <span>{{searchParams.observation}}</span>
+            {% set criteriaDelimter='<br/>' %}
+         {% endif %}
+      </div>
+
+      {{criteriaDelimter|raw}}
+
+      <div class="actions">
+         <div class="row">
+            <div class="col-md-6 col-sm-12">
+               <a id="effacer_critere" class="btn btn-default" data-confirm="{{'actions.confirmDeleteSearchCriteria'|trans}}" href="{{path('clearSearchParams')}}">{{'Search.actions.clear_criteria'|trans}}</a>
+               <a id="enregistrer_critere" class="btn btn-default" href="{{path('searchList_new')}}">{{'Search.actions.create_new_list'|trans}}</a>
+            </div>
+            <div class="col-md-6 col-sm-12">
+               {% if searchLists|length > 0 %}
+                  <form action="{{path('searchList_saveOnExisting')}}" method="post" class="form form-inline pull-right">
+                     <label for="liste_liste">{{'Search.actions.save_criteria_on_list'|trans}}</label>
+                     <select name="searchListId" class="form-control" id="liste_liste" required>
+                        <option value="" selected="selected"></option>
+                        {% for searchList in searchLists %}
+                           <option value="{{searchList.id}}">{{searchList.name|truncate(50)}}</option>
+                        {% endfor %}
+                     </select>
+                     <input class="btn btn-success" type="submit" value="{{'actions.record'|trans}}">
+                  </form>
+               {% endif %}
+            </div>
+         </div>
+
+      </div>
+   </div>
+</div>

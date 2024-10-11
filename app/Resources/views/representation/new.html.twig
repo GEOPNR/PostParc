@@ -1,0 +1,143 @@
+{{ form_start(form) }}
+<div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+   <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+         {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+         {{ form_row(form.isShared) }}
+         {{ form_row(form.isEditableByOtherEntities) }}
+</div>
+<div class="row">
+    <div class="alert alert-info col-md-12" role="alert">
+        {{ 'Representation.coordinateHelpMessage'|trans() }}
+    </div>
+</div>    
+<div class="row">
+   <div class="col-md-4">
+      {{ form_row(form.natureOfRepresentation) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.mandateType) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.personFunction) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.elected) }}
+   </div>
+   <div class="col-md-6 form-group">
+      {{ form_label(form.organization) }}
+      {{ form_widget(form.organization) }}
+      <select id="postparcbundle_representation_organization" name="postparcbundle_representation[organization]" class="organization-select2-autocomplete form-control" >
+      </select>
+   </div>
+   <div class="col-md-6 form-group">
+      {{ form_row(form.service) }}
+   </div>
+   <div class="col-md-6 form-group">
+      {{ form_row(form.observation) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.mandatDurationIsUnknown) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.beginDate) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.mandatDuration) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.estimatedTime) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.periodicity) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.estimatedCost) }}
+   </div>
+   <div class="col-md-4">
+      {{ form_row(form.tags) }}
+   </div>
+
+</div>
+<div class="row">
+   <div class="col-md-2">
+      {{ form_row(form.sendAlert) }}
+   </div>
+   <div class="col-md-5">
+      {{ form_row(form.nbMonthBeforeAlert) }}
+   </div>
+   <div class="col-md-5">
+      {{ form_row(form.alerter) }}
+   </div>
+
+   <div class="col-md-12">
+      <div class="form-group">
+         <div id="postparcbundle_representation_attachments" data-prototype="">
+            <i class="fa-solid fa-file" aria-hidden="true"></i> {{ form_label(form.attachments) }}
+         </div>
+      </div>
+   </div>
+   <div class="col-md-12">
+      <ul class="attachments" data-prototype="{{ form_widget(form.attachments.vars.prototype)|e('html_attr') }}">
+         {% for attachment in form.attachments %}
+            <li class="col-md-3 panel panel-default">{{ form_widget(attachment) }}</li>
+            {% endfor %}
+      </ul>
+   </div>
+   <div class="col-md-12">
+      <div class="form-group">
+         <div class="checkbox">
+            <label>
+               <input type="checkbox" id="postparcbundle_representation_specific_coordinate{{ pfoId ? '-' ~ pfoId : '' }}"
+                      data-toggle="collapse" data-target="#collapseCoordinate{{ pfoId ? '-' ~ pfoId : '' }}" aria-expanded="false" aria-controls="collapseCoordinate">
+               {{ 'Representation.field.specificCoordinate'|trans }}
+            </label>
+         </div>
+      </div>
+      <div class="collapse" id="collapseCoordinate{{ pfoId ? '-' ~ pfoId : '' }}">
+         <div class="well">
+            <div class="row">
+               <div class="col-md-12">
+                  {{ form_row(form.coordinate.addressLine1) }}
+               </div>
+               <div class="col-md-12">
+                  {{ form_row(form.coordinate.addressLine2) }}
+               </div>
+               <div class="col-md-12">
+                  {{ form_row(form.coordinate.addressLine3) }}
+               </div>
+               <div class="col-md-4">
+                  {{ form_row(form.coordinate.cedex) }}
+               </div>
+               <div class="col-md-4">
+                  {{ form_row(form.coordinate.phone) }}
+               </div>
+               <div class="col-md-4">
+                  {{ form_row(form.coordinate.mobilePhone) }}
+               </div>
+               <div class="col-md-4">
+                  {{ form_row(form.coordinate.fax) }}
+               </div>
+               <div class="col-md-8">
+                  {{ form_row(form.coordinate.webSite) }}
+               </div>
+               <div class="col-md-6">
+                  {{ form_row(form.coordinate.city) }}
+               </div>
+               <div class="col-md-6">
+                  {{ form_row(form.coordinate.email) }}
+               </div>
+               <div class="col-md-6">
+                  {{ form_row(form.coordinate.facebookAccount) }}
+               </div>
+               <div class="col-md-6">
+                  {{ form_row(form.coordinate.twitterAccount) }}
+               </div>
+               {{ form_row(form.coordinate) }}
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+{{ form_row(form.attachments, {'label': false}) }}
+{{ form_end(form) }}

@@ -1,0 +1,13 @@
+{% if confirmationDate or unconfirmationDate or representedBy  %}
+   {% if confirmationDate %}
+    {{ confirmationDate|localizeddate() }} <span class="label label-success">{{ 'Event.present'|trans() }}</span>
+   {% endif %}
+   {% if unconfirmationDate %}
+       {{ unconfirmationDate|localizeddate() }} <span class="label label-warning">{{ 'Event.missing'|trans() }}</span>
+   {% endif %}
+   {% if representedBy %}
+       {{ representedByDate|localizeddate() }} <br><span class="label label-info">{{ 'Event.representedBy'|trans( {'%representedBy%' : representedBy} ) }}</span>
+   {% endif %}   
+{% else %} 
+    <a href="{{ path('confirmEventPresence', {'confirmationToken':confirmationToken}) }}" title="{{ 'Event.actions.manualConfirmPresence'|trans() }}"  target="_blank"><i class="fa-solid fa-calendar-check"></i></a>
+{% endif %}

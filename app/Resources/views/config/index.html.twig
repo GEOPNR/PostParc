@@ -1,0 +1,288 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block title %}
+    {{'config.title'|trans()}}
+{% endblock title %}
+{% block body %}
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+        {% set url = path('config_module' , {'id': entityID}) %}
+    {% else %}
+        {% set url = path('config_module') %}
+    {% endif %}
+
+    <h1>{{'config.title'|trans()}}</h1>
+    <form method="POST" actions="{{url}}">
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <h4><i class="fa-solid fa-cogs" aria-hidden="true"></i>&nbsp;{{'config.labels.general_config'|trans()}}</h4>
+                <div class="well well-sm form-group">
+                    <label for="tabsOrder_personalCoordinate" >{{'config.tabsOrder'|trans()}}</label>
+                    <div class="row">
+                        {% for key, value in configs.tabsOrder %} 
+                            {% if key != 'representations' or (key == 'representations' and app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true)  %}
+                                <div class="col-md-6">
+                                    {{('TabsLabels.'~key)|trans}}
+                                </div>
+                                <div class="col-md-6">
+                                    <input type='number' min="1" max="4" class="form-control" name='tabsOrder[{{ key }}]' id='tabsOrder_persons' value='{{ value }}' />
+                                </div>
+                            {% endif %}
+                        {% endfor %}                   
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <h4><i class="fa-solid fa-cubes" aria-hidden="true"></i>&nbsp;{{'config.labels.richeTextConfig'|trans()}}</h4>
+                <div class="well well-sm form-group">
+                    <label >{{'config.summernote_font_family'|trans()}}</label>
+                    <select name="summernote_font-family" class="form-control select2">
+                        <option value=""></option>
+                        {%  for font_family_key,font_family_value in summernote_font_families %}
+                            <option {% if configs.summernote_font_family == font_family_value %} selected {% endif %} value="{{ font_family_value }}">{{ font_family_value }}</option>
+                        {% endfor %}
+                    </select>
+                    <br/>     
+                    <label >{{'config.summernote_font_size'|trans()}}</label>
+                    <select name="summernote_font_size" class="form-control select2">
+                        <option value=""></option>
+                        {%  for font_size_key,font_size_value in summernote_font_sizes %}
+                            <option {% if configs.summernote_font_size == font_size_value %} selected {% endif %}  value="{{ font_size_value }}">{{ font_size_value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>                     
+            </div>            
+
+            <div class="col-md-6 col-sm-12">
+                <h4><i class="fa-solid fa-calendar-check" aria-hidden="true"></i>&nbsp;{{'config.labels.event_module'|trans()}} <a href="javascript:void(0)"  data-toggle="modal" data-target="#modalEvent"><i class="fa-solid fa-question-circle"></i></a></h4>
+                <div class="well well-sm">
+                    <div class="checkbox" >
+                        <label for="use_event_module">
+                            <input type="checkbox" name="use_event_module" {% if configs.use_event_module %} checked {% endif %}>{{'config.use_event_module'|trans()}}
+                        </label>
+                    </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="modalEvent" tabindex="-1" role="dialog" aria-labelledby="modalEventLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="modalEventLabel">{{'config.labels.event_module'|trans()}}</h4>
+                            </div>
+                            <div class="modal-body">
+                                {{'config.modulePresentation.event'|trans()|nl2br}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end Modal -->
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <h4><i class="fa-solid fa-bullhorn" aria-hidden="true"></i>&nbsp;{{'config.labels.representation_module'|trans()}} <a href="javascript:void(0)"  data-toggle="modal" data-target="#modalRepresentation"><i class="fa-solid fa-question-circle"></i></a></h4>
+                <div class="well well-sm">
+                    <div class="checkbox" >
+                        <label for="use_representation_module">
+                            <input type="checkbox" name="use_representation_module" {% if configs.use_representation_module %} checked {% endif %}>{{'config.use_representation_module'|trans()}}
+                        </label>
+                    </div>
+                    <a href="{{ path('mandateType_index') }}" class="btn btn-default"><i class="fa-solid fa-cogs" aria-hidden="true"></i>&nbsp;{{ 'nav.mandateTypes'|trans() }}</a>
+                    <a href="{{ path('natureOfRepresentation_index') }}" class="btn btn-default"><i class="fa-solid fa-cogs" aria-hidden="true"></i>&nbsp;{{ 'nav.natureOfRepresentations'|trans() }}</a>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="modalRepresentation" tabindex="-1" role="dialog" aria-labelledby="modalRepresentationLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="modalRepresentationLabel">{{'config.labels.representation_module'|trans()|nl2br}}</h4>
+                            </div>
+                            <div class="modal-body">
+                                {{'config.modulePresentation.representation'|trans()|nl2br}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end Modal -->
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <h4><i class="fa-solid fa-lock" aria-hidden="true"></i>&nbsp;{{'config.labels.readerLimitations_module'|trans()}} <a href="javascript:void(0)"  data-toggle="modal" data-target="#modalReaderLimitations"><i class="fa-solid fa-question-circle"></i></a></h4>
+                <div class="well well-sm">
+                    <div class="checkbox" >
+                        <label for="use_readerLimitations_module">
+                            <input type="checkbox" name="use_readerLimitations_module" {% if configs.use_readerLimitations_module %} checked {% endif %}>{{'config.use_readerLimitations_module'|trans()}}
+                        </label>
+                    </div>
+                    <a href="{{path('readerLimitation_manage')}}" class="btn btn-default">{{'config.edit_readerLimitations_module'|trans()}}</a>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="modalReaderLimitations" tabindex="-1" role="dialog" aria-labelledby="modalReaderLimitationsLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="modalReaderLimitationsLabel">{{'config.labels.readerLimitations_module'|trans()}}</h4>
+                            </div>
+                            <div class="modal-body">
+                                {{'config.modulePresentation.readerLimitations'|trans()|nl2br}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end Modal -->
+            </div>
+
+
+            {% if isMultiInstance is defined and isMultiInstance == true %}
+                <div class="col-md-6 col-sm-12">
+                    <h4><i class="fa-solid fa-cubes" aria-hidden="true"></i>&nbsp;{{'config.labels.multiInstance_module'|trans()}} <a href="javascript:void(0)"  data-toggle="modal" data-target="#modalMultinstance"><i class="fa-solid fa-question-circle"></i></a></h4>
+                    <div class="well well-sm">
+                        <div class="checkbox">
+                            <label for="shared_contents">
+                                <input type="checkbox" name="shared_contents" {% if configs.shared_contents %} checked {% endif %}>{{'config.shared_contents'|trans()}}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label for="show_SharedContents">
+                                <input type="checkbox" name="show_SharedContents" {% if configs.show_SharedContents %} checked {% endif %}>{{'config.show_SharedContents'|trans()}}
+                            </label>
+                        </div>
+                        {% if is_granted('ROLE_SUPER_ADMIN')%}
+                            <a href="{{ path('entity_index') }}" class="btn btn-default">{{ 'nav.entity'|trans() }}</a>
+                        {% endif %}
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modalMultinstance" tabindex="-1" role="dialog" aria-labelledby="multiInstanceModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="multiInstanceModalLabel">{{'config.labels.multiInstance_module'|trans()}}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    {{'config.modulePresentation.multiInstance'|trans()|nl2br}}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end Modal -->
+                </div>
+            {% endif %}
+
+            {% if (is_granted('ROLE_SUPER_ADMIN') or configs.use_massiveMail )%}
+                <div class="col-md-6 col-sm-12">
+                    <h4><i class="fa-solid fa-paper-plane" aria-hidden="true"></i>&nbsp;{{'config.labels.massiveMail_module'|trans()}}  <a href="javascript:void(0)"  data-toggle="modal" data-target="#modalMassiveMail"><i class="fa-solid fa-question-circle"></i></a></h4>
+                    <div class="well well-sm">
+                        {% if is_granted('ROLE_SUPER_ADMIN')%}
+                            <div class="checkbox">
+                                <label for="use_massiveMail">
+                                    <input type="checkbox" name="use_massiveMail" {% if configs.use_massiveMail %} checked {% endif %}>{{'config.use_massiveMail'|trans()}}
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="max_email_per_month">{{'config.max_email_per_month'|trans()}}</label>
+                                <input type="text" class="form-control" id="max_email_per_month" name="max_email_per_month" value="{{configs.max_email_per_month}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="domains_alowed">{{'config.domains_alowed'|trans()}}</label>
+                                <input type="text" class="form-control" id="max_email_per_month" name="domains_alowed" value="{{configs.domains_alowed|join(';')}}">
+                                <span id="helpBlock" class="help-block">{{'config.helps.domains_alowed'|trans()}}</span>
+                            </div>
+                        {% endif %}
+                        <div class="checkbox ">
+                            <label for="hideSpecificMessageField">
+                                <input type="checkbox" name="hideSpecificMessageField" {% if configs.hideSpecificMessageField %} checked {% endif %}>{{'config.hideSpecificMessageField'|trans()}}
+                            </label>
+                        </div>
+                        <div class="checkbox ">
+                            <label for="emptySpecificMessageField">
+                                <input type="checkbox" name="emptySpecificMessageField" {% if configs.emptySpecificMessageField %} checked {% endif %}>{{'config.emptySpecificMessageField'|trans()}}
+                            </label>
+                        </div>
+                        <div class="checkbox ">
+                            <label for="hideBlocSendWithSendingMailSoftware">
+                                <input type="checkbox" name="hideBlocSendWithSendingMailSoftware" {% if configs.hideBlocSendWithSendingMailSoftware %} checked {% endif %}>{{'config.hideBlocSendWithSendingMailSoftware'|trans()}}
+                            </label>
+                        </div>
+                        <a href="{{ path('mailStats_index') }}" class="btn btn-default"><i class="fa-solid fa-line-chart" aria-hidden="true"></i>&nbsp;{{ 'nav.mailStats'|trans() }}</a>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modalMassiveMail" tabindex="-1" role="dialog" aria-labelledby="modalMassiveMailLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="modalMassiveMailLabel">{{'config.labels.massiveMail_module'|trans()}}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    {{'config.modulePresentation.readerLimitations'|trans()|nl2br}}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end Modal -->
+                </div>
+            {% endif %}
+
+            <div class="col-md-6 col-sm-12">
+                <h4><i class="fa-solid fa-envelope" aria-hidden="true"></i>&nbsp;{{'config.labels.sendInBlue_module'|trans()}} <a href="javascript:void(0)"  data-toggle="modal" data-target="#modalsendInBlue"><i class="fa-solid fa-question-circle"></i></a> </h4>
+                <div class="well well-sm">
+                    <div class="checkbox">
+                        <label for="use_sendInBlue_module">
+                            <input type="checkbox" id="use_use_sendInBlue_module" name="use_sendInBlue_module" class="hiddenPilotField" data-hiddedClass="sendInBlueApiKey" {% if configs.use_sendInBlue_module is defined and configs.use_sendInBlue_module %} checked {% endif %}>{{'config.use_sendInBlue_module'|trans()}}
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="sendInBlue_apiKey">{{'config.labels.sendInBlue_apiKey'|trans()}}</label>
+                        <input type="text" class="form-control sendInBlueApiKey" id="sendInBlue_apiKey" name="sendInBlue_apiKey" value="{% if configs.sendInBlue_apiKey is defined %} {{ configs.sendInBlue_apiKey }} {% endif %}">
+                        <small id="sendInBlue_apiKey_help" class="form-text text-muted"><a href="https://help.sendinblue.com/hc/fr/articles/209467485-%C3%80-quoi-sert-ma-cl%C3%A9-API-et-comment-la-r%C3%A9cup%C3%A9rer" target="_blank">{{ 'SendInBlue.messages.get_your_api_key_link'|trans() }}</a></small>
+                    </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="modalsendInBlue" tabindex="-1" role="dialog" aria-labelledby="modalsendInBlueLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="modalMassiveMailLabel">{{'config.labels.sendInBlue_module'|trans()}}</h4>
+                            </div>
+                            <div class="modal-body">
+                                {{'config.modulePresentation.sendInBlue'|trans()|nl2br}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end Modal -->
+            </div>
+        </div>                    
+        <div class="row">                    
+
+            <div class="col-md-12">
+                <hr/>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">{{'actions.update'|trans()}}</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

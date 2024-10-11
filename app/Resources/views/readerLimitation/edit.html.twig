@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    {{'ReaderLimitation.edit'|trans}}
+{% endblock title %}
+{% block body %}
+    <h1>{{'ReaderLimitation.edit'|trans}}</h1>
+    {% include 'default/updatedByDiv.html.twig' with {'object': readerLimitation} %}
+    <form name="form" method="post" action="{{path('readerLimitation_manage')}}" id="readerLimitation-form">
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <div class="form-group">
+                    <label for="filterFunction">{{'AdvancedSearch.field.function'|trans}}</label><br>
+                    <select data-placeholder="{{'AdvancedSearch.data-placeholder.function'|trans}}." name="filterFunction[]" id="filterFunction" multiple="true" class="form-control" >
+                        {% if readerLimitationObject.functions is defined %}
+                            {% for function in readerLimitationObject.functions %}
+                                <option value="{{function.id}}" selected>{{function.name}}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="filterFunction_noLimitation" id="filterFunction_noLimitation" {% if readerLimitationObject.function_noLimitation is not defined or readerLimitationObject.function_noLimitation=='on' %}checked{% endif %}> {{'ReaderLimitation.noLimitation'|trans}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <hr>
+                <div class="form-group">
+                    <label for="filterservice">{{'AdvancedSearch.field.service'|trans}}</label><br>
+                    <select data-placeholder="{{'AdvancedSearch.data-placeholder.service'|trans}}." name="filterService[]" id="filterService" multiple="true" class="form-control" >
+                        {% if readerLimitationObject.services is defined %}
+                            {% for service in readerLimitationObject.services %}
+                                <option value="{{service.id}}" selected>{{service.name}}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="filterService_noLimitation" id="filterService_noLimitation" {% if readerLimitationObject.service_noLimitation is not defined or readerLimitationObject.service_noLimitation=='on' %}checked{% endif %}> {{'ReaderLimitation.noLimitation'|trans}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <div class="form-group">
+                    <label for="filterOrganizationType">{{'AdvancedSearch.field.organizationType'|trans}}</label><br>
+                    <select data-placeholder="{{'AdvancedSearch.data-placeholder.organizationType'|trans}}." name="filterOrganizationType[]" id="filterOrganizationType" multiple="true" class="form-control" >
+                        {% if readerLimitationObject.organizationTypes is defined %}
+                            {% for organizationType in readerLimitationObject.organizationTypes %}
+                                <option value="{{organizationType.id}}" selected>{{organizationType.name}}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="filterOrganizationType_noLimitation" id="filterOrganizationType_noLimitation" {% if readerLimitationObject.organizationType_noLimitation is not defined or readerLimitationObject.organizationType_noLimitation=='on' %}checked{% endif %}> {{'ReaderLimitation.noLimitation'|trans}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <hr>
+                <div class="form-group">
+                    <label for="filterTags">{{'AdvancedSearch.field.tag'|trans}}</label><br>
+                    <select data-placeholder="{{'AdvancedSearch.data-placeholder.tag'|trans}}." name="filterTag[]" id="filterTag" multiple="true" class="form-control">
+                        {% if readerLimitationObject.tags is defined %}
+                            {% for tag in readerLimitationObject.tags %}
+                                <option value="{{tag.id}}" selected>{{tag.name}}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="filterTag_noLimitation" id="filterTag_noLimitation" {% if readerLimitationObject.tag_noLimitation is not defined or readerLimitationObject.tag_noLimitation=='on' %}checked{% endif %}> {{'ReaderLimitation.noLimitation'|trans}}
+                        </label>
+                    </div>
+                </div>
+            </div>                    
+        </div>
+                   
+        <div class="row">
+            <div class="col-md-6">
+                <hr>
+                <div class="form-group">
+                    <label for="filterMandateTypes">{{'AdvancedSearch.field.mandateType'|trans}}</label><br>
+                    <select data-placeholder="{{'AdvancedSearch.data-placeholder.mandateType'|trans}}." name="filterMandateType[]" id="filterMandateType" multiple="true" class="form-control">
+                        {% if readerLimitationObject.mandateTypes is defined %}
+                            {% for mandateType in readerLimitationObject.mandateTypes %}
+                                <option value="{{mandateType.id}}" selected>{{mandateType.name}}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="filterMandateType_noLimitation" id="filterMandateType_noLimitation" {% if readerLimitationObject.mandateType_noLimitation is not defined or readerLimitationObject.mandateType_noLimitation=='on' %}checked{% endif %}> {{'ReaderLimitation.noLimitation'|trans}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>            
+                    
+        <input class="btn btn-primary" type="submit" name="submitbutton" id="submitbutton" value="{{'actions.save'|trans()}}">                    
+    </form>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script type="text/javascript" src="{{ asset('bundles/postparc/js/search.js')}}"></script>
+{% endblock javascripts %}

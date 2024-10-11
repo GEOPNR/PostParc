@@ -1,0 +1,196 @@
+<script type="text/javascript">
+
+    {% if app.user.coordinate and app.user.coordinate.coordinate|length > 0 %}
+        {% set coordinate = app.user.coordinate.coordinate %}
+    {% else %}
+        {% set coordinate = app.user.entity.coordinate %}
+    {% endif %}
+        // hack to show map correctly when tab is show
+        $("body").on('shown.bs.tab', '#maplink', function() {
+    {% if coordinate|length > 0 %}
+            var mymap = L.map('mapid', {
+                center: [{{coordinate}}],
+                zoom: 10,
+                minZoom: 6,
+                maxZoom: 17,
+                animate: true
+            });
+    {% else %}
+            var mymap = L.map('mapid');
+    {% endif %}
+
+            L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(mymap);
+
+    {# marker definition #}
+            var iconInfo = L.icon({
+                iconUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-info.svg')}}',
+                shadowUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-shadow.png')}}',
+                iconAnchor: [22, 94],
+                popupAnchor: [-5, -85]
+            });
+            var iconSuccess = L.icon({
+                iconUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-success.svg')}}',
+                shadowUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-shadow.png')}}',
+                iconAnchor: [22, 94],
+                popupAnchor: [-5, -85]
+            });
+            var iconWarning = L.icon({
+                iconUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-warning.svg')}}',
+                shadowUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-shadow.png')}}',
+                iconAnchor: [22, 94],
+                popupAnchor: [-5, -85]
+            });
+            var iconDanger = L.icon({
+                iconUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-danger.svg')}}',
+                shadowUrl: '{{ asset('bundles/postparc/lib/leaflet/images/marker-shadow.png')}}',
+                iconAnchor: [22, 94],
+                popupAnchor: [-5, -85]
+            });
+
+
+    {% set arrayOfLatLngs = '' %}
+    {% set separator = '' %}
+
+            var markers = L.markerClusterGroup({
+                chunkedLoading: true
+            });
+
+    {# persons #}
+
+    {% for person in allResults.persons %}
+        {% if person.getCoordinate() and person.getCoordinate().getCoordinate()|length %}
+                    var marker = L.marker(
+                            [{{person.getCoordinate().getCoordinate()}}],
+                            {
+                                title: "{{person}}",
+                                icon: iconInfo
+                            }
+                    ).addTo(mymap);
+                    marker.bindPopup("{{'loading'|trans()}}...").openPopup();
+                    marker.on('click', function(e) {
+                        var popup = e.target.getPopup();
+                        var content = "<a href='{{ path('person_show', {'id': person.id}) }}'>{{person}}</a>";
+                                var url = Routing.generate('ajax_getCoordinateDistanceInfos', { id: {{person.getCoordinate().id}} }
+                                );
+                        $.get(url).done(function(data) {
+                            popup.setContent(content + data);
+                            popup.update();
+                        });
+                    });
+                    marker.closePopup();
+                    markers.addLayer(marker);
+            {% set arrayOfLatLngs = arrayOfLatLngs~separator~'['~person.getCoordinate().getCoordinate()~']' %}
+            {% set separator = ',' %}
+        {% endif %}
+    {% endfor %}
+
+
+    {# organizations #}
+
+    {% for organization in allResults.organizations %}
+        {% if organization.getCoordinate() and organization.getCoordinate().getCoordinate()|length %}
+                    var marker = L.marker(
+                            [{{organization.getCoordinate().getCoordinate()}}],
+                            {
+                                title: "{{organization}}",
+                                icon: iconWarning
+                            }
+                    ).addTo(mymap);
+                    marker.bindPopup("{{'loading'|trans()}}...").openPopup();
+                    marker.on('click', function(e) {
+                        var popup = e.target.getPopup();
+                        var content = "<a href='{{ path('organization_show', {'id': organization.id}) }}'>{{organization}}</a>";
+                                var url = Routing.generate('ajax_getCoordinateDistanceInfos', { id: {{organization.getCoordinate().id}} }
+                                );
+                        ;
+                        $.get(url).done(function(data) {
+                            popup.setContent(content + data);
+                            popup.update();
+                        });
+                    });
+                    marker.closePopup();
+                    markers.addLayer(marker);
+            {% set arrayOfLatLngs = arrayOfLatLngs~separator~'['~organization.getCoordinate().getCoordinate()~'],' %}
+        {% endif %}
+    {% endfor %}
+
+
+    {# pfos #}
+    {% for pfo in allResults.pfos %}
+        {% if pfo.getPreferedCoordinateAddress() %}
+            {% set coordinate = pfo.getPreferedCoordinateAddress() %}
+        {% else %}
+            {% set coordinate = pfo.getOrganization().getCoordinate() %}
+        {% endif %}
+        {% if coordinate and coordinate.getCoordinate()|length %}
+                var marker = L.marker(
+                        [{{coordinate.getCoordinate()}}],
+                        {
+                            title: "{{pfo}}",
+                            icon: iconSuccess
+                        }
+                ).addTo(mymap);
+                marker.bindPopup("{{'loading'|trans()}}...").openPopup();
+                marker.on('click', function(e) {
+                    var popup = e.target.getPopup();
+                    var content = "<a href='{{ path('pfo_show', {'id': pfo.id}) }}'>{{pfo}}</a>";
+                            var url = Routing.generate('ajax_getCoordinateDistanceInfos', { id: {{coordinate.id}} }
+                            );
+                    $.get(url).done(function(data) {
+                        popup.setContent(content + data);
+                        popup.update();
+                    });
+                });
+                marker.closePopup();
+                markers.addLayer(marker);
+            {% set arrayOfLatLngs = arrayOfLatLngs~separator~'['~coordinate.getCoordinate()~']' %}
+            {% set separator = ',' %}
+        {% endif %}
+    {% endfor %}
+
+    {# representations #}
+    {% if allResults.representations is defined %}
+        {% for representation in allResults['representations'] %}
+            {% if representation.getCoordinateObject() and representation.getCoordinateObject().getCoordinate()|length %}
+                    var marker = L.marker(
+                            [{{representation.getCoordinateObject().getCoordinate()}}],
+                            {
+                                title: "{{representation}}",
+                                icon: iconDanger
+                            }
+                    ).addTo(mymap);
+                {% if representation.organization %}
+
+                        marker.bindPopup("{{'loading'|trans()}}...").openPopup();
+                        marker.on('click', function(e) {
+                            var popup = e.target.getPopup();
+                            var content = "<a href='{{path('organization_show', {'id': representation.organization.id, 'activeTab': 'representations'})}}'>{{representation}}</a>";
+                                    var url = Routing.generate('ajax_getCoordinateDistanceInfos', { id: {{representation.getCoordinateObject().id}} }
+                                    );
+                            ;
+                            $.get(url).done(function(data) {
+                                popup.setContent(content + data);
+                                popup.update();
+                            });
+                        });
+                        marker.closePopup();
+                {% endif %}
+                        markers.addLayer(marker);
+                {% set arrayOfLatLngs = arrayOfLatLngs~separator~'['~representation.getCoordinateObject().getCoordinate()~']' %}
+                {% set separator = ',' %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if app.user.entity.coordinate|length == 0 %}
+            var bounds = new L.LatLngBounds([{{arrayOfLatLngs}}]);
+            mymap.fitBounds(bounds);
+    {% endif %}
+            mymap.addLayer(markers);
+            mymap.invalidateSize(false);
+
+        });
+
+</script>

@@ -1,0 +1,206 @@
+{% set representationElectedLabels = {'0':'Representation.elected'|trans(),'1':'Representation.designated'|trans() } %}
+{% set origin = path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params'))  %}
+
+{% if representations|length %}
+    <form action="{{path('representation_batch', {'origin':origin})}}" method="post" >
+        <div class="sf-admin-batch-actions-choice">
+            <div class="form-group">
+                <label for="batch_action">{{'forSelection'|trans}}</label>
+                <select name="batch_action" class="form-control">
+                    <option value="">{{'chooseAction'|trans}}</option>
+                    {% if is_granted('ROLE_CONTRIBUTOR') %}
+                        <option value="batchDelete">{{'actions.delete'|trans}}</option>
+                    {% endif %}
+                    <option value="batchAddBasket">{{'actions.addBasket'|trans}}</option>
+                </select>
+            </div>
+            <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+
+        </div>
+        <table class="table table-striped table-condensed table-responsive table-hover representations">
+            <thead>
+                <tr>
+                    <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+                    <th>{{'genericFields.name'|trans}}</th>
+                    <th>{{'genericFields.actions'|trans}}</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for representation in representations %}
+                    {% if representation.deletedAt is null and (is_granted("ROLE_SUPER_ADMIN") or representation.entity.id == app.user.entity.id or (representation.entity.id != app.user.entity.id and representation.isShared==1 ) ) %}
+                        {% if ( (representation.entity.id != app.user.entity.id and representation.isEditableByOtherEntities !=1 ) and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                            {% set editable = false %}
+                        {% else %}
+                            {% set editable = true %}
+                        {% endif %}
+                        <tr id="representation-{{ representation.id }}" {% if editable==false %} class="warning"{% endif %}>
+                            <td><input type="checkbox" name="representationIds[]" value="{{ representation.id }}" class="sf_admin_batch_checkbox"></td>
+                            <td>
+                                {% set url = "#" %}
+                                {% if representation.getPerson() and representation.getPerson().deletedAt is null %}
+                                    {% if representation.getPerson().entity.id == app.user.entity.id or is_granted("ROLE_SUPER_ADMIN") or (representation.getPerson().entity.id != app.user.entity.id and representation.getPerson().isShared==1)%}
+                                        <a href="{{ path('person_show', {'id': representation.getPerson().id }) }}">{{ representation.getPerson() }}</a>
+                                    {% else %}
+                                        {{ representation.getPerson() }}
+                                    {% endif %}
+                                    &nbsp;/&nbsp;
+                                {% endif %}
+                                {% if representation.getPfo() and representation.getPfo().deletedAt is null %}
+                                    {% if representation.getPfo().entity.id == app.user.entity.id or is_granted("ROLE_SUPER_ADMIN") or (representation.getPfo().entity.id != app.user.entity.id and representation.getPfo().isShared==1)%}
+                                        <a href="{{ path('pfo_show', {'id': representation.getPfo().id }) }}">{{ representation.getPfo() }}</a>
+                                    {% else %}
+                                        {{ representation.getPfo() }}
+                                    {% endif %}
+                                    &nbsp;/&nbsp;
+                                {% endif %}
+                                {% if representation.getOrganization() and representation.getOrganization().deletedAt is null %}
+                                    {% if representation.getOrganization().entity.id == app.user.entity.id or is_granted("ROLE_SUPER_ADMIN") or (representation.getOrganization().entity.id != app.user.entity.id and representation.getOrganization().isShared==1)%}
+                                        <a href="{{ path('organization_show', {'id': representation.getOrganization().id }) }}">
+                                            {% if representation.getOrganization().getAbbreviation() %}
+                                                {{ representation.getOrganization().getAbbreviation() }}
+                                            {% else %}
+                                                {{ representation.getOrganization() }}
+                                            {% endif %}
+                                        </a>
+                                    {% else %}
+                                        {% if representation.getOrganization().getAbbreviation() %}
+                                            {{ representation.getOrganization().getAbbreviation() }}
+                                        {% else %}
+                                            {{ representation.getOrganization() }}
+                                        {% endif %}
+                                    {% endif %}
+                                    &nbsp;
+                                {% endif %}
+                                {% if  representation.getService() %}
+                                    ({{ representation.getService() }})
+                                {% endif %}
+                                ({% if representation.elected %}{{representationElectedLabels[representation.elected]}}{% endif %}{% if not(representation.mandatDurationIsUnknown) and representation.endDate %}-> {{ representation.endDate|date("d/m/Y") }}{% endif %}){% if representation.mandateType %} | {{representation.mandateType}}{% endif %}
+                            </td>
+                            <td >
+                                <a href="{{path('representation_addBasket', {'id':representation.id })}}?origin={{  path(app.request.get('_route'), app.request.get('_route_params')) }}" class="btn btn-default btn-xs add-to-selection-button" data-type="representation" data-id="{{representation.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                                <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#representation-{{ representation.id }}-modal">
+                                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                                </button>
+                                <a href="{{path('representation_exportVcard', {'id':representation.id })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.exportVcard'|trans}}"><i class="fa-solid fa-address-card"></i></a>
+                                    {% if editable and is_granted("ROLE_CONTRIBUTOR") %}
+                                    <a class="btn btn-primary btn-xs" href="{{ path('representation_edit', {'id': representation.id }) }}?origin={{  path(app.request.get('_route'), app.request.get('_route_params')) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                                        <i class="fa-solid fa-pencil-alt" aria-hidden="true"></i>
+                                    </a>
+                                    <button class="btn btn-warning btn-xs delete-representation" data-representationId="{{ representation.id }}" {% if pfoId is defined %}data-pfo="{{ pfoId }}"{%endif%} data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.delete'|trans}}">
+                                        <i class="fa-solid fa-trash-alt" aria-hidden="true"></i>
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>{# empty Twig template #}
+    </form>
+    {# modal for representation show #}
+    {% for representation in representations %}
+        {% if (is_granted("ROLE_SUPER_ADMIN") or representation.entity.id == app.user.entity.id or (representation.entity.id != app.user.entity.id and representation.isShared==1) ) %}
+            {% if (representation.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                {% set editable = false %}
+            {% else %}
+                {% set editable = true %}
+            {% endif %}
+            <div class="modal fade" id="representation-{{ representation.id }}-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">{{representation}}</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            <h3><i class="fa-solid fa-info-circle" aria-hidden="true"></i>&nbsp;{{'informations'|trans}}</a></h3>
+                            <ul class="list-unstyled">
+                                {% if representation.service %}
+                                    <li><strong>{{'Representation.field.service'|trans()}}:</strong>
+                                        {{representation.service}}</li>
+                                    {% endif %}
+                                    {% if representation.observation|length >0 %}
+                                    <li><strong>{{'Representation.field.observation'|trans()}}:</strong>
+                                        {{representation.observation}}</li>
+                                    {% endif %}
+                                    {% if representation.elected|length >0 %} 
+                                    <li><strong>{{'Representation.field.elected'|trans()}}:</strong>
+                                        {{representationElectedLabels[representation.elected]}}</li>
+                                    {% endif %}
+                                <li><strong>{{'Representation.field.mandateType'|trans()}}:</strong>
+                                    {{representation.mandateType}}</li>
+                                    {% if not(representation.mandatDurationIsUnknown) %}
+                                    <li><strong>{{'Representation.field.beginDate'|trans()}}:</strong>
+                                        {{representation.beginDate|date("d/m/Y")}}</li>
+                                    <li><strong>{{'Representation.field.mandatDuration'|trans()}}:</strong>{{representation.mandatDuration}} {{'units.month'|trans()}} -> {{ representation.endDate|date("d/m/Y") }}</li>
+                                    {% endif %}
+                                <li><strong>{{'Representation.field.estimatedTime'|trans()}}:</strong>{{representation.estimatedTime}} {{'units.hoursByMonth'|trans()}}</li>
+                                <li><strong>{{'Representation.field.estimatedCost'|trans()}}:</strong>{{representation.estimatedCost}} {{'units.euro'|trans()}}</li>
+                                <li><strong>{{'Representation.field.periodicity'|trans()}}:</strong>{{representation.periodicity}} {{'units.perYear'|trans()}}</li>
+                                <li><strong>{{'Representation.field.periodicity'|trans()}}:</strong>{{representation.periodicity}} {{'units.perYear'|trans()}}</li>
+                                <li><strong>{{'Event.field.organization'|trans()}}:</strong>{{representation.organization}}</li>
+                                    {% if representation.coordinate and (representation.coordinate.city or representation.coordinate.email) %}
+                                        {% set coordinate = representation.coordinate %}
+                                    <li><strong>{{'Representation.field.specificCoordinate'|trans()}}</strong>
+                                        <ul class="list-unstyled">
+                                            {% if coordinate.addressLine1|length > 0 %}
+                                                <li><i class="fa-solid fa-home"></i>&nbsp;{{coordinate.addressLine1}}</li>
+                                                {% endif %}
+                                                {% if coordinate.addressLine2|length > 0 %}
+                                                <li>{{ coordinate.addressLine2 }}</li>
+                                                {% endif %}
+                                                {% if coordinate.addressLine3|length > 0 %}
+                                                <li>{{ coordinate.addressLine3 }}</li>
+                                                {% endif %}
+                                                {% if coordinate.city %}
+                                                <li>{% if coordinate.city.zipCode %}{{ coordinate.city.zipCode }} {%endif %}{{ coordinate.city.getName() }}{% if coordinate.cedex|length > 0 %} {{ coordinate.cedex }}{% endif %}</li>
+                                                {% endif %}
+                                                {% if coordinate.email %}
+                                                <li><a href="mailto:{{coordinate.email}}"><i class="fa-solid fa-envelope"></i>&nbsp;{{coordinate.email}}</a></li>
+                                                {% endif %}
+                                                {% if coordinate.webSite|length > 0 %}
+                                                <li><a href="{{coordinate.webSite}}"><i class="fa-solid fa-desktop"></i>&nbsp;{{coordinate.webSite}}</a></li>
+                                                {% endif %}
+                                                {% if coordinate.facebookAccount|length > 0 %}
+                                                <li><a href="{{coordinate.facebookAccount}}"><i class="fa-brands fa-facebook"></i>&nbsp;{{coordinate.facebookAccount}}</a></li>
+                                                {% endif %}
+                                                {% if coordinate.twitterAccount|length > 0 %}
+                                                <li><a href="{{coordinate.twitterAccount}}"><i class="fa-brands fa-twitter"></i>&nbsp;{{coordinate.twitterAccount}}</a></li>
+                                                {% endif %}
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                                {% if representation.attachments|length>0 %}
+                                    <li><strong>{{'genericFields.attachments'}}:</strong>
+                                        {% for attachment in representation.attachments %}
+                                            {% set ext = attachment|split('.')|last %}
+                                            <br/>{{attachment}} ({{ ext }}) <a class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Attachment.actions.download'|trans}}" href="{{ app.request.scheme ~'://' ~ app.request.httpHost~ base_url ~ vich_uploader_asset(attachment, 'attachmentFile') }}" target="_blank"><i class="fa-solid fa-download" aria-hidden="true"></i></a>
+                                            {% endfor %}
+                                        {% endif %}
+                                </li>
+                            </ul>
+
+                            <h3><i class="fa-solid fa-bell" aria-hidden="true"></i>&nbsp;{{'alerts'|trans}}</h3>
+                            {% if representation.sendAlert and representation.alerter%}
+                                <ul class="list-unstyled">
+                                    <li><strong>{{'Representation.field.alerter'|trans()}}:</strong>
+                                        {{representation.alerter}}</li>
+                                    <li><strong>{{'Representation.field.alertDate'|trans()}}:</strong>
+                                        {{representation.alertDate|date("d/m/Y")}}</li>
+                                </ul>
+                            {% else %}
+                                <div class="alert alert-warning" role="alert">{{'Representation.no_alert_activated'|trans}}</div>
+                            {% endif %}
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}

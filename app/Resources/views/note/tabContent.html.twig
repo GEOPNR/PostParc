@@ -1,0 +1,73 @@
+<div class="tab-pane fade" data-id="{{ object.id }}" id="notes{{object.getClassName()}}-{{object.id}}">
+   <div class="row">
+      <div class="col-md-6">
+         <h2>{{'genericFields.notes'|trans}}</h2>
+      </div>
+      {% if is_granted('ROLE_CONTRIBUTOR') %}
+      <div class="col-md-6">
+         <br/>
+         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#noteModalForm-{{ object.id }}">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i> {{ 'Note.actions.addNewNote'|trans }}
+         </button>
+      </div>
+      {%  endif %}
+   </div>
+
+   <div class="row">
+      <div class="col-md-12">
+         <div class="table-responsive">
+            <table class="table table-striped">
+
+               {%  for note in notes %}
+                  <tr {% if note.isPrivate %}class="warning"{% endif %}>
+                     <td>
+                        {{ note.date|date('d/m/Y H:i') }}
+                        {%  if note.getTags()|length %}
+                           <br/><i class="fa-solid fa-tags" aria-hidden="true"></i> {{ note.getTags()|join(', ') }}
+                        {% endif %}
+                     </td>
+                     <td width="65%">
+                        <strong>{{ note.title }}</strong>
+                        <p>{{ note.content|raw }}</p>
+                     </td>
+                     <td>
+                        <div class="note-date">
+                           <small>{{ 'genericFields.created'|trans() }} {{ note.updated|date('d M Y H:i') }}</small>
+                        </div>
+                        <small>{{ 'by'|trans }} {{ note.createdBy }}</small> {%  if note.isprivate %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}
+                     </td>
+                     <td>
+                        {% if ( ( note.createdBy.id == app.user.id ) or ( note.createdBy.entity.id == app.user.entity.id and is_granted('ROLE_ADMIN') ) ) %}
+                           {{ render(controller('PostparcBundle:Note:getEditDom',{ 'id': note.id })) }} 
+                            <a href="{{ path('note_delete', {'id': note.id}) }}" class="btn btn-default btn-xs delete-ajax-button" data-type="note" data-id="{{note.id}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}">
+                              <i class="fa-solid fa-trash-alt"></i>
+                           </a>   
+                        {% endif %}
+                     </td>
+                  </tr>
+               {%  endfor %}
+            </table>
+         </div>
+      </div>
+   </div>
+
+   <div class="modal fade" id="noteModalForm-{{ object.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <form action="{{ path('note_add', {'className': object.getClassName(), 'objectId': object.id}) }}" method="POST">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">{{ 'Note.actions.addNewNote'|trans }}</h4>
+               </div>
+               <div class="modal-body">
+                  {{ form_widget(form) }}
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'actions.close'|trans() }}</button>
+                  <button type="submit" class="btn btn-primary">{{ 'actions.save'|trans() }}</button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>

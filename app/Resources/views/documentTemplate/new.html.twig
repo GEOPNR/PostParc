@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+   {{'DocumentTemplate.new'|trans}}
+{% endblock title %}
+{% block body %}
+   <h1>{{'DocumentTemplate.new'|trans}}</h1>
+
+   {{ form_start(form) }}
+   <div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+      <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+            {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+            {{ form_row(form.isShared) }}
+            {{ form_row(form.isEditableByOtherEntities) }}
+   </div>
+   <div class="row">
+      <div class="col-md-4">
+         {{ form_row(form.isActive) }}         
+      </div>
+      <div class="col-md-4">
+         {{ form_row(form.mailable) }}
+      </div>
+      <div class="col-md-4">
+         {{ form_row(form.isPrivate) }}
+      </div>
+      <div class="col-md-6">
+         {{ form_row(form.name) }}
+         {{ form_row(form.description) }}
+      </div>
+      <div class="col-md-3">
+         {{ form_row(form.marginTop) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+      <div class="col-md-3">
+         {{ form_row(form.marginBottom) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+      <div class="col-md-3">
+         {{ form_row(form.marginLeft) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+      <div class="col-md-3">
+         {{ form_row(form.marginRight) }}
+         <span class="help-block">({{"units.inMm"|trans}})</span>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-md-6">
+         {{ form_row(form.printFooter) }}
+         {{ form_row(form.footer) }}
+      </div>
+      <div class="col-md-6">
+         {{ form_row(form.printImage) }}
+         {{ form_row(form.image) }}
+         <p class="help-block">{{"DocumentTemplate.message.onlyPngFormatIsAllowed"|trans}}</p>
+         {{ form_row(form.printImageAsBackground) }}
+      </div>
+   </div>
+   <hr/>
+   <div class="row">
+      <div class="col-md-8">
+         {{ form_row(form.subject) }}
+         <p class="help-block">{{"DocumentTemplate.message.useOnlyForMassiveEmail"|trans}}</p>
+         {{ form_row(form.body) }}
+
+      </div>
+      <div class="col-md-4">
+         <div class="panel panel-default panel-vars">
+            <div class="panel-heading">
+               <i class="fa-solid fa-puzzle-piece"></i>&nbsp;<strong>{{'Variables'|trans}}</strong>
+            </div>
+            <ul>
+               {% for key, field in documentTemplate_availableFields %}
+                  <li>
+                     <div class="var">
+                        <div class="pull-left">
+                           <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[{{field}}]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                        </div>
+                        <div class="info">
+                           {{key|trans}} <small class="name text-muted">[[{{field}}]]</small>
+                        </div>
+                     </div>
+                  </li>
+               {% endfor %}
+            </ul>
+         </div>
+      </div>
+   </div>
+   {# form_widget(form) #}
+   <div class="btn-group form-actions addActionsOnTop">
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('documentTemplate_index')}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+      </a>
+      <input type="submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+      <input type="submit" class="btn btn-info" name="createAndContinue" value="{{'actions.createAndContinue'|trans()}}">
+   </div>
+   {{ form_end(form) }}
+   {#{{ elfinder_tinymce_init4('default', {'width':'900', 'height': '450', 'title':'FileExplorer'|trans} ) }}
+   {{ tinymce_init() }}#}
+{% endblock %}

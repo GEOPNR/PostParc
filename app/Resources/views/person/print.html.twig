@@ -1,0 +1,201 @@
+{% extends 'base_pdf.html.twig' %}
+{% block head_css %}
+   <link href="{{ path ~ asset('bundles/postparc/lib/jquery-ui/jquery-ui.min.css') }}" type="text/css" rel="stylesheet"/>
+   <link href="{{ path ~ asset('bundles/postparc/lib/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet"/>
+   <link href="{{ path ~ asset('bundles/postparc/css/styles.css') }}" type="text/css" rel="stylesheet"/>
+{% endblock %}
+
+
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig %}
+   {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+{% set representationElectedLabels = {'0':'Representation.elected'|trans(),'1':'Representation.designated'|trans() } %}
+
+{% block body %}
+
+    <div class="text-right">
+   <h1 >{{ person }}</h1>
+    </div>
+
+    <div class="row">
+       {%  if is_granted('ROLE_CONTRIBUTOR') and person.dontShowCoordinateForReaders() %}
+          <div class="alert alert-warning"><i class="fa-solid fa-user-shield"></i> {{ 'Person.messages.dontShowCoordinateForReaders'|trans() }}</div>
+       {% endif %}  
+       {%  if person.getDontWantToBeContacted() %}
+          <div class="alert alert-danger"><i class="fa-solid fa-exclamation-triangle " aria-hidden="true"></i> {{ 'Person.field.dontWantToBeContacted'|trans() }}</div>
+       {% else %}
+      {% if person.coordinate %}
+         <div class="well">
+            <h2>{{ 'Person.personalCoordinate'|trans }}</h2>
+            <ul class="no-type">
+               {%  if person.coordinate.getFormatedAddress(personnalFieldsRestriction)|raw|length %}
+                  <li><i class="fa-solid fa-home"></i> {{ person.coordinate.getFormatedAddress(personnalFieldsRestriction)|raw }}</li>
+               {%  endif %}
+
+               {% if (person.coordinate.email and 'email' not in personnalFieldsRestriction ) %}
+              <li><i class="fa-solid fa-envelope"></i>&nbsp;{{person.coordinate.email}}</li>
+              {% endif %}
+              {% if (person.coordinate.phone and 'phone' not in personnalFieldsRestriction ) %}
+              <li><i class="fa-solid fa-phone"></i>&nbsp;{{person.coordinate.phoneCode}}{{person.coordinate.phone}}</li>
+              {% endif %}
+              {% if (person.coordinate.mobilePhone and 'mobilePhone' not in personnalFieldsRestriction) %}
+              <li><i class="fa-solid fa-mobile" aria-hidden="true"></i>&nbsp;{{person.coordinate.phoneCode}}{{person.coordinate.mobilePhone}}</li>
+              {% endif %}
+              {% if (person.coordinate.fax and 'fax' not in personnalFieldsRestriction) %}
+              <li><i class="fa-solid fa-fax"></i>&nbsp;{{person.coordinate.fax}}</li>
+              {% endif %}
+              {% if (person.coordinate.webSite and 'webSite' not in personnalFieldsRestriction ) %}
+              <li><i class="fa-solid fa-desktop"></i>&nbsp;{{person.coordinate.webSite}}</li>
+              {% endif %}
+              {% if (person.coordinate.facebookAccount  and 'facebookAccount' not in personnalFieldsRestriction) %}
+              <li><i class="fa-brands fa-facebook"></i>&nbsp;{{person.coordinate.facebookAccount}}</li>
+              {% endif %}
+              {% if (person.coordinate.twitterAccount  and 'twitterAccount' not in personnalFieldsRestriction) %}
+              <li><i class="fa-brands fa-twitter"></i>&nbsp;{{person.coordinate.twitterAccount}}</li>
+              {% endif %}
+              {% if (person.getTags() | length  and 'tags' not in personnalFieldsRestriction)%}
+              <li><i class="fa-solid fa-tags" aria-hidden="true"></i> {{person.getTags()|join(', ')}}</li>
+              {% endif %}
+              {% if (person.coordinate.city and person.coordinate.city.territories | length) %}
+                    <li><i class="fa-solid fa-object-group" aria-hidden="true"></i> {{person.coordinate.city.territories|join(', ')}}</li>
+              {% endif %} 
+            </ul>
+         {% endif %}
+      </div>
+   {% endif %}
+ </div>
+
+   <div class="row">
+       <h3>{{ 'Pfo.field.pfoPersonGroups'|trans() }} / {{ 'Person.field.representations'|trans }}</h3>
+       <div class="well">
+           {% if person.pfoPersonGroups|length > 0 %}
+              <h4>{{ 'Pfo.field.pfoPersonGroups'|trans() }}</h4>
+              <ul class="no-type">
+                 {% for ppg in person.pfoPersonGroups %}
+                    {% if (not(ppg.group.deletedAt) and ( ppg.group.entity.id == app.user.entity.id or ( ppg.group.entity.id != app.user.entity.id and ppg.group.isShared==1) or is_granted("ROLE_SUPER_ADMIN")) ) %}
+                       <li> {{ ppg.group.getCompletName }} </li>
+                       {% endif %}
+                    {% endfor %}
+              </ul>
+           {% endif %}
+
+           {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true  and representations|length > 0 %}
+                  <h4>{{ 'Person.field.representations'|trans }}</h4>
+                  <ul class="no-type">
+                     {% for representation in representations %}
+                        {% if representation.deletedAt is null and (is_granted("ROLE_SUPER_ADMIN") or representation.entity.id == app.user.entity.id or (representation.entity.id != app.user.entity.id and representation.isShared==1 ) ) %}
+                           <li>
+                              {% if representation.getPerson() and representation.getPerson().deletedAt is null %}
+                                 {{ representation.getPerson() }}
+                                 &nbsp;/&nbsp;
+                              {% endif %}
+                              {% if representation.getPfo() and representation.getPfo().deletedAt is null %}
+                                 {{ representation.getPfo() }}
+                                 &nbsp;/&nbsp;
+                              {% endif %}
+                              {% if representation.getOrganization() and representation.getOrganization().deletedAt is null %}
+                                 {% if representation.getOrganization().getAbbreviation() %}
+                                    {{ representation.getOrganization().getAbbreviation() }}
+                                 {% else %}
+                                    {{ representation.getOrganization() }}
+                                 {% endif %}
+                                 &nbsp;
+                              {% endif %}
+                              {% if  representation.getService() %}
+                                 ({{ representation.getService() }})
+                              {% endif %}
+                              ({{representationElectedLabels[representation.elected]}}{% if not(representation.mandatDurationIsUnknown) and representation.endDate %}-> {{ representation.endDate|date("d/m/Y") }}{% endif %}){% if representation.mandateType %} | {{representation.mandateType}}{% endif %}
+                           </li>
+
+
+                        {% endif %}
+                     {% endfor %}
+                  </ul>
+           {% endif %}
+        </div>
+    </div>
+
+   {% if pfos|length > 0 %}
+        <div class="row">
+
+               <h3>{{ 'Person.professionalCoordinate'|trans }}</h3>
+
+                {% for pfo in pfos %}
+                <div class="well">
+                    <h4>
+                        <i class="fa-solid fa-cubes"></i>
+                        {% if pfo.organization and pfo.organization.getAbbreviation() %}
+                            {{ pfo.organization.getAbbreviation() }}
+                        {% else %}
+                            {{ pfo.organization }}
+                        {% endif %}
+
+                    </h4>
+                    <ul class="no-type">
+                        {% if pfo.organization and  pfo.organization.coordinate %}
+                           <li><i class="fa-solid fa-home"></i> {{ pfo.organization.coordinate.getFormatedAddress()|raw }}</li>
+                        {% endif %}
+                        {% if pfo.personFunction %}
+                            <li>{{ 'Pfo.field.personFunction'|trans() }} : {{ pfo.personFunction }}</li>
+                        {% endif %}
+                        {% if pfo.service %}
+                            <li>{{ 'Pfo.field.service'|trans() }} : {{ pfo.service }}</li>
+                        {% endif %}
+                        {% if (pfo.phone) %}
+                            <li><i class="fa-solid fa-phone"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{pfo.phone}}</a> ({{'directLine'|trans}})</li>
+                        {% endif %}
+                        {% if (pfo.mobilePhone) %}
+                            <li><i class="fa-solid fa-mobile" aria-hidden="true"></i>&nbsp;{{pfo.mobilePhone}}({{'directLine'|trans}})</li>
+                        {% endif %}
+                        {% if (pfo.fax) %}
+                            <li><i class="fa-solid fa-fax"></i>&nbsp;{{pfo.fax}} ({{'directLine'|trans}})</li>
+                        {% endif %}
+                        {% if pfo.getPreferedEmails()|length > 0 %}
+                           {% for mail in pfo.getPreferedEmails() %}
+                               <li><i class="fa-solid fa-envelope"></i>&nbsp;{{mail}}</li>
+                           {% endfor %}
+                        {% else %}
+                            {% if pfo.getEmail()|length > 0 %}
+                            <li><i class="fa-solid fa-envelope"></i>&nbsp;{{pfo.getEmail()}}</li>
+                            {% else %}
+                                {% if (pfo.organization and pfo.organization.coordinate and pfo.organization.coordinate.email) %}
+                                    <li><i class="fa-solid fa-envelope"></i>&nbsp;{{pfo.organization.coordinate.email}}</li>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                         {% if pfo.organization and pfo.organization.coordinate %}
+                           {% if (pfo.organization.coordinate.phone) %}
+                              <li><i class="fa-solid fa-phone"></i>&nbsp;{{pfo.organization.coordinate.phone}}</li>
+                           {% endif %}
+                           {% if (pfo.organization.coordinate.mobilePhone) %}
+                              <li><i class="fa-solid fa-mobile"></i>&nbsp;{{pfo.organization.coordinate.mobilePhone}}</li>
+                           {% endif %}
+                           {% if (pfo.organization.coordinate.fax) %}
+                              <li><i class="fa-solid fa-fax"></i>&nbsp;{{pfo.organization.coordinate.fax}}</li>
+                           {% endif %}
+                           {% if (pfo.organization.coordinate.webSite) %}
+                              <li><i class="fa-solid fa-desktop"></i>&nbsp;{{pfo.organization.coordinate.webSite}}</li>
+                           {% endif %}
+                           {% if (pfo.organization.coordinate.facebookAccount) %}
+                              <li><i class="fa-brands fa-facebook"></i>&nbsp;{{pfo.organization.coordinate.facebookAccount}}</li>
+                           {% endif %}
+                           {% if (pfo.organization.coordinate.twitterAccount) %}
+                              <li><i class="fa-brands fa-twitter"></i>&nbsp;{{pfo.organization.coordinate.twitterAccount}}</li>
+                           {% endif %}
+                        {% endif %}
+                    </ul>
+
+                </div>
+                {% endfor %}
+
+        </div>
+   {% endif %}
+
+
+   <h3>{{ 'genericFields.notes'|trans }}</h3>
+   {{ render(controller('PostparcBundle:Note:printNotes',{ 'className': person.getClassName() , 'objectId': person.id })) }}
+
+
+{% endblock %}

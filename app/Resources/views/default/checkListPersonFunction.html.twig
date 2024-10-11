@@ -1,0 +1,11 @@
+{% if personFunctions|length >0 %}
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <p><strong>{{'warning'|trans}} !</strong><br/>{{'PersonFunction.flash.personFunctionExistingWithSameName'|trans}} :</p>
+    <ul>
+    {% for personFunction in personFunctions %}
+        <li><a target="_new" href="{{ path('function_edit',{'id': personFunction.id}) }}">{{ personFunction }}</a>  ( <a href="mailto:{{ personFunction.createdBy.email }}">{{ personFunction.createdBy }}</a> )</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}

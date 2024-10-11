@@ -1,0 +1,9 @@
+PostparcBundle\Entity\Organization:
+    exclusion_policy: none
+    properties:
+        id:
+            groups: ['place', 'price', 'theme']
+        name:
+            groups: ['place', 'price', 'theme']
+        coordinate:
+            groups: ['place', 'price', 'theme']

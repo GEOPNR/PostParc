@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{'Selection.document.label'|trans}}
+{% endblock title %}
+
+{% block body %}
+<div class="row">
+    <div class="col-sm-12 col-md-8">
+        <h1>{{'Selection.document.label'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-14"><i class="fa-solid fa-question-circle"></i></a></h1>
+    </div>
+    {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '14'})) }}
+    <div class="col-sm-12 col-md-4" id="impressionOptionShowHide">
+        <button class="btn btn-default">{{'Selection.print.actions.showCoordinateOptions'|trans }} <i class="fa-solid fa-caret-square-down"></i></button>
+    </div>
+</div>
+<div id="sf_admin_content">
+
+    <div class="bs-callout bs-callout-info">
+
+        <form action="{{path('generate_massive_document_execute')}}" method="post"  class="form-inline" role="form" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-12">
+                    {{ render(controller('PostparcBundle:Selection:getPrintOptions',{'forGenerationMassiveDocument':true})) }}
+                </div>
+
+                <div class="col-sm-12 col-md-5">
+                    <div class="form-group">
+                        <label for="documentTemplateIds">{{'Selection.document.documentTemplate'|trans }}</label>
+                        <select name="documentTemplateId" class="form-control" id="documentTemplateIds">
+                            <option value=""></option>
+                            {% for documentTemplate in documentTemplates %}
+                            <option value="{{ documentTemplate.id }}">{{ documentTemplate| truncate(40, false, '...') }}</option>
+                            {% endfor %}
+                        </select>
+                        <br/>
+                        <label for="dateFieldDetails">{{'Selection.document.dateFieldDetails'|trans }}</label>
+                        <input type="text" name="dateFieldDetails" id="dateFieldDetails" class="form-control" value="le {{ "now"|date("d/m/Y") }}"/>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-md-1">
+                    <br/>{{ 'or'|trans() }}<br/>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                    <label for="documentModelFile">{{'Selection.document.documentModelFile'|trans }}</label>
+                     
+                    <input type="file" name="documentModelFile" class="form-control not-btn-file-reset"/>
+                    <p class="help-block">
+                      {{'Selection.document.documentModelFileHelp'|trans|raw  }}
+                    </p> 
+                    
+                    <p class="help-block">
+                        {{'Selection.document.exportExplanation'|trans }} :
+                        {% for key, field in documentTemplate_availableFields %}
+                            <br/><strong>[{{field}}]</strong> : {{key|trans}}
+                        {% endfor %}
+                    </p>
+                    
+                    <strong>{{ 'or'|trans() }}</strong><br/>
+                    
+                    <div class="form-group">
+                        <label for="uploadedModelFile">{{'Selection.document.uploadedModelFiles'|trans }}</label>
+                        <select name="uploadedModelFile" class="form-control select2" id="uploadedModelFile">
+                            <option value=""></option>
+                            {% for uploadedModelFile in uploadedModelFiles %}
+                                <option value="{{ uploadedModelFile }}">{{ uploadedModelFile }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <hr/>
+                    <label for="exportFormat">{{'Selection.document.exportFormat'|trans }}</label>
+                    <input type="radio" name="exportFormat" value="odt" checked>odt&nbsp;
+                    <input type="radio" name="exportFormat" value="docx">docx&nbsp;
+                    <input type="radio" name="exportFormat" value="pdf">pdf
+                    <br/>
+                </div>
+            </div>
+
+            <div class="row">
+                <hr/>
+                <div class="col-xs-12 col-sm-6 col-md-12 ">
+                    <input type="submit" value="{{'actions.generate'|trans}} !" class="btn btn-primary btn-lg btn-block">
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+{% endblock %}

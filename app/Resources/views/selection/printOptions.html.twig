@@ -1,0 +1,102 @@
+{% if not(forGenerationMassiveDocument) %}
+    <div class="col-sm-12 col-md-12">
+        <label for="PrintFormatids">{{'Selection.print.stickerFormat'|trans }}</label>
+        <select name="printFormatId" class="form-control" id="PrintFormatids">
+            {% for printFormat in printFormats %}
+                <option value="{{ printFormat.id }}">{{ printFormat }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endif %}
+<div class="col-sm-12 col-md-12">
+    <div id="impressionOptionBlock" style="display: none;">
+        <p>{% if forGenerationMassiveDocument %} {{ 'Selection.print.CoordinateOption'|trans }} {% else %} {{ 'Selection.print.printOption'|trans }} {% endif %}: <a href="#" onclick="javascript:;" class="btn btn-default btn-xs" id="unCheckAll">{{'actions.unCheckAll'|trans() }}</a></p>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'Selection.export.person_options'|trans}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for key, option in printOptions['person'] %}
+                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'Selection.export.organization_options'|trans}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for key, option in printOptions['organization'] %}
+                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'Selection.export.pfo_options'|trans}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for key, option in printOptions['pfo'] %}
+                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'Selection.export.coordinate_options'|trans}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for key, option in printOptions['coordinate'] %}
+                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+                <div class="col-xs-12 col-sm-6 col-md-3">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{'Selection.export.representation_options'|trans}}</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% for key, option in printOptions['representation'] %}
+                                <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked=""> {{option}}<br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Options :</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% for key, option in printOptions['options'] %}
+                            <input type="checkbox" class="checkbox" value="{{option}}" name="{{key}}" checked> {{option}}<br/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% if not(forGenerationMassiveDocument) %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-12">
+            <input type="submit" value="{{'actions.generate'|trans}} !" class="btn btn-primary" onclick="return confirm('{{'flash.alertMessageForPdfGeneration'|trans|trim}}');">
+        </div>
+    </div>
+{% endif %}

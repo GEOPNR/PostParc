@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}
+   {{'Duplicate.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+
+
+   <h1>{{'Duplicate.list'|trans}}
+      <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{duplicatePersons|length + duplicateOrganizations|length}}</span> {{'results'|trans}}</small>
+   </h1>
+
+   <ul class="nav nav-tabs">
+       <li class="active"><a data-toggle="tab" href="#persons">{{'Duplicate.tabs.persons'|trans()}} ({{duplicatePersons|length}})</a></li>
+       <li><a data-toggle="tab" href="#organizations">{{'Duplicate.tabs.organizations'|trans()}} ({{duplicateOrganizations|length}})</a></li>
+       <li><a data-toggle="tab" href="#personFunctions">{{'Duplicate.tabs.personFunctions'|trans()}} ({{duplicatePersonFunctions|length}})</a></li>
+   </ul>
+
+<div class="tab-content">
+  <div id="persons" name="persons" class="tab-pane fade in active">
+    {% include 'duplicate/_list.html.twig' with {'duplicates':duplicatePersons, 'duplicateType': 'person'} %}
+  </div>
+  <div id="organizations" name="organizations" class="tab-pane fade">
+    {% include 'duplicate/_list.html.twig' with {'duplicates':duplicateOrganizations, 'duplicateType': 'organization'} %}
+  </div>
+  <div id="personFunctions" name="organizations" class="tab-pane fade">
+    {% include 'duplicate/_list.html.twig' with {'duplicates':duplicatePersonFunctions, 'duplicateType': 'personFunction'} %}
+  </div>
+
+</div>
+
+
+
+{% endblock %}

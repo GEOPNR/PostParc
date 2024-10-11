@@ -1,0 +1,297 @@
+{% set recipientsChoice = { '1': 'EventAlert.onlyOrganizer', '2' : 'EventAlert.onlyParticipants', '3': 'all'} %}
+<div class="row">
+
+    {% if nbItemsWhitoutEmail > 0 %}
+        <div class="alert alert-warning bs-callout bs-callout-warning">
+            <div class="row">
+                <div class="col-md-12 col-lg-8">
+                    <strong>{{'warning'|trans}} !</strong>
+                    <ul class="no-item">
+
+                        {% if itemsWhitoutEmail.persons is defined and itemsWhitoutEmail.persons|length  %}
+                            <li>
+                                <span class="label label-pill label-info">{{itemsWhitoutEmail.persons|length}}</span>  {{'Pfo.field.person'|trans}}(s) parmi les participants n'ont pas d'adresse email
+                                <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmailPersons" aria-expanded="false" aria-controls="itemsWhitoutEmailPersons">Voir les {{'Pfo.field.person'|trans}}(s)</a>
+                            <li/>
+                            <div class="collapse" id="itemsWhitoutEmailPersons">
+                                <div class="well">
+                                    <ul>
+                                        {% for personWithoutEmail in itemsWhitoutEmail.persons %}
+                                            {% set link = path('person_edit', {'id': personWithoutEmail.id}) %}
+                                            <li><a href="{{ link }}" target='_blank'>{{ personWithoutEmail }}</a></li>
+                                            {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}                        
+
+                        {% if itemsWhitoutEmail.pfos is defined and itemsWhitoutEmail.pfos|length %}
+                            <li>
+                                <span class="label label-pill label-info">{{itemsWhitoutEmail.pfos|length}}</span> {% if itemsWhitoutEmail.pfos|length >1 %}{{'Pfo.labels'|trans}}{% else %}{{'Pfo.label'|trans}}{% endif %}  parmi les participants n'ont pas d'adresse email
+                                <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmailPfos" aria-expanded="false" aria-controls="itemsWhitoutEmail">Voir les {{'Pfo.label'|trans}}(s)</a>
+                            </li>
+                            <div class="collapse" id="itemsWhitoutEmailPfos">
+                                <div class="well">
+                                    <ul>
+                                        {% for itemWhitoutEmail in itemsWhitoutEmail.pfos %}
+                                            {% set link = path('pfo_edit', {'id': itemWhitoutEmail.id}) %}
+                                            <li><a href="{{ link }}" target='_blank'>{{ itemWhitoutEmail }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if itemsWhitoutEmail.representations is defined and itemsWhitoutEmail.representations|length %}
+                            <li>
+                                <span class="label label-pill label-info">{{itemsWhitoutEmail.representations|length}}</span> {% if itemsWhitoutEmail.representations|length >1 %}{{'Representation.labels'|trans}}{% else %}{{'Representation.label'|trans}}{% endif %} parmi les participants n'ont pas d'adresse email
+                                <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href="#itemsWhitoutEmailReps" aria-expanded="false" aria-controls="itemsWhitoutEmailReps">Voir les {{'Representation.label'|trans}}(s)</a>
+                            </li>
+                            <div class="collapse" id="itemsWhitoutEmailReps">
+                                <div class="well">
+                                    <ul>
+                                        {% for itemWhitoutEmail in itemsWhitoutEmail.representations %}
+                                            {% set link = path('representation_edit', {'id': itemWhitoutEmail.id}) %}
+                                            <li><a href="{{ link }}" target='_blank'>{{ itemWhitoutEmail }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="col-md-8">
+        <h2>{{'EventAlert.list'|trans()}}  <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#addEventAlertForm" {% if consumptionInfos.quota < consumptionInfos.nbEmail %}disabled{% endif %}><i class="fa-solid fa-plus" aria-hidden="true"></i>&nbsp;{{'EventAlert.actions.addNew'|trans}}</button></h2>
+    </div>
+    <div class="col-md-4">
+        {% include 'mailMassiveModule/_mailConsumptionInfosBloc.html.twig' with {'consumptionInfos': consumptionInfos} %}
+    </div>
+</div>
+
+
+<div id="addEventAlertForm" class="collapse">
+    {{ form_start(formEventAlert) }}
+    <div class="row">
+
+        {% if documentTemplates|length()>0 %}
+            <div class="bs-callout bs-callout-info col-md-12">
+                <div class="form-group">
+                    <label for="documentTemplate" class="control-label">{{'sendMailMassifModule.actions.load_DocumentTemplate'|trans}}</label>
+                    <select id="documentTemplate" name="documentTemplate" class="form-control">
+                        {% for documentTemplate in documentTemplates %}
+                            <option value="{{documentTemplate.id}}">{{documentTemplate}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <a href="javascript:void(0)" class="btn btn-info" id="loadDocumentTemplateForEventAlert">Charger</a>
+            </div>
+        {% endif %}
+
+        <div class="col-md-8 col-sm-6">
+            {{ form_row(formEventAlert.name) }}
+            {{ form_row(formEventAlert.message) }}
+            {{ form_row(formEventAlert.mailFooter) }}
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <i class="fa-solid fa-clock" aria-hidden="true"></i> <label class="control-label">{{ 'EventAlert.sendParameters'|trans() }}</label>
+                </div>
+                <div class="panel-body">
+
+                    <div class="row form-group">
+                        <div class="col-md-6 ">
+                            {{ form_row(formEventAlert.senderName) }}
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            {{ form_row(formEventAlert.senderEmail) }}
+                        </div>
+                    </div> 
+                    {{ form_row(formEventAlert.isManualAlert) }}
+                    {{ form_row(formEventAlert.gap) }}
+                    {{ form_row(formEventAlert.unit) }}
+                    {{ form_row(formEventAlert.direction) }}
+                    {{ form_row(formEventAlert.recipients) }}
+                    {{ form_row(formEventAlert.addRGPDMessageForPerson) }}
+                    {{ form_row(formEventAlert.onlyForConfirmedContact) }}
+                    {{ form_row(formEventAlert.onlyForUnConfirmedContact) }}
+                    {{ form_row(formEventAlert.limitToRecipiantsList) }}                             
+                    <div class="row form-group">
+                        <div class="col-md-{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}4{% else %}6{% endif %}">
+                            {{ form_row(formEventAlert.eventAlertPersons) }}
+                        </div>
+                        <div class="col-md-{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}4{% else %}6{% endif %}">
+                            {{ form_row(formEventAlert.eventAlertPfos) }}
+                        </div>
+                        <div class="{% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}col-md-4{% else %}d-none{% endif %}">
+                            {{ form_row(formEventAlert.eventAlertRepresentations) }}
+                        </div>
+                    </div>
+
+                    {{ form_row(formEventAlert.isPrintOnInterface) }}
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-md-4 col-sm-6">
+
+            <div class="panel panel-default panel-vars">
+                <div class="panel-heading">
+                    <i class="fa-solid fa-puzzle-piece"></i>&nbsp;<strong>{{'Variables'|trans}}</strong>
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        {% for key, field in documentTemplate_availableFields %}
+                            <li>
+                                <div class="var">
+                                    <div class="pull-left">
+                                        <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[{{field}}]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                                    </div>
+                                    <div class="info">
+                                        {{key|trans}} <small class="name">[[{{field}}]]</small>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                        {# add new variable for confirmation url #}
+                        <li>
+                            <div class="var">
+                                <div class="pull-left">
+                                    <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[confirmation_url]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                                </div>
+                                <div class="info">
+                                    {{'Event.confirmationUrl'|trans}} <small class="name">[[confirmation_url]]</small>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa-solid fa-file" aria-hidden="true"></i> <label class="control-label">{{'genericFields.attachments'|trans()}}</label>{{ form_label(formEventAlert.attachments) }}
+                </div>
+                <div class="panel-body">
+                    <ul class="attachments" data-prototype="{{ form_widget(formEventAlert.attachments.vars.prototype)|e('html_attr') }}">
+                        {% for attachment in formEventAlert.attachments %}
+                            <li class="col-md-3 panel panel-default">{{ form_widget(attachment) }}</li>
+                            {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-12 col-sm-12">
+            <div class="btn-group ">
+                <input type="submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+            </div>
+        </div>
+    </div>
+    {{ form_end(formEventAlert) }}
+    <hr/>
+</div>
+
+
+{% if eventAlerts|length()>0  %}
+
+    <form action="{{path('eventAlert_batch', {'id': event.id})}}" method="post">
+        <div class="sf-admin-batch-actions-choice">
+            <div class="form-group">
+                <label for="batch_action">{{'forSelection'|trans}}</label>
+                <select name="batch_action" class="form-control">
+                    <option value="">{{'chooseAction'|trans}}</option>
+                    <option value="batchDelete">{{'actions.delete'|trans}}</option>
+                </select>
+            </div>
+            <input type="submit" class="btn btn-default" value="ok">
+            {% include 'default/selectResultsPerPage.html.twig'  %}
+
+        </div>
+        <div class="sf_admin_list no-more-tables">
+            <table class="table table-striped table-condensed table-responsive table-hover">
+                <thead>
+                    <tr>
+                        <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.name'|trans(), 'ea.name') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.effectiveDate'|trans(), 'ea.effectiveDate') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.recipients'|trans(), 'ea.recipients') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.isPrintOnInterface'|trans(), 'ea.isPrintOnInterface') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.onlyForConfirmedContact'|trans(), 'ea.onlyForConfirmedContact') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.onlyForUnConfirmedContact'|trans(), 'ea.onlyForUnConfirmedContact') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.isManualAlert'|trans(), 'ea.isManualAlert') }}</th>
+                        <th>{{ knp_pagination_sortable(eventAlerts, 'EventAlert.field.isSended'|trans(), 'ea.isSended') }}</th>
+                        <th>{{ 'EventAlert.field.AttachmentSize'|trans() }}</th>
+                        <th>{{'genericFields.actions'|trans}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for eventAlert in eventAlerts %}
+
+                        <tr>
+                            <td><input type="checkbox" name="ids[]" value="{{ eventAlert.id }}" class="sf_admin_batch_checkbox"></td>
+                            <td>{{ eventAlert.name }}</td>
+                            <td>
+                                {% if ( (not eventAlert.isManualAlert) or (eventAlert.isManualAlert and eventAlert.isSended) )%}
+                                    {{ eventAlert.effectiveDate|localizeddate() }} {% if date(eventAlert.effectiveDate) < date() and eventAlert.isSended != 1 %}<span class="label label-warning">{{'EventAlert.outOfDate'|trans()}} !</span>{% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if eventAlert.limitToRecipiantsList %}                                    
+                                    {{ eventAlert.eventAlertPersons|join(', ') }}
+                                    {{ eventAlert.eventAlertPfos|join(', ') }}
+                                    {{ eventAlert.eventAlertRepresentations|join(', ') }}
+                                {% else %}
+                                    {{ recipientsChoice[eventAlert.recipients]|trans }}
+                                {% endif %}
+                            </td>
+                            <td>{% if eventAlert.isPrintOnInterface %}<i class="fa-solid fa-check" aria-hidden="true"></i>{% endif %}</td>
+                            <td>{% if eventAlert.onlyForConfirmedContact %}<i class="fa-solid fa-check" aria-hidden="true"></i>{% endif %}</td>
+                            <td>{% if eventAlert.onlyForUnConfirmedContact %}<i class="fa-solid fa-check" aria-hidden="true"></i>{% endif %}</td>
+                            <td>{% if eventAlert.isManualAlert %}<i class="fa-solid fa-check" aria-hidden="true"></i>{% endif %}</td>
+                            <td>
+                            {% if eventAlert.isSended %}
+                                <i class="fa-solid fa-check" aria-hidden="true"></i><br/>
+                                {% if eventAlert.token %}
+                                    {% set percent =  eventAlert.nbEmail?(eventAlert.nbOpenedEmail*100/eventAlert.nbEmail)|round:0 %}
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percent }}%;min-width:2em;">
+                                            {{ percent }}%
+                                        </div>
+                                    </div>                                
+                                {% endif %}
+                            {% endif %}</td>
+                            <td>{{ eventAlert.getAttachmentSizes() }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    {% if eventAlert.isSended %}
+                                        {% include 'eventAlert/eventAlertSendResume.html.twig' with {'eventAlert': eventAlert} %}
+                                    {% else %}
+                                        <a href="{{ path('eventAlert_edit', {'id':eventAlert.id })}}" class="btn btn-default  btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}"><i class="fa-solid fa-pencil-alt"></i></a>
+                                            {% if eventAlert.isManualAlert %}
+                                            <a href="{{ path('eventAlert_launchManualy', {'id':eventAlert.id })}}" class="btn btn-default  btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.launchManualy'|trans}}" data-confirm="{{'actions.confirmLaunchManualy'|trans}}"><i class="fa-solid fa-play-circle"></i></a>
+                                            {% endif %}
+                                        <a href="{{ path('eventAlert_delete', {'id': eventAlert.id}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                                    {% endif %}
+
+                                    {% if ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+                                        <a class="btn btn-default btn-xs " href="{{path('eventAlert_copy', {'id':eventAlert.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.copy'|trans}}"  data-container="body" data-confirm="{{'actions.confirmCopy'|trans}}">
+                                            <i class="fa-solid fa-copy" aria-hidden="true"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+            <div class="navigation text-center">
+                {{ knp_pagination_render(eventAlerts) }}
+            </div>
+
+            {% endif %}
+

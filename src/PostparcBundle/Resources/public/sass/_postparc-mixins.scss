@@ -1,0 +1,112 @@
+@mixin retina() {
+	@media only screen and (-webkit-min-device-pixel-ratio : 1.5),
+	only screen and (min-device-pixel-ratio : 1.5) {
+		@content;
+	}
+}
+
+@mixin ret($img, $bgsize) {
+	@media only screen and (-webkit-min-device-pixel-ratio : 1.5),
+	only screen and (min-device-pixel-ratio : 1.5) {
+		background-image: $img;
+		-webkit-background-size: $bgsize;
+		background-size: $bgsize;
+	}
+}
+
+@mixin font-size($font-size: 16) {
+	font-size : #{$font-size}px;
+	font-size : #{$font-size / 10}rem;
+}
+
+@mixin clearfix() {
+	*zoom : 1;
+	&:before,
+	&:after {
+		display: table;
+		content : "";
+	}
+	&:after {
+		clear : both;
+	}
+}
+
+/* Gestion des media queries avec fallback pour IE 8 et moins */
+$fix-mqs: false !default;
+
+@mixin respond-min($width) {
+
+	@if $fix-mqs {
+		@if $fix-mqs >= $width {
+			@content;
+		}
+	}
+	@else {
+		@media screen and (min-width: $width) {
+			@content;
+		}
+	}
+}
+
+@mixin respond-max($width) {
+	$max-width : $width - 1px;
+
+	@if $fix-mqs {
+		@if $fix-mqs <= $max-width {
+			@content;
+		}
+	}
+	@else {
+		@media screen and (max-width: $max-width) {
+			@content;
+		}
+	}
+}
+
+$old-ie: false !default;
+
+@mixin old-ie {
+	@if $old-ie {
+		@content;
+	}
+}
+
+@mixin keyframe ($animation_name) {
+	@-webkit-keyframes $animation_name {
+		@content;
+	}
+	 
+	@-moz-keyframes $animation_name {
+		@content;
+	}
+	 
+	@-o-keyframes $animation_name {
+		@content;
+	}
+	 
+	@keyframes $animation_name {
+		@content;
+	}
+}
+
+@mixin animation ($delay, $duration, $animation) {
+	-webkit-animation-delay: $delay;
+	-webkit-animation-duration: $duration;
+	-webkit-animation-name: $animation;
+	-webkit-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+	 
+	-moz-animation-delay: $delay;
+	-moz-animation-duration: $duration;
+	-moz-animation-name: $animation;
+	-moz-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+	 
+	-o-animation-delay: $delay;
+	-o-animation-duration: $duration;
+	-o-animation-name: $animation;
+	-o-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+	 
+	animation-delay: $delay;
+	animation-duration: $duration;
+	animation-name: $animation;
+	animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+}

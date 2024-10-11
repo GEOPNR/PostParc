@@ -1,0 +1,24 @@
+auth-tokens:
+    type:     rest
+    resource: PostparcApiBundle\Controller\AuthTokenController
+
+organizations :
+  type: rest
+  resource:     "PostparcApiBundle:OrganizationRest"
+  name_prefix:  api_
+
+persons :
+  type: rest
+  resource:     "PostparcApiBundle:PersonRest"
+  name_prefix:  api_
+
+pfos :
+  type: rest
+  resource:     "PostparcApiBundle:PfoRest"
+  name_prefix:  api_
+
+lists :
+  type: rest
+  resource:     "PostparcApiBundle:ListRest"
+  name_prefix:  api_
+

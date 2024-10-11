@@ -1,0 +1,12 @@
+{% extends 'base_pdf.html.twig' %}
+{% block head_css %}
+    <link href=" {{ path ~ asset('bundles/postparc/lib/jquery-ui/jquery-ui.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ path ~ asset('bundles/postparc/lib/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ path ~ asset('bundles/postparc/css/styles.css') }}" type="text/css" rel="stylesheet"/>
+{% endblock %}
+
+{% block body %}
+    <div class="text-center">
+        {{ 'documentGeneratedBy'|trans() }} @Postparc {{ 'on'|trans() }} {{ now | date('d/m/Y H:i') }} <br/> {{ app_name }}
+    </div>
+{% endblock %}

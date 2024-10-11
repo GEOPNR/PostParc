@@ -1,0 +1,65 @@
+<br/>
+{% if ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+   <div class="col-md-6 form-inline">
+      <div class="form-group">
+         <label for="addPfosToEvent">{{'Event.actions.addPfosToEvent'|trans}}</label>
+         <select name="addPfosToEvent" class="form-control" id="addPfosToEvent" multiple></select>
+         <button class="btn btn-primary" id="addPfosToEventSubmitButton" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+      </div>
+   </div>
+{% endif %}
+{% if pfos|length()>0  %}
+   <div class="sf_admin_list no-more-tables">
+      <table class="table table-striped table-condensed table-responsive table-hover">
+         <thead>
+            <tr>
+               <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+               <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.person'|trans(), 'p.name') }}</th>
+               <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.personFunction'|trans(), 'f.name') }}</th>
+               {#<th>{{ knp_pagination_sortable(pfos, 'Pfo.field.service'|trans(), 's.name') }}</th>#}
+               <th>{{ 'Email.field.email'|trans }}</th>
+               <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.organization'|trans(), 'o.name') }}</th>
+               <th>{{ knp_pagination_sortable(pfos, 'Coordinate.field.city'|trans(), 'city.name') }}</th>
+               <th>{{ knp_pagination_sortable(persons, 'EventConfirmationPresence.fields.confirmationDate'|trans(), 'ep.confirmationDate') }}</th>
+               <th>{{'genericFields.actions'|trans}}</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% set originPath =  path('event_show', {'id':event.id, 'activeTab': 'pfos' } )%}
+            {% for pfo in pfos %}
+               {% set listEmail = pfo.email  %}                    
+               {% if pfo.preferedEmails  and pfo.preferedEmails | length > 0 %}
+                   {% set listEmail = pfo.preferedEmails | join(', ') %}
+               {% endif %} 
+               {% if (pfo.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                  {% set editable = false %}
+               {% else %}
+                  {% set editable = true %}
+               {% endif %}
+               <tr {% if editable==false %} class="warning"{% endif %}>
+                  <td><input type="checkbox" name="pfoIds[]" value="{{ pfo.id }}" class="sf_admin_batch_checkbox"></td>
+                  <td>{% if pfo.person is not null  %}{{pfo.person.name}} {{pfo.person.firstName}}{% endif %}</td>
+                  <td>{{pfo.personFunction}}</td>
+                  {#<td>{{pfo.service}}</td>#}
+                  <td>{{ listEmail }}</td>
+                  <td>{{pfo.organization}}</td>
+                  <td>{% if pfo.organization %}{{pfo.organization.coordinate.city}}{% endif %}</td>
+                  <td>{{ render(controller('PostparcBundle:Event:getEventPfosConfirmationDate',{'pfo': pfo, 'event':event})) }}</td>
+                  <td>
+                     <div class="btn-group">
+                        <a href="{{path('pfo_show', {'id':pfo.id })}}" class="btn btn-default btn-xs" alt="{{'actions.actions'|trans}}" title="{{'actions.actions'|trans}}"><i class="fa-solid fa-info"></i></a>
+                        <a href="{{path('pfo_addBasket', {'id':pfo.id ,'origin':'event', 'eventId':event.id })}}" class="btn btn-default btn-xs add-to-selection-button"  data-type="pfo" data-id="{{pfo.id}}" alt="{{'actions.addBasket'|trans}}" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                           {% if (editable or ( not(editable) and pfo.isEditableByOtherEntities) ) and ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+                           <a href="{{path('event_removePfo', {'id':event.id, 'pfoId':pfo.id,'origin': originPath })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Event.actions.removePfo'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                           {% endif %}
+                     </div>
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+   <div class="navigation text-center">
+      {{ knp_pagination_render(pfos) }}
+   </div>
+{% endif %}

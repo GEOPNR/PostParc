@@ -1,0 +1,27 @@
+<script type="text/javascript">
+
+   $(document).ready(function() {
+      var map_{{object.id}} = L.map('map-{{object.id}}', {
+         center: [{{object.coordinate.coordinate}}],
+         zoom: 15,
+         minZoom: 6,
+         maxZoom: 17,
+         zoomControl: false
+      });
+      L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map_{{object.id}});
+      var markers = new L.LayerGroup().addTo(map_{{object.id}});
+      var marker = L.marker([{{object.coordinate.coordinate}}]).addTo(markers);
+
+
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+         var target = $(e.target).attr("href");
+         var tab = $(target);
+         if (tab && tab.data('mapid') && tab.data('mapid') == 'map_{{object.id}}') {
+            //console.log('resize map map_{{object.id}}');
+            map_{{object.id}}.invalidateSize(true);
+         }
+      });
+   });
+</script>

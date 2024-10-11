@@ -1,0 +1,12 @@
+{% if object.updated %}
+<div class="bs-callout bs-callout-info">
+    {{'lastModificationOn'|trans}} {{object.updated|date('d/m/Y H:i')}}
+    {% if(object.updatedBy) %}
+    {{'by'|trans}} {{ object.updatedBy }}.
+    {% endif %}
+    <a  href="{{ path('version_liste', {'objectId': object.id, 'class':object.getClassName()}) }}" title="{{'actions.showVersion'|trans}}">
+        {{'actions.showVersion'|trans}}
+    </a>
+
+</div>
+{% endif %}

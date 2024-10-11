@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+
+{% block title %}
+{{'Territory.listCities'|trans}} "{{territory}}"
+{% endblock title %}
+
+{% block body %}
+<div id="sf_admin_container">
+    <div class="row">
+        <div class="col-sm-12 col-md-10">
+            <h1>{{'Territory.listCities'|trans}} "{{territory}}"
+            {% if(subFolder == true) %}
+                {{'Territory.listSubTerritory'|trans}}
+            {% endif %}
+            </h1>
+        </div>
+        <div class="col-sm-12 col-md-2">
+            <div class="nav-list-actions">
+                <ul>
+                    {% if(subFolder == false) %}
+                    <li><a href="{{ path('territory_listSubTerritoryCities', { 'id': territory.id }) }}" class="btn btn-default" data-toggle="tooltip" data-placement="top" data-container="body" alt="{{'Territory.actions.listeSubTerritoryCities'|trans}}" title="{{'Territory.actions.listeSubTerritoryCities'|trans}}"><i class="fa-solid fa-sitemap"></i></a></li>
+                    {% else %}
+                    <li><a href="{{ path('territory_listCities', { 'id': territory.id }) }}" class="btn btn-default" data-toggle="tooltip" data-placement="top" data-container="body" alt="{{'Territory.actions.listCities'|trans}}" title="{{'Territory.actions.listCities'|trans}}"><i class="fa-solid fa-map-marker"></i></a></li>
+                    {% endif %}
+                    <li><a class="sf-admin-filters-toggle btn btn-default"><i class="fa-solid fa-filter"></i><span class="libelle"> {{'sorts'|trans}}</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="sf_admin_bar">
+        <div class="sf-admin-filters">
+            {{ form_start(search_form) }}
+            <div class="form-group form-action pull-right">
+                <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+                <button type="submit" name="filter_action" class="btn btn btn-success" value="filter">{{'actions.sort'|trans}}</button>
+            </div>
+            {{ form_widget(search_form) }}
+            {{ form_end(search_form) }}
+        </div>
+        <div class="bs-callout bs-callout-info">
+            <form action="{{ path('territory_addCity',{ 'id': territory.getId()}) }}" method="post" class="form-inline" role="form">
+                <div class="row">
+                <div class="col-sm-12 col-md-6 form-group">
+                    <label for="documentTemplateIds">{{'Territory.actions.add_city_to_territory'|trans}}</label>
+                    <select name="cityId" class="form-control city-select2-autocomplete" id="cityId" data-placeholder="{{'AdvancedSearch.data-placeholder.city'|trans}}." >
+                        <option value="" selected disabled>{{'AdvancedSearch.data-placeholder.city'|trans}}</option>
+                    </select>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                        <input type="submit" value="Ajouter" class="btn btn-primary">
+                </div>
+                </div>
+            </form>
+        </div>
+        <form action="{{ path('territory_batchCities',{ 'id': territory.getId()}) }}" method="post" >
+
+            <div class="sf-admin-batch-actions-choice">
+                <div class="form-group">
+                    <label for="batch_action">{{'forSelection'|trans}}</label>
+                    <select name="batch_action" class="form-control">
+                        <option value="">{{'chooseAction'|trans}}</option>
+                        <option value="batchDeleteFromTerritory">{{'actions.deleteFromTerritory'|trans}}</option>
+                    </select>
+                </div>
+                <input class="btn btn-default" type="submit" value="ok">
+            </div>
+            <div class="sf_admin_list no-more-tables">
+                <table class="table table-striped table-condensed table-responsive table-hover treetable" >
+                    <thead>
+                        <tr>
+                            <th id="sf_admin_list_batch_actions">
+                                <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                            </th>
+                            <th>{{'City.field.name'|trans}}</th>
+                            <th>{{'City.field.territories'|trans}}</th>
+                            <th id="sf_admin_list_th_actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for city in cities %}
+                        <tr>
+                            <td><input type="checkbox" name="ids[]" value="{{city.id}}" class="sf_admin_batch_checkbox"></td>
+                            <td>{{ city }}</td>
+                            <td>{{ city.getListTerritories() }}</td>
+                            <td>{% if(subFolder == true) %}
+                                <a class="btn btn-default btn-xs" href="{{ path('territory_SubdeleteCity', { 'id': territory.getId(),'cityId': city.getId() }) }}" data-toggle="tooltip" data-placement="top" title="{{'Territory.actions.deleteFromSubTerritory'|trans}}" data-container="body" onclick="return confirm('{{'Territory.actions.confirmMassiveDeleteCities'|trans}}');" ><i class="fa-solid fa-trash-alt"></i></a>
+                                {% else %}
+                                <a class="btn btn-default btn-xs" href="{{ path('territory_deleteCity', { 'id': territory.getId(),'cityId': city.getId() }) }}" data-toggle="tooltip" data-placement="top" title="{{'actions.deleteFromTerritory'|trans}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" ><i class="fa-solid fa-trash-alt"></i></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    </div>
+</div>
+
+{% endblock body %}
+
+{% block javascripts %}
+{{ parent() }}
+<script type="text/javascript" src="{{ asset('bundles/postparc/js/postparc-autocomplete.js')}}"></script>
+{% endblock javascripts %}

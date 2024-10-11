@@ -1,0 +1,315 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: parameters_postparc.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+    - { resource: "@PostparcBundle/Resources/config/services.yml" }
+    - { resource: doctrine_extensions.yml }
+    - { resource: "@PostparcApiBundle/Resources/config/services.yml" }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: fr
+    # param a ajouter pour specifier si multi instance ou non
+    isMultiInstance: false
+    sendinblue_api_key: changeme
+    maxLockDuration: 30
+    noreplyEmails: [changeme]
+    summernote_default_font_family: 'Open Sans'
+    summernote_default_font_size: '14'
+    
+    dkim:
+        use_dkim: false
+        selector: mail
+        domain: postparc.fr
+        private_key_path: src/PostparcBundle/Lib/DKIM/mail.private
+
+    piwik:
+       enable: true
+       piwirlUrl: 'changeme'
+       piwikSiteId: 21
+       token_auth: 'changeme'
+       piwikStatsMailId: 83
+       scheme: 'https'
+
+    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
+
+
+framework:
+    #esi:             ~
+    #translator:      { fallbacks: ['%locale%'] }
+    translator: ~
+    secret:          '%secret%'
+    router:
+        resource: '%kernel.root_dir%/config/routing.yml'
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    #serializer:      { enable_annotations: true }
+    templating:
+        engines: ['twig']
+        #assets_version: SomeVersionScheme
+    default_locale:  '%locale%'
+    trusted_hosts:   ~
+    trusted_proxies: ~
+    session:
+        # handler_id set to null will use default session handler from php.ini
+        handler_id:  ~
+        save_path:   '%kernel.root_dir%/../var/sessions/%kernel.environment%'
+        cookie_lifetime: 172800 # deux jours
+        gc_maxlifetime: 7200
+    fragments:       ~
+    http_method_override: true
+    assets: ~
+    serializer:
+        enabled: false
+        
+sensio_framework_extra:
+ router:
+     annotations: false        
+
+# Twig Configuration
+twig:
+    # a commenter sur prod
+    debug:            '%kernel.debug%'
+    # a decommenter sur prod
+    #debug: true
+    strict_variables: '%kernel.debug%'
+    form_themes:
+        - LexikFormFilterBundle:Form:form_div_layout.html.twig
+        - bootstrap_3_layout.html.twig
+        - PostparcBundle:Form:field_type_help.html.twig
+        - PostparcBundle:Form:fields.html.twig
+        - 'TetranzSelect2EntityBundle:Form:fields.html.twig'
+
+    globals:
+        app_name: '%instanceName%'
+        per_page_global: '%per_page_global%'
+        app_version: '2.5.0'
+        base_url: '%base_url%'
+        isMultiInstance: '%isMultiInstance%'
+        locales:
+            - fr
+            - en
+            - es
+            - it
+        documentTemplate_availableFields:
+                'Person.field.name' : 'p_name'
+                'Person.field.firstName' : 'p_firstName'
+                'Person.field.civility' : 'p_civility'
+                'Pfo.field.particleFunction' : 'pfo_particleFunction'
+                'Pfo.field.personFunction' : 'pfo_function'
+                'Pfo.field.additionalFunction' : 'pfo_additionalFunction'
+                'Pfo.field.service' : 'pfo_service'
+                'Pfo.field.organization' : 'o_name'
+                'Organization.field.abbreviation': o_abbreviation
+                'Representation.field.mandateType' : 'mt_name'
+                'Representation.field.personFunction' : 'rep_function'
+                'genericFields.coordinate': 'coord_bloc'
+        piwik: '%piwik%'
+
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_mysql
+        host:     '%database_host%'
+        port:     '%database_port%'
+        dbname:   '%database_name%'
+        user:     '%database_user%'
+        password: '%database_password%'
+        charset:  utf8mb4
+        default_table_options:
+           charset: utf8mb4
+           collate: utf8mb4_unicode_ci
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: '%kernel.root_dir%/data/data.db3"
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #     path:     '%database_path%'
+
+    orm:
+        auto_generate_proxy_classes: '%kernel.debug%'
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        # specials lines form gedmo config
+        mappings:
+            tree:
+                type: annotation
+                alias: GedmoTree
+                prefix: Gedmo\Tree\Entity
+                dir: '%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/src/Tree/Entity'
+                is_bundle: false
+            loggable:
+                type: annotation
+                alias: GedmoLoggable
+                prefix: Gedmo\Loggable\Entity
+                dir: '%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/src/Loggable/Entity'
+                is_bundle: false
+            translatable:
+                type: annotation
+                alias: GedmoTranslatable
+                prefix: Gedmo\Translatable\Entity
+                dir: '%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/src/Translatable/Entity'
+                is_bundle: false
+
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: '%mailer_transport%'
+    host:      '%mailer_host%'
+    username:  '%mailer_user%'
+    password:  '%mailer_password%'
+    spool:     { type: memory }
+    antiflood:
+        threshold: 80
+        sleep: 1
+
+fos_user:
+    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
+    firewall_name: main
+    user_class: PostparcBundle\Entity\User
+    from_email:
+        address: changeme
+        sender_name: postparc
+
+services:
+    twig.extension.intl:
+        class: Twig_Extensions_Extension_Intl
+        tags:
+            - { name: twig.extension }
+    twig.extension.text:
+       class: Twig_Extensions_Extension_Text
+       tags:
+            - { name: twig.extension }
+
+    # a decommenter sur prod
+#    twig.extension.debug:
+#        class: Twig_Extensions_Extension_Debug
+#        tags:
+#            - { name: twig.extension }
+#    debug.twig.extension:
+#        class: Twig_Extension_Debug
+#        tags: [{ name: 'twig.extension' }]
+
+
+knp_paginator:
+    page_range: 5                      # default page range used in pagination control
+    default_options:
+        page_name: page                # page query parameter name
+        sort_field_name: sort          # sort field query parameter name
+        sort_direction_name: direction # sort direction query parameter name
+        distinct: true                 # ensure distinct results, useful when ORM queries are using GROUP BY statements
+    template:
+        #pagination: KnpPaginatorBundle:Pagination:sliding.html.twig     # sliding pagination controls template
+        pagination: KnpPaginatorBundle:Pagination:twitter_bootstrap_v3_pagination.html.twig
+        sortable: KnpPaginatorBundle:Pagination:sortable_link.html.twig # sort link template
+
+lexik_form_filter:
+    force_case_insensitivity: false
+    listeners:
+        doctrine_orm: true
+        doctrine_dbal: false
+        doctrine_mongodb: false
+    where_method: ~  # null | and | or
+
+circle_rest_client:
+    curl:
+      defaults:
+        CURLOPT_HTTPHEADER:     [ 'Content-Type: application/json' ]
+        CURLOPT_FOLLOWLOCATION: true
+
+white_october_tcpdf:
+    class: 'PostparcBundle\Lib\PostparcPDF'
+    tcpdf:
+        k_path_fonts: '%kernel.root_dir%/../vendor/tecnickcom/tcpdf/fonts/'
+
+bazinga_js_translation:
+    locale_fallback: fr  # It is recommended to set the same value used for the translator fallback
+
+vich_uploader:
+    db_driver: orm
+    mappings:
+        document_attachment:
+            uri_prefix:         /uploads/attachments/%kernel.environment%
+            upload_destination: '%kernel.root_dir%/../web/uploads/attachments/%kernel.environment%'
+            namer: vich_uploader.namer_origname
+            inject_on_load:     true
+            delete_on_update:   true
+            delete_on_remove:   true
+
+
+fos_rest:
+    routing_loader:
+        include_format: false
+    view:
+        view_response_listener: true
+        formats:
+            json: true
+            xml: true
+    serializer:
+        serialize_null:  true
+    exception:
+        enabled: true
+        messages:
+            'Symfony\Component\Security\Core\Exception\BadCredentialsException': true
+            'Symfony\Component\HttpKernel\Exception\HttpException' : true
+        codes:
+            'Symfony\Component\Security\Core\Exception\BadCredentialsException': 401
+    format_listener:
+        rules:
+            - { path: '^/api/*', priorities: ['json'], fallback_format: 'json' }
+            - { path: '^/', priorities: ['html'], fallback_format: 'html' }
+    body_listener:
+        enabled: true
+    param_fetcher_listener:
+        enabled: true
+
+jms_serializer:
+    handlers:
+        datetime:
+            default_format: "Y-m-d\\TH:i:sP"
+            default_timezone: "UTC"
+
+nelmio_api_doc:
+    areas:
+        path_patterns: # an array of regexps
+            - ^/api(?!/doc$)
+#        host_patterns:
+#            - ^api\.
+    documentation:
+        schemes: [http, https]
+        info:
+            title: Postparc API
+            description: api de l'application postparc
+            version: 1.0.0
+        securityDefinitions:
+            X-Auth-Toke:
+                type: apiKey
+                description: 'X-Auth-Token: authToken'
+                name: Authorization
+                in: header
+        security:
+            - X-Auth-Token: []
+
+tetranz_select2_entity:
+  scroll: false
+
+# SENDINBLUE
+sendinblue_api:
+   clients:
+        postparc:
+            endpoints:
+                - account
+                - email_campaigns
+                - contacts
+                - lists
+                - senders
+                - sms_campaigns
+                - process
+                - smtp
+            key: '%sendinblue_api_key%'
+

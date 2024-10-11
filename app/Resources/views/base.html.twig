@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|split('_')[0] }}">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{{ app_name }} {% if isMultiInstance is defined and isMultiInstance == true and app.user.entity.parent %} - {{ app.user.entity.slug|upper }}{% endif %} - {% block title %}{% endblock %}</title>
+      <!-- <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" /> -->
+      <link rel="icon" type="image/x-icon" href="{{ asset('bundles/postparc/images/favicon.ico') }}">
+      <link href='//fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+      <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+      {% block stylesheets %}
+         <link href="{{ asset('bundles/postparc/lib/jquery-ui/jquery-ui.min.css') }}" type="text/css" rel="stylesheet"/>
+         <link href="{{ asset('bundles/postparc/lib/select2/dist/css/select2.min.css') }}" type="text/css" rel="stylesheet"/>
+         <link href="{{ asset('bundles/postparc/lib/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet"/>
+         <link href="{{ asset('bundles/postparc/lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}" type="text/css" rel="stylesheet"/>
+         <link href="{{ asset('bundles/postparc/lib/datetimepicker/build/jquery.datetimepicker.min.css') }}" type="text/css" rel="stylesheet"/>
+         <!-- summernote -->
+         <link rel="stylesheet" href="{{ asset('bundles/postparc/lib/summernote/summernote-bs4.css') }}">
+         <link href="{{ asset('bundles/postparc/css/styles.css') }}" type="text/css" rel="stylesheet"/>
+         {% if app.environment not in ['dev', 'prod'] %}
+            {% set specificsUrl = 'bundles/postparc/specifics/'~ app.environment ~ '/css/env.css' %}
+            <link href="{{ asset(specificsUrl) }}" type="text/css" rel="stylesheet"/>
+         {% endif %}
+      {% endblock stylesheets %}
+   </head>
+   <body>
+      {% block header %}
+         <!-- header -->
+         <span name="top"></span>
+         <header id="header">
+            {% include 'header.html.twig' %}
+
+            <!-- navigation -->
+            {% block mainNavigation %}
+               {% include 'nav.html.twig' %}
+            {% endblock mainNavigation %}
+            <div id="createByOtherEntityMessage" class="alert alert-warning" style="display:none;" role="alert"><strong>{{'createByOtherEntity'|trans()}} !</strong></div>
+         </header>
+      {% endblock header %}
+
+      <div id="content" role="main">
+         <!-- page content -->
+         <div class="container">
+            {% include 'alerts.html.twig' %}
+         {% block body %}{% endblock body %}
+         {% if isMultiInstance is defined and isMultiInstance == true %}
+            <div id="createByOtherEntity" class="row" style="display:none;">
+               <div class="col-sm-12">
+                  <button type="button" class="btn btn-warning btn-xs" disabled="disabled">&nbsp;&nbsp;&nbsp;</button><small> : {{'createByOtherEntity'|trans()}}.</small>
+               </div>
+            </div>
+         {% endif %}
+      </div>
+   </div>
+
+   {% block footer %}
+      {% include 'footer.html.twig' %}
+   {% endblock footer %}
+   {% include 'modalAlerts.html.twig' %}
+
+   {% block javascripts %}
+       <!--<script src="{{ app.request.scheme ~'://' ~ app.request.httpHost ~ asset('js/_globals.js') }}"></script>-->
+
+      <script type="text/javascript" src="{{ asset('bundles/postparc/js/jquery-2.2.4.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/js/jquery.browser.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/bootstrap3/js/bootstrap.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/jquery.pwstrength.bootstrap/pwstrength-bootstrap.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/fontawesome-free/js/all.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/js/postparc.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/js/post-parc-ui.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/js/postparc-autocomplete.js')}}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/js/postparc-ajax-all-user.js')}}"></script>
+      {% if is_granted('ROLE_CONTRIBUTOR') %}
+         <script type="text/javascript" src="{{ asset('bundles/postparc/js/postparc-ajax-contributor.js')}}"></script>
+      {% endif %}
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/select2/dist/js/select2.full.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/select2/dist/js/i18n/fr.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/infinite-scroll/infinite-scroll.pkgd.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/bootstrap-datepicker/js/bootstrap-datepicker.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.'~ app.request.getLocale() ~ '.js') }}" charset="UTF-8"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/datetimepicker/build/jquery.datetimepicker.full.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/jquery-ui/jquery-ui.min.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/jquery-ui/i18n/datepicker-'~ app.request.getLocale() ~ '.js') }}" charset="UTF-8"></script>
+      <script type="text/javascript" src="{{ path('fos_js_routing_js', {'callback': 'fos.Router.setData'}) }}"></script>
+      <script src="{{ asset('bundles/bazingajstranslation/js/translator.min.js') }}"></script>
+      <script src="{{ url('bazinga_jstranslation_js')|replace({'http': scheme}) }}"></script>
+      <script src="{{ asset('bundles/tetranzselect2entity/js/select2entity.js') }}"></script>
+       <!-- Summernote -->
+      <script src="{{ asset('bundles/postparc/lib/summernote/summernote.min.js') }}"></script>
+      <script src="{{ asset('bundles/postparc/lib/summernote/lang/summernote-'~ app.request.getLocale()|lower~'-'~ app.request.getLocale()|upper~'.js') }}"></script>
+      <script src="{{ asset('bundles/postparc/lib/summernote-templates-plugin/summernote-templates.js') }}"></script>
+      <script src="{{ asset('bundles/postparc/lib/summernote-cleaner/summernote-cleaner.js') }}"></script>
+      
+      <!--[if lt IE 9]>
+          <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <![endif]-->
+      {# mise en hidden des champs isShared #}
+      {% if isMultiInstance is not defined or (isMultiInstance is defined and isMultiInstance == false)  or (app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').shared_contents==false) %}
+         <script type="text/javascript">
+            $("#sharedInformationFormOptions").attr('style', 'display:none');
+            $("input[type='checkbox'][id$='_isShared']").closest('div[class="checkbox"]').attr('style', 'display:none');
+            $("input[type='checkbox'][id$='_isEditableByOtherEntities']").closest('div[class="checkbox"]').attr('style', 'display:none');
+         </script>
+      {% endif %}
+   {% endblock javascripts %}
+   
+   {% block addtional_javascripts %}
+   {% endblock addtional_javascripts %}    
+
+   {% if piwik is defined and piwik.enable==1 %}
+      {% block piwik %}
+         <!-- Piwik -->
+         <script type="text/javascript">
+            var _paq = _paq || [];
+            _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+            _paq.push(["setCookieDomain", "{{ app.environment }}.postparc.fr"]);
+            _paq.push(["setDomains", ["{{ app.environment }}.postparc.fr"]]);
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            _paq.push(['setCustomVariable', 1, 'domaine', '{{ app.environment }}', scope = "visit"]);
+            _paq.push(['setCustomVariable', 2, 'entity','{{ app.environment }}{% if isMultiInstance is defined and isMultiInstance == true and app.user.entity.parent %}_{{ app.user.entity.slug|upper }}{% endif %}', scope = "visit"]);
+            (function() {
+               var u = "//{{piwik.piwirlUrl}}/";
+               _paq.push(['setTrackerUrl', u + 'matomo.php']);
+               _paq.push(['setSiteId', {{ piwik.piwikSiteId }}]);
+               var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+               g.type = 'text/javascript';
+               g.async = true;
+               g.defer = true;
+               g.src = u + 'matomo.js';
+               s.parentNode.insertBefore(g, s);
+            })();
+         </script>
+         <noscript><p><img src="//{{piwik.piwirlUrl}}/matomo.php?idsite={{piwik.piwikSiteId}}&domaine={{ app.environment }}&entity={{ app.environment }}{% if isMultiInstance is defined and isMultiInstance == true and app.user.entity.parent %}_{{ app.user.entity.slug|upper }}{% endif %};rec=1" style="border:0;" alt="" /></p></noscript>
+         <!-- End Piwik Code -->
+      {% endblock piwik %}
+   {% endif %}
+</body>
+</html>

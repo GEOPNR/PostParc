@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+
+{% block title %}
+   {{'Event.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+
+   <div class="nav-list-actions col-md-3 pull-right">
+      <ul>
+         {% if is_granted('ROLE_USER_PLUS') %}
+            <li class="sf_admin_action_new">
+               <a class="btn btn-primary" href="{{path('event_new')}}"><i class="fa-solid fa-plus"></i><span class="libelle">&nbsp;{{'actions.new'|trans}}</span></a>
+            </li>
+         {% endif %}
+         <li><a class="sf-admin-filters-toggle btn btn-default active"><i class="fa-solid fa-filter"></i><span class="libelle">&nbsp;{{'sorts'|trans}}</span></a></li>
+      </ul>
+   </div>
+
+   <h1>{{'Event.list'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-27"><i class="fa-solid fa-question-circle"></i></a>
+      <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{pagination.getTotalItemCount}}</span> {{'results'|trans}}</small>
+   </h1>
+   {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '27'})) }}
+
+   <div class="sf-admin-filters" {% if( app.request.session.has("eventFilter") and app.request.session.get("eventFilter")|length ) %} style="display:block;" {% endif %}>
+      {{ form_start(search_form) }}
+      <div class="form-group form-action pull-right">
+         <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+         <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+      </div>
+      {{ form_widget(search_form) }}
+      {{ form_end(search_form) }}
+   </div>
+
+   <form action="{{path('event_batch')}}" method="post" >
+      {% include 'default/selectResultsPerPage.html.twig'  %}
+      {% if is_granted('ROLE_CONTRIBUTOR') %}
+         <div class="sf-admin-batch-actions-choice">
+            <div class="form-group">
+               <label for="batch_action">{{'forSelection'|trans}}</label>
+               <select name="batch_action" class="form-control">
+                  <option value="">{{'chooseAction'|trans}}</option>
+                  <option value="batchDelete">{{'actions.delete'|trans}}</option>
+               </select>
+            </div>
+            <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+         </div>
+      {% endif %}
+      <div class="sf_admin_list scrollable_list no-more-tables">
+         <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+               <tr>
+                  {% if is_granted('ROLE_CONTRIBUTOR') %}
+                     <th id="sf_admin_list_batch_actions">
+                        <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                     </th>
+                  {% endif %}
+                  <th>{{ knp_pagination_sortable(pagination, 'genericFields.name'|trans(), 'e.name') }}</th>
+                  <th>{{ knp_pagination_sortable(pagination, 'Event.field.date'|trans(), 'e.date') }}</th>
+                  <th>{{ 'Event.nbParticipant' | trans }}</th>
+                  <th>{{ 'Event.nbPresent' | trans }}</th>
+                  <th>{{ 'Event.nbAbsent' | trans }}</th>
+                  <th id="sf_admin_list_th_actions">{{'actions.actions'|trans}}</th>
+               </tr>
+            </thead>
+            <tbody>     
+               {% for event in pagination %}
+                  {% if (event.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                     {% set editable = false %}
+                  {% else %}
+                     {% set editable = true %}
+                  {% endif %}
+                  <tr {% if editable==false %} class="warning"{% endif %}>
+                     {% if is_granted('ROLE_CONTRIBUTOR') %}
+                        <td><input type="checkbox" name="ids[]" value="{{ event.id }}" class="sf_admin_batch_checkbox"></td>
+                        {% endif %}
+                     <td>{{ event.name }}</td>
+                     <td>{{ event.date|date('d-m-Y H:i') }}{% if event.duration %} <i class="fa-solid fa-arrow-right"></i> {{ event.endDate|localizeddate() }}{% endif %}</td>
+                     <td>{{ event.getNbParticipant }}</td>
+                     <td>{{ event.getNbPresent }}</td>
+                     <td>{{ event.getNbAbsent }}</td>
+                     <td>
+                        <div class="btn-group">
+                           <a class="btn btn-default btn-xs" href="{{ path('event_show', {'id': event.id}) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.show'|trans}}">
+                              <i class="fa-solid fa-eye"></i>
+                           </a>
+                           {% if is_granted('ROLE_USER_PLUS') %}
+                                 <a class="btn btn-default btn-xs " href="{{path('event_copy', {'id':event.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.copy'|trans}}"  data-container="body" data-confirm="{{'actions.confirmCopy'|trans}}">
+                                    <i class="fa-solid fa-copy" aria-hidden="true"></i>
+                                 </a>
+                           {% endif %}
+                           {% if (is_granted('ROLE_USER_PLUS') and event.getCreatedBy.id == app.user.id) or is_granted('ROLE_CONTRIBUTOR')  %}
+                              <a class="btn btn-default btn-xs" href="{{ path('event_edit', {'id': event.id}) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                                 <i class="fa-solid fa-pencil-alt"></i>
+                              </a>
+                           {% endif %}
+                           {% if ((is_granted('ROLE_USER_PLUS') and event.getCreatedBy.id == app.user.id) or is_granted('ROLE_CONTRIBUTOR')) and ( editable or ( not(editable) and event.isEditableByOtherEntities) ) %}
+                              <a class="btn btn-default btn-xs " href="{{path('event_delete', {'id':event.id })}}" data-type="event" data-id="{{event.id}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}" >
+                                 <i class="fa-solid fa-trash-alt"></i>
+                              </a>
+                           {% endif %}
+                        </div>
+                     </td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </form>
+
+   <div class="navigation text-center">
+      {{ knp_pagination_render(pagination) }}
+   </div>
+
+{% endblock %}

@@ -1,0 +1,54 @@
+<div class="modal fade" id="add-new-Profession-Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">{{'Profession.new'|trans()}}</h4>
+         </div>
+         <div class="modal-body">
+            <form id="form-modal-add-new-Profession" method="POST" actions="{{ path('ajax_add_new_profession') }}">
+               {{ form_widget(form) }}
+               <input type="submit" id="add-new-function-submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+               {{ form_end(form) }}
+
+               </div>
+
+               <div class="modal-footer">
+
+               </div>
+         </div>
+      </div>
+   </div>
+   <script type="text/javascript">
+
+      $("#form-modal-add-new-Profession").submit(function(event)
+      {
+         /* stop form from submitting normally */
+         if (!event)
+            var event = window.event;
+         event.preventDefault();
+
+         var url = '{{ path('ajax_add_new_profession') }}';
+         var posting = $.post(url, {
+            'profession[name]': $('#profession_name').val(),
+            'profession[_token]': $('#profession__token').val()
+         });
+         posting.done(function(data) {
+            $('#add-new-Profession-Modal').modal('toggle');
+            var jsonArray = JSON.parse(data);
+            $('.ajax-add-new-profession').prepend("<option value='" + jsonArray.id + "' selected='selected'>" + jsonArray.name + "</option>");
+            // reload select2
+            $('.ajax-add-new-profession').select2();
+            // ajout alerte
+            var domAlert = "<div id=\"alert-box\"><div class=\"alert alert-success alert-dismissible alert-auto-hidden\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><div class=\"flash-success\">{{ 'flash.addSuccess'|trans() }}</div></div></div>";
+            $('#content').append(domAlert);
+            hideAlertMessage();
+            //$(".alert-auto-hidden").fadeTo(3000, 800).slideUp('slow', function(){
+            //    $(".alert-auto-hidden").alert('close');
+            //});
+         });
+
+      });
+
+   </script>
+

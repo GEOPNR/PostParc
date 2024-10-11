@@ -1,0 +1,74 @@
+<div class="tab-pane fade {% if activeTab == 'persons'  %} active in {% endif %}" id="persons">
+
+   <a href="javascript:void(0)" data-content-type="persons" class="btn btn-info btn-xs btn-block addTabToSelection">{{'actions.addTabElementsToSelection'|trans}}</a>
+
+   <div class="sf_admin_list no-more-tables" >
+      <table class="table table-striped table-condensed table-responsive table-hover">
+         <thead>
+            <tr>
+               <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+               <th>{{ knp_pagination_sortable(persons, 'Person.field.name'|trans(), 'p.slug') }}</th>
+               {% if ('phone' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.phone'|trans(), 'c.phone') }}</th>
+               {% endif %}
+               {% if ('mobilePhone' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.mobilePhone'|trans(), 'c.mobilePhone') }}</th>
+               {% endif %}
+               {% if ('email' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Email.field.email'|trans(), 'e.email') }}</th>
+               {% endif %}
+               {% if ('city' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.city'|trans(), 'city.name') }}</th>
+               {% endif %}
+               <th>{{'genericFields.actions'|trans}}</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for person in persons %}
+               {% if (person.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                  {% set editable = false %}
+               {% else %}
+                  {% set editable = true %}
+               {% endif %}
+               <tr class="{% if editable==false %}warning{% endif %}{% if person.dontWantToBeContacted == 1 %}dontWantToBeContacted{%  endif  %}">
+                  <td><input type="checkbox" name="personIds[]" value="{{ person.id }}" class="sf_admin_batch_checkbox"></td>
+                  <td>{% if person.deletedAt %}<s>{% endif %}<a href="{{ path('person_show', {'id': person.id}) }}">{{ person }}</a>{% if person.dontWantToBeContacted == 1 %} <i class="fa-solid fa-mask" title="{{ 'Person.field.dontWantToBeContacted'|trans() }}"></i> {%  endif  %}{% if is_granted('ROLE_CONTRIBUTOR') and person.dontShowCoordinateForReaders == 1 %} <i class="fa-solid fa-user-shield" title="{{ 'Person.messages.dontShowCoordinateForReaders'|trans() }}"></i> {%  endif  %}{% if person.deletedAt %}</s>{% endif %}</td>
+                  {% if ('phone' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="javascript:;" class="phoneNumber">{% if person.getCoordinate().getPhone() %}{{ person.getCoordinate().getPhoneCode() }}{{ person.getCoordinate().getPhone() }}{% endif %}</a>{% endif %}</td>
+                  {% endif %}
+                  {% if ('mobilePhone' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="javascript:;" class="phoneNumber">{% if person.coordinate.mobilePhone %}{{ person.getCoordinate().getPhoneCode() }}{{ person.coordinate.mobilePhone }}{% endif %}</a>{% endif %}</td>
+                  {% endif %}
+                  {% if ('email' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="mailto:{{person.coordinate.email}}">{{ person.coordinate.email }}</a>{% endif %}</td>
+                  {% endif %}
+                  {% if ('city' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) and person.coordinate.city %}{{ person.coordinate.city.getName() }}{% endif %}</td>
+                  {% endif %}
+                  <td>
+                     <div class="btn-group">
+                        <a href="{{ path('person_show', {'id': person.id}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Person.actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                        {% if person.coordinate  and person.coordinate.coordinate|length and 'geographicalCoordinate' not in personnalFieldsRestriction and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) )%}
+                           <a class="btn btn-default btn-xs" href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{coordinate}}%3B{{person.coordinate.coordinate}}" target=blank" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'itinerary'|trans}}"><i class="fa-solid fa-map" aria-hidden="true"></i></a>
+                        {% endif %}
+                        {% if (is_granted('ROLE_CONTRIBUTOR') and ( editable == true or ( not(editable) and person.isEditableByOtherEntities) ) )%}
+                           <a class="btn btn-default btn-xs" href="{{ path('person_edit', {'id': person.id,'origin':'search' }) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                              <i class="fa-solid fa-pencil-alt"></i>
+                           </a>
+                           <a class="btn btn-default btn-xs delete-ajax-button" data-type="person" data-id="{{person.id}}" href="{{path('person_delete', {'id':person.id,'origin':'search' })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}" >
+                              <i class="fa-solid fa-trash-alt"></i>
+                           </a>
+                        {% endif %}
+                        <a href="{{path('person_exportVcard', {'id':person.id })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.exportVcard'|trans}}"><i class="fa-solid fa-address-card"></i></a>
+                        <a href="{{path('person_addBasket', {'id':person.id,'origin':'search' })}}" class="btn btn-default btn-xs add-to-selection-button" data-type="person" data-id="{{person.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                     </div>
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+   <div class="navigation text-center">
+      {{ knp_pagination_render(persons) }}
+   </div>
+</div>

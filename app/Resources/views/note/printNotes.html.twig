@@ -1,0 +1,19 @@
+<table class="table table-bordered tab-condensed">
+    <tbody>
+       {%  for note in notes %}
+          <tr {% if note.isPrivate %}class="warning"{% endif %}>
+             <td>
+                {{ note.date|date('d/m/Y H:i') }}
+                <small>{{ 'by'|trans }} {{ note.createdBy }}</small> {%  if note.isprivate %}<i class="fa-solid fa-lock" aria-hidden="true"></i>{% endif %}
+                {%  if note.getTags()|length %}
+                   <br/><i class="fa-solid fa-tags" aria-hidden="true"></i> {{ note.getTags()|join(', ') }}
+                {% endif %}
+             </td>
+             <td>
+                <strong>{{ note.title }}</strong>
+                <p>{{ note.content|raw }}</p>
+             </td>
+          </tr>
+       {%  endfor %}
+   </tbody>
+</table>

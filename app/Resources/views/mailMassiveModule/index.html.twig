@@ -1,0 +1,276 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{'sendMailMassifModule.label'|trans}}
+{% endblock title %}
+
+{% block body %}
+    {% set nbEmails = emails|length %}
+    <h1>{{'sendMailMassifModule.label'|trans}}
+        <small class="text-info" data-toggle="tooltip" data-placement="right" data-html="true" title="{{emails|join('\n')}}">&nbsp;&nbsp;({{nbEmails}} email{% if nbEmails > 1%}s{% endif %})</small>
+    </h1>
+    <div class="col-md-8">
+    {% if documentTemplates|length()>0 %}
+        <div class="bs-callout bs-callout-info">
+            <div class="form-group">
+                <label for="documentTemplate" class="control-label">{{'sendMailMassifModule.actions.load_DocumentTemplate'|trans}}</label>
+                <select id="documentTemplate" name="documentTemplate" class="form-control">
+                    {% for documentTemplate in documentTemplates %}
+                        <option value="{{documentTemplate.id}}">{{documentTemplate}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <a href="javascript:void(0)" class="btn btn-info" id="loadDocumentTemplate">Charger</a>
+        </div>
+    {% endif %}
+    </div>
+    <div class="col-md-4">
+        {% include 'mailMassiveModule/_mailConsumptionInfosBloc.html.twig' with {'consumptionInfos': consumptionInfos} %}
+    </div>
+
+    <form action="{{path('mailMassiveModule_process')}}" method="post" id="sendMailMassifModuleForm" enctype="multipart/form-data">
+
+        <div class="row">
+            {% if nbEmails > 0  %}
+                <div class="col-md-12">
+                    <a href="javascript:void(0);" id="showHidedetailledMailListLink" class="btn btn-info btn-xs"><i class="far fa-list-alt"></i> {{ 'sendMailMassifModule.actions.showDetailledMailList'|trans() }}</a>
+                    <div id="detailledMailListBlock" style="display:none;">
+                        <table class="table table-striped table-condensed table-responsive table-hover">
+                            {% for entityType, emailsDetails in selectionDataEmailsDetails %}
+                                {%  for objectId, infos in emailsDetails %}                            
+                                    <tr id="{{entityType}}-{{objectId}}">                                
+                                        <td>{{ infos['label'] }}</td>
+                                        <td>{{ infos['emails']|join(';')}}</td>
+                                        <td>
+                                            <input type="hidden" name="emails[{{entityType}}][{{objectId}}]" value="{{ infos['emails']|join(';')}}"/> 
+                                            <a href="javascript:void(0);" data-label="{{ infos['label'] }}" data-selectedValues="{{ infos['emails']|join(';')}}" data-type="{{entityType}}" data-id="{{objectId}}" class="changeEmailInMailMassifModule btn btn-default btn-xs">
+                                                <i class="fa-solid fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {%  endfor %}
+                            {%  endfor %}    
+                        </table>
+                    </div>
+                </div>
+            {% endif %}        
+            <div class="col-md-8">
+                <label for="sender" class="control-label">{{'sendMailMassifModule.fields.sender'|trans}}</label>
+                <div class="row form-group">
+                    <div class="col-md-6 ">
+                        <label for="senderName" class="control-label">{{'sendMailMassifModule.fields.senderName'|trans}}</label>
+                        <input type="text" class="form-control"  id="senderName" name="senderName" style="border-radius:4px!important;border-top-right-radius:0!important;border-bottom-right-radius:0!important;" value="{{app.user}}" />
+                    </div>
+                    <div class="form-group col-md-6 ">
+                        <label for="sender" class="control-label">{{'sendMailMassifModule.fields.senderEmail'|trans}}</label>
+                        <select id="noreplyEmail" name="noreplyEmail" class="form-control" >
+                            {% for email in noreplyEmails %}
+                                <option value="{{email}}">{{email}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="sendMeCopyOfMail" value="1"> {{ 'actions.sendMeCopyOfMail'|trans() }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="deleteDuplicateEmails" value="1" checked> {{ 'actions.deleteDuplicateEmails'|trans() }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="addRGPDMessageForPerson" value="1" checked> {{ 'sendMailMassifModule.fields.addRGPDMessageForPerson'|trans() }}
+                    </label>
+                </div>
+            </div>
+
+        </div>
+                    
+        <div class="row">
+            <div class="col-md-8">
+                <div class="form-group">
+                    {{ form_row(form.subject) }}
+                    <p class="help-block">{{"sendMailMassifModule.messages.variables_can_be_use_for_this_field"|trans}}</p>
+                </div>
+                <div class="form-group">
+                    {{ form_row(form.body) }}
+                    <p class="help-block">{{"sendMailMassifModule.messages.variables_can_be_use_for_this_field"|trans}}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default panel-vars">
+                    <div class="panel-heading">
+                        <i class="fa-solid fa-puzzle-piece"></i>&nbsp;<strong>{{'Variables'|trans}}</strong>
+                    </div>
+                    <ul>
+                        {% for key, field in documentTemplate_availableFields %}
+                            <li>
+                                <div class="var">
+                                    <div class="pull-left">
+                                        <button href="javascript:void(0);" class="btn btn-default insertToBody" value="[[{{field}}]]" ><i class="fa-solid fa-caret-square-left"></i></button>
+                                    </div>
+                                    <div class="info">
+                                        {{key|trans}} <small class="name">[[{{field}}]]</small>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+                    
+            <div class="row">
+                <div class="checkbox col-md-8">
+                    {{ form_row(form.requestingAReadReceipt) }}
+                    <p class="help-block">{{"sendMailMassifModule.messages.requestingAReadReceipt"|trans}}</p>
+                </div>
+            </div>
+                
+            <div class="row">
+                <div class="form-group col-md-8">
+                    <label for="mailFooter" class="control-label ">{{'sendMailMassifModule.fields.mailFooter'|trans}}</label>
+                    <select id="mailFooter" name="mailFooterId" class="form-control">
+                        <option value=""></option>
+                        {% for mailFooter in mailFooters %}
+                            <option value="{{mailFooter.id}}">{{mailFooter}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+                    
+            {% if not(app.session.get('currentEntityConfig') is defined) or not(app.session.get('currentEntityConfig').hideSpecificMessageField) %}        
+                <div class="row">
+                    <div class="col-md-8">
+                        <label for="replyToContent" class="control-label ">{{'sendMailMassifModule.fields.replyToContent'|trans}}</label>
+                        <textarea id="replyToContentId" name="replyToContent" class="form-control summernote">
+                            {{ replyToContent }}
+                        </textarea>
+                        <p class="help-block">{{"sendMailMassifModule.messages.replyToContent"|trans}}</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="row">
+                <div class="form-group col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa-solid fa-file" aria-hidden="true"></i> <label class="control-label">{{'genericFields.attachments'|trans()}}</label>{{ form_label(form.attachments) }}
+                        </div>
+                        <div class="panel-body">
+                            <ul class="attachments" data-prototype="{{ form_widget(form.attachments.vars.prototype)|e('html_attr') }}">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>   
+
+        </div>
+        <button {% if not(nbEmails > 0) %} disabled {%  endif %}type="submit" class="btn btn-primary" id="submitMailMassifModule" data-toggle="tooltip" data-placement="top" data-container="body" title="Envoyer" data-confirm="{{'actions.sendMailMassifConfirm'|trans({'%nbMail%' : nbEmails})}}" {% if quotaExceeded %}disabled{% endif %}>Envoyer</button>
+    <form>
+
+{% endblock body %}
+
+{% block addtional_javascripts %}
+    <script type="text/javascript">
+        $(function () {
+            $('#sendMailMassifModuleForm').submit(function (ev) {
+
+                if (!$('#dataConfirmModal').length) {
+                    $('body').append('<div id="dataConfirmModal" class="modal" role="dialog" aria-labelledby="dataConfirmLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h3 id="dataConfirmLabel">{{'confirm'|trans}}</h3></div><div class="modal-body"></div><div class="modal-footer"><button class="btn" data-dismiss="modal" aria-hidden="true">{{'no'|trans}}</button><a class="btn btn-danger" id="dataConfirmOK" >{{'yes'|trans}}</a></div></div></div></div>');
+                }
+                $('#dataConfirmModal').find('.modal-body').text($("#submitMailMassifModule").attr('data-confirm'));
+                $('#dataConfirmOK').attr('onClick', "document.getElementById(\'sendMailMassifModuleForm\').submit();");
+                $('#dataConfirmModal').modal({show: true});
+                var htmlContent = $('.summernote').summernote('code');
+                $("input#mail_massif_module_body").val(htmlContent);
+
+                return false;
+            });
+        });
+
+        $('#attachment').change(function () {
+            if (this.files[0].size / (1024 * 1024) > {{maxAttachmentFileSize}}) {
+                alert('Merci de séléectionner un fichier dont la taille est inférieure à {{maxAttachmentFileSize}} MB');
+                $(this).parent().addClass('has-error');
+            } else {
+                $(this).parent().removeClass('has-error');
+            }
+        });
+
+        $("#showHidedetailledMailListLink").click(function () {
+            $("#detailledMailListBlock").slideToggle('fast');
+        });
+
+        $(document).ready(function ($, event) {
+            validateSelectedEmails();
+            changeEmailInMailMassifModule();
+        });
+
+        $(document).ajaxComplete(function () {
+            validateSelectedEmails();
+            changeEmailInMailMassifModule();
+        });
+
+        function changeEmailInMailMassifModule() {
+            $(".changeEmailInMailMassifModule").click(function () {
+                var id = $(this).data('id');
+                var type = $(this).data('type');
+                var selectedValues = $(this).data('selectedvalues');
+                var label = $(this).data('label');
+                if (type) {
+                    $.ajax({
+                        url: Routing.generate('ajax_getPreferedEmailsSelectForMailMassifmodule'),
+                        type: "POST",
+                        async: true, // Mode asynchrone
+                        dataType: "json",
+                        data: {
+                            'id': id,
+                            'type': type,
+                            'selectedValues': selectedValues,
+                            'label': label
+                        },
+                        complete: function (response) {
+                            console.log('complete : ' + response.responseText);
+                            $('#' + type + '-' + id).html(response.responseText);
+                        },
+                        success: function (response) {
+                            console.log('success : ' + response);
+
+                        },
+                        error: function (response) {
+                            console.log('error : ' + response);
+                        }
+                    });
+                }
+                event.preventDefault();
+                return false;
+            });
+        }
+
+        function validateSelectedEmails() {
+            $(".validateSelectedEmails").click(function () {
+                var selector = $(this).data('selector');
+                // get selected values
+                var selectedValues = $("#" + selector).val();
+                // replace hidden field
+                var joinValues = selectedValues.join(';');
+                $('#hidden-field-' + selector).val(joinValues);
+                // replace select
+                $('#' + selector).replaceWith(joinValues);
+                // remove save button
+                $('#save-button-' + selector).remove();
+                $('#edit-button-' + selector).removeClass('hidden');
+                event.preventDefault();
+                return false;
+            });
+        }
+
+    </script>
+{% endblock  %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/postparc/js/attachments.js') }}"></script>
+{% endblock %}

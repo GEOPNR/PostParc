@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Selection.print.label'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <div class="row">
+      <div class="col-sm-12 col-md-8">
+         <h1>{{'Selection.print.label'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-14"><i class="fa-solid fa-question-circle"></i></a></h1>
+      </div>
+      {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '14'})) }}
+      {% if nbElements > 0 %}
+         <div class="col-sm-12 col-md-4" id="impressionOptionShowHide">
+            <a href="javascript:void(0)" class="btn btn-default">{{'Selection.print.actions.showPrintoptions'|trans }} <i class="fa-solid fa-caret-square-down"></i></a>
+         </div>
+      {% endif %}
+   </div>
+   <div id="sf_admin_content">
+      {% if nbElements > 0 %}
+         <div class="bs-callout bs-callout-info">
+            <div class="col-sm-12 col-md-12">
+               <p>{{'Selection.print.messages.first_message'|trans({'%nbItems%': nbElements })|raw }}.</p>
+            </div>
+
+            <form action="{{path('print_selection_execute')}}" method="post" class="form-inline" role="form">
+               {{ render(controller('PostparcBundle:Selection:getPrintOptions')) }}
+            </form>
+
+         </div>
+      {% else %}
+         <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-12">
+               <div class="alert alert-warning" role="alert">{{'flash.emptySelection'|trans}}</div>
+            </div>
+         </div>
+      {% endif %}
+   </div>
+
+{% endblock body %}

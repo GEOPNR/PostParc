@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+{% if app.user.coordinate and app.user.coordinate.coordinate|length > 0 %}
+   {% set coordinate = app.user.coordinate.coordinate %}
+{% else %}
+   {% set coordinate = app.user.entity.coordinate %}
+{% endif %}
+{% block title %}
+   {{'Organization.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <div class="nav-list-actions col-md-3 pull-right">
+      <ul>
+         {% if is_granted('ROLE_CONTRIBUTOR') %}
+            <li class="sf_admin_action_new">
+               <a class="btn btn-primary" href="{{path('organization_new')}}"><i class="fa-solid fa-plus"></i><span class="libelle">&nbsp;{{'actions.new'|trans}}</span></a>
+            </li>
+         {% endif %}
+         <li><a class="sf-admin-filters-toggle btn btn-default active"><i class="fa-solid fa-filter"></i><span class="libelle">&nbsp;{{'sorts'|trans}}</span></a></li>
+      </ul>
+   </div>
+
+   <h1>{{'Organization.list'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-6"><i class="fa-solid fa-question-circle"></i></a>
+      <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{pagination.getTotalItemCount}}</span> {{'results'|trans}}</small>
+   </h1>
+   {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '6'})) }}
+
+   <div class="sf-admin-filters" {% if( app.request.session.has("organizationFilter") and app.request.session.get("organizationFilter")|length ) %} style="display:block;" {% endif %}>
+      {{ form_start(search_form) }}
+      <div class="form-group form-action pull-right">
+         <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+         <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+      </div>
+      {{ form_widget(search_form) }}
+      {{ form_end(search_form) }}
+   </div>
+
+   <form action="{{path('organization_batch')}}" method="post" >
+      <div class="sf-admin-batch-actions-choice">
+         <div class="form-group">
+            <label for="batch_action">{{'forSelection'|trans}}</label>
+            <select name="batch_action" class="form-control">
+               <option value="">{{'chooseAction'|trans}}</option>
+               {% if is_granted('ROLE_CONTRIBUTOR') %}
+                  <option value="batchDelete">{{'actions.delete'|trans}}</option>
+               {% endif %}
+               <option value="batchAddBasket">{{'actions.addBasket'|trans}}</option>
+               <option value="batchExportVcard">{{'actions.exportVcard'|trans}}</option>
+            </select>
+         </div>
+         <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+         {% include 'default/selectResultsPerPage.html.twig'  %}
+
+      </div>
+      <div class="sf_admin_list scrollable_list no-more-tables" >
+         <table class="table table-striped table-condensed table-responsive table-hover ">
+            <thead>
+               <tr>
+                  <th id="sf_admin_list_batch_actions">
+                     <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                  </th>
+                  <th>{{ knp_pagination_sortable(pagination, 'Organization.field.name'|trans(), 'o.name') }}</th>
+                  <th>{{ knp_pagination_sortable(pagination, 'Organization.field.abbreviation'|trans(), 'o.abbreviation') }}</th>
+                  <th>{{ knp_pagination_sortable(pagination, 'Organization.field.organizationType'|trans(), 'ot.name') }}</th>
+                  <th>{{ knp_pagination_sortable(pagination,'Organization.field.city'|trans(), 'city.slug') }}</th>
+                  <th>{{'Organization.field.coordinate'|trans()}}</th>
+                  <th id="sf_admin_list_th_actions" style="width:170px;">{{'actions.actions'|trans}}</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for organization in pagination %}
+                  {% if (organization.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                     {% set editable = false %}
+                  {% else %}
+                     {% set editable = true %}
+                  {% endif %}
+                  <tr {% if editable==false %} class="warning"{% endif %}>
+                     <td><input type="checkbox" name="ids[]" value="{{ organization.id }}" class="sf_admin_batch_checkbox"></td>
+                     <td><a href="{{path('organization_show', {'id': organization.id})}}">{{ organization.name }}</a></td>
+                     <td>{{ organization.abbreviation }}</td>
+                     <td>{{ organization.organizationType }}</td>
+                     <td>{% if organization.coordinate %}{{ organization.coordinate.city }}{% endif %}</td>
+                     <td class="sf_admin_text sf_admin_list_td_ListCoordonnees">
+                        {% if organization.coordinate %}
+                           <ul>
+                              {% if organization.coordinate.phone|length %}
+                                 <li>
+                                    <i class="fa-solid fa-phone"></i>&nbsp;{{ organization.coordinate.phone }}
+                                 </li>
+                              {% endif %}
+                              {% if organization.coordinate.email and organization.coordinate.email.email|length %}
+                                 <li>
+                                    <a href="mailto:{{ organization.coordinate.email }}"><i class="fa-solid fa-envelope"></i>&nbsp;{{ organization.coordinate.email }}</a>
+                                 </li>
+                              {% endif %}
+                              {% if organization.coordinate.website|length %}
+                                 <li>
+                                    <a href="{{ organization.coordinate.website }}"><i class="fa-solid fa-laptop"></i>&nbsp;{{ organization.coordinate.website }}</a>
+                                 </li>
+                              {% endif %}
+                           </ul>
+                        {% endif %}
+                     </td>
+                     <td>
+                        <div class="btn-group">
+                           <a href="{{path('organization_show', {'id': organization.id})}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.info'|trans}}"><i class="fa-solid fa-info"></i></a>
+                              {% if organization.coordinate and organization.coordinate.coordinate|length %}
+                              <a class="btn btn-default btn-xs" href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{coordinate}}%3B{{organization.coordinate.coordinate}}" target=blank" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'itinerary'|trans}}"><i class="fa-solid fa-map" aria-hidden="true"></i></a>
+                              {% endif %}
+                           <a href="{{path('organization_exportVcard', {'id':organization.id })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.exportVcard'|trans}}"><i class="fa-solid fa-address-card"></i></a>
+                              {% if ( is_granted('ROLE_CONTRIBUTOR') and ( editable or ( not(editable) and organization.isEditableByOtherEntities) ) ) %}
+                              <a href="{{path('organization_edit', {'id': organization.id})}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                                 <i class="fa-solid fa-pencil-alt"></i>
+                              </a>
+                              <a href="{{path('organization_delete', {'id': organization.id})}}" class="btn btn-default btn-xs delete-ajax-button" data-type="organization" data-id="{{organization.id}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}">
+                                 <i class="fa-solid fa-trash-alt"></i>
+                              </a>
+                           {% endif %}
+                           <a href="{{path('organization_addBasket', {'id':organization.id })}}" class="btn btn-default btn-xs add-to-selection-button"  data-type="organization" data-id="{{organization.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                           {% include 'default/_favoriteStarBlock.html.twig' with {'object': organization} %}
+                        </div>
+                     </td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </form>
+
+   <div class="navigation text-center">
+      {{ knp_pagination_render(pagination) }}
+   </div>
+{% endblock %}

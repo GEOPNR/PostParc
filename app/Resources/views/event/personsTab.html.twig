@@ -1,0 +1,89 @@
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if (currentEntityConfig and  currentEntityConfig['personnalFieldsRestriction'] is defined ) %}
+   {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+<br/>
+{% if ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+   <div class="col-md-6">
+      <div class="form-group form-inline">
+         <label for="addPersonsToEvent">{{'Event.actions.addPersonsToEvent'|trans}}</label>
+         <select name="addPersonsToEvent" class="form-control" id="addPersonsToEvent" multiple style="width:90%;display:inline-block;"></select>
+         <button class="btn btn-primary" id="addPersonsToEventSubmitButton" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+      </div>
+   </div>
+{% endif %}
+
+{% if persons|length() > 0  %}
+   <div class="sf_admin_list no-more-tables">
+      <table class="table table-striped table-condensed table-responsive table-hover">
+         <thead>
+            <tr>
+               <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+               <th>{{ knp_pagination_sortable(persons, 'Person.field.name'|trans(), 'p.name') }}</th>
+               <th>{{ knp_pagination_sortable(persons, 'Person.field.firstName'|trans(), 'p.firstName') }}</th>
+                  {% if ('phone' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.phone'|trans(), 'coord.phone') }}</th>
+                  {% endif %}
+                  {% if ('mobilePhone' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.mobilePhone'|trans(), 'coord.mobilePhone') }}</th>
+                  {% endif %}
+                  {% if ('email' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Email.field.email'|trans(), 'email.email') }}</th>
+                  {% endif %}
+                  {% if ('city' not in personnalFieldsRestriction ) %}
+                  <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.city'|trans(), 'city.name') }}</th>
+                  {% endif %}
+               <th>{{ knp_pagination_sortable(persons, 'EventConfirmationPresence.fields.confirmationDate'|trans(), 'ep.confirmationDate') }}</th>
+               <th>{{'genericFields.actions'|trans}}</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% set originPath =  path('event_show', {'id':event.id, 'activeTab': 'persons' } )%}
+            {% for person in persons %}
+               {% if (person.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                  {% set editable = false %}
+               {% else %}
+                  {% set editable = true %}
+               {% endif %}
+               <tr class="{% if editable==false %} warning {% endif %} {% if person.dontWantToBeContacted == 1 %} danger {%  endif  %}">
+
+                  <td><input type="checkbox" name="personIds[]" value="{{ person.id }}" class="sf_admin_batch_checkbox"></td>
+                  <td>{{ person.name }}{% if person.dontWantToBeContacted == 1 %} <i class="fa-solid fa-mask" title="{{ 'Person.field.dontWantToBeContacted'|trans() }}"></i> {%  endif  %}{% if is_granted('ROLE_CONTRIBUTOR') and person.dontShowCoordinateForReaders == 1 %} <i class="fa-solid fa-user-shield" title="{{ 'Person.messages.dontShowCoordinateForReaders'|trans() }}"></i> {%  endif  %}</td>
+                  <td>{{ person.firstName }}</td>
+                  {% if ('phone' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="javascript:;" class="phoneNumber">{% if person.getCoordinate().getPhone() %}{{ person.getCoordinate().getPhoneCode() }}{{ person.getCoordinate().getPhone() }}{% endif %}</a>{% endif %}</td>
+                     {% endif %}
+                     {% if ('mobilePhone' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="javascript:;" class="phoneNumber">{% if person.coordinate.mobilePhone %}{{ person.getCoordinate().getPhoneCode() }}{{ person.coordinate.mobilePhone }}{% endif %}</a>{% endif %}</td>
+                     {% endif %}
+                     {% if ('email' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="mailto:{{person.coordinate.email}}">{{ person.coordinate.email }}</a>{% endif %}</td>
+                     {% endif %}
+                     {% if ('city' not in personnalFieldsRestriction ) %}
+                     <td>{% if person.cordinate is defined and person.coordinate.city is defined and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) )%}{{ person.coordinate.city.name }}{% endif %}</td>
+                  {% endif %}
+                  <td>{{ render(controller('PostparcBundle:Event:getEventPersonsConfirmationDate',{'person':person, 'event':event})) }}</td>
+                  <td>
+                     <div class="btn-group">
+                        <a href="{{ path('person_show', {'id': person.id }) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Person.actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                        <a href="{{path('person_addBasket', {'id':person.id,'origin':'event', 'eventId':event.id })}}" class="btn btn-default btn-xs add-to-selection-button"  data-type="person" data-id="{{person.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                        {% if ( editable or ( not(editable) and person.isEditableByOtherEntities) ) and ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+                           <a href="{{path('event_removePerson', {'id':event.id, 'personId':person.id, 'origin':originPath  })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Event.actions.removePerson'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                        {% endif %}
+                     </div>
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+   <div class="navigation text-center">
+      {{ knp_pagination_render(persons) }}
+   </div>
+   <div class="row" style="">
+      <div class="col-sm-12">
+         <button type="button" class="btn btn-danger btn-xs" disabled="disabled">&nbsp;&nbsp;&nbsp;</button><small> : {{ 'Person.field.dontWantToBeContacted'|trans() }}.</small>
+      </div>
+   </div>
+{% endif %}

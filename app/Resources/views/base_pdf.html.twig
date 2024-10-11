@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Postparc : {% block title %}{% endblock %}</title>
+    {% block head_css %}
+
+    {% endblock %}
+    {% block head_js %}
+    {% endblock %}
+    <style type="text/css">
+
+
+      body{
+        margin-bottom: 20px;
+      }
+
+    </style>
+  </head>
+
+  <body>
+
+    <div id="wrapper">
+
+      <div id="content-wrapper">
+        <div class="container">
+
+          {% block body %}
+
+
+          {% endblock body %}
+        </div>
+      </div>
+      <!-- /#page-wrapper -->
+
+    </div>
+    {% block bottom_js %}
+      {#         {% include 'javascripts.html.twig' %}#}
+    {% endblock bottom_js %}
+
+    {% block additional_bottom_js %}
+    {% endblock additional_bottom_js %}
+
+  </body>
+
+</html>

@@ -1,0 +1,1066 @@
+
+#   /$$$$$$                                          /$$
+#  /$$__  $$                                        |__/
+# | $$  \__/  /$$$$$$  /$$$$$$$   /$$$$$$   /$$$$$$  /$$  /$$$$$$$
+# | $$ /$$$$ /$$__  $$| $$__  $$ /$$__  $$ /$$__  $$| $$ /$$_____/
+# | $$|_  $$| $$$$$$$$| $$  \ $$| $$$$$$$$| $$  \__/| $$| $$
+# | $$  \ $$| $$_____/| $$  | $$| $$_____/| $$      | $$| $$
+# |  $$$$$$/|  $$$$$$$| $$  | $$|  $$$$$$$| $$      | $$|  $$$$$$$
+#  \______/  \_______/|__/  |__/ \_______/|__/      |__/ \_______/
+
+created: Créé le
+updated: Mis à jour le
+createdBy: Créé par
+updatedBy: Mis à jour par
+Previous: Précédent
+Next: Suivant
+result: Résultat
+results: Résultats
+createANewEntry : Créer une nouvelle entrée
+sorts: Filtres
+forSelection: Pour la sélection
+chooseAction: Choisir une action
+help: Aide
+warning: Attention
+yes: Oui
+no: Non
+confirm: Merci de confirmer
+search: Recherche
+my_selection: Ma sélection
+lastModificationOn: Dernière modification le
+by: Par
+resultsPerPage: Résultats par page
+version: Version
+FileExplorer: Explorateur de fichiers
+directLine: ligne directe
+hello: bonjour
+welcome: bienvenue !
+before: avant
+after: après
+all: tous
+parent: parent
+childreen: enfant
+informations: Informations
+alerts: Alertes
+Root entity: Entité racine
+createByOtherEntity: Contenu crée par une autre entité que la votre
+<i class="fa spinner" id="ui-spinner"></i>: '<i class="fa spinner" id="ui-spinner"></i>'
+notShared: Non partagé
+or: ou
+withoutTitle: Sans titre
+Days: Jours
+Hours: Heures
+Minutes: Minutes
+map: Carte
+loading: Chargement
+itinerary: Itinéraire
+
+
+units:
+    numberPerYear: nombre / an
+    inMonth: en mois
+    hoursByMonth: heures / mois
+    month: mois
+    hour: heure
+    day: jour
+    week: semaine
+    euro: €
+    perYear: par an
+    inMm: en millimètre
+
+actions:
+    actions: Actions
+    add: Ajouter
+    sort: Filtrer
+    order: Ordonner
+    erase: Effacer
+    update: Mettre à jour
+    edit: Modifier
+    show: Voir
+    clear: Vider
+    info: Informations
+    delete: Supprimer
+    deleteImage: Supprimer l'image
+    deleteFromGroup: Retirer du groupe
+    deleteFromTerritory: Retirer du territoire
+    export: Exporter
+    new: Nouveau
+    create: Créer
+    createAndContinue: Créer et continuer
+    close: Fermer
+    backToTheList: Retour à la liste
+    addBasket: Ajouter à ma sélection
+    removeFromBasket: Retirer de ma sélection
+    removeFromEvent: Supprimer de l'événement
+    collapseAll : Tout plier
+    unCollapseAll: Tout déplier
+    confirmCopy: Etes vous sur de vouloir copier cet élément ?
+    confirmDelete: Etes vous sur de vouloir supprimer cette entrée ?
+    confirmDeleteMultiple: Etes vous sur de vouloir supprimer toutes les entrées sélectionnées ?
+    confirmAction: Attention ! Cette action est irréversible, confirmez vous ?
+    confirmUseThisVersion: Etes vous certain de vouloir remplacer la version actuelle par cette version ?
+    selectCity: -- Sélectionnez une commune --
+    selectPerson: -- Sélectionnez une personne --
+    selectFunction: -- Sélectionnez une fonction --
+    selectAdditionalFunction: -- Sélectionnez un complément de fonction --
+    selectService: -- Sélectionnez un service/commission --
+    selectProfession: -- Sélectionnez une profession --
+    selectOrganizationType: -- Sélectionnez un type d'organisme --
+    selectFrequency: -- Sélectionnez une fréquence --
+    selectOneOrManyTags: -- Sélectionnez un ou plusieurs domaines --
+    selectMailFooter: -- Sélectionnez une signature de mail --
+    selectMandateType: -- Sélectionnez un type de mandat --
+    deleteAllSelection: Etes-vous certain de vouloir supprimer l'ensemble de votre sélection ?
+    confirmDeleteSelection: Etes vous sur de vouloir supprimer cette entrée de votre sélection ?
+    confirmDeleteSearchCriteria: Etes vous sur de vouloir supprimer vos critères de recherche ?
+    generate: Générer
+    edit_my_account: Modifier mon compte
+    record: Enregistrer
+    useThisVersion: Utiliser cette version
+    showDifference: Voir les modifications effectuées
+    showVersion: Voir les différentes versions
+    activate: Activer
+    unactivate: Désactiver
+    callbackEditActualVersion: Retour à l'édition de la version actuelle
+    sendMailMassifConfirm: Vous êtes sur le point d'envoyer %nbMail% emails, confirmez vous ?
+    suppressionConfirmed: Supprimé avec succès.
+    save: Enregistrer
+    selectEventType: Sélectionnez le type d'événement
+    become_original_user: Revenir à son compte utilisateur
+    user_switch: Bascule utilisateur
+    copy: Copier
+    resetFile: Effacer le champ fichier
+    sendMeCopyOfMail: M'envoyer une copie du mail
+    restore: Restaurer
+    exportVcard: Exporter au format Vcard
+    unCheckAll: Tout décocher
+    checkAll: Tout cocher
+    search: Rechercher
+    getYourCoordinate: obtenir sa coordonnée
+exceptions:
+    pageNotFound:
+        title: Page non trouvée
+        text: La page que vous cherchez n'a pu être trouvée. Verifiez cette adresse ou
+    pageNotAllowed:
+        title: Page non autorisée
+        text: La page que vous cherchez à consulter ne vous est pas autorisée. Verifiez cette adresse ou
+    returnToTheHomepage: retournez à la page d'accueil
+    noConfigurationAvailable: Aucune configuration disponible.
+    errorOccured:
+        title: Une erreur est survenue
+error:
+    notAValidCityNumber : Ce n'est un numero de commune valide
+    configureEmailerForHtml: Pour pouvoir lire cette email vous devez configurer votre logiciel de messagerie pour lire les emails en HTML.
+
+flash:
+    updateSuccess: La mise à jour a été effectuée avec succès
+    editSuccess: La mise à jour a été effectuée avec succès
+    deleteSuccess: Suppression effectuée avec succès !
+    deleteFailure: Une erreur est survenue lors de la suppression !
+    deleteMassiveSuccess: Suppression en masse effectuée avec succès !
+    addSuccess: Ajout effectué avec succès !
+    addFailure: Une erreur est survenue lors d'ajout !
+    emptySelection: Votre Sélection est vide !
+    alreadyPresent: Ajout à la sélection impossible car déjà présent.
+    addElementToSelectionSuccess: L'élément a été ajouté à votre sélection
+    deleteFromSelectionSuccess: L'élement a été retiré de la sélection
+    deleteAllSelectionSuccess : Votre sélection a été vidée avec succès !
+    noSearchResult: Aucun résultat ne correspond à votre recherche
+    clear_criteria_success: Les critères de recherches ont été effacé avec succés
+    updateSearchListSuccess : Mise à jour de la liste de recherche effectuée avec succès !
+    updateSearchListError: Mise à jour de la liste de recherche impossible !
+    revertSuccess: Le changement de version a été effectué avec succés !
+    unactivateSuccess: Les éléments ont été désactivés avec succés !
+    activateSuccess: Les éléments ont été activés avec succés !
+    massiveSendMailSuccess: emails viennent d'être envoyés avec succés !
+    massiveSendMailFailureEmpty: Erreur, aucun mail a envoyer !
+    massiveSendMailFailureBadEmails : Attention, les adresses emails suivantes sont considérées comme mauvaises
+    massiveSendMailQuotaExceeded : Envoi de mail impossible votre quota par mois ne permet pas d'effectuer cette envoi
+    add_city_to_territorySuccess: La ville a été ajouté au territoire avec succés !
+    addToGroupFromSelectionSuccess: Le contenu de votre séléction a été ajouté au groupe avec succés !
+    NoElementaddToGroupFromSelectionError: Aucun élément n'a été ajouté au groupe ( déjà présents ).
+    addToEventFromSelectionSuccess: Le contenu de votre séléction a été ajouté à l'évènement avec succés !
+    NoElementaddToEventFromSelectionError: Aucun élément n'a été ajouté à l'évènement ( déjà présents ).
+    OrganizationCantBeAddedToGroupError: Impossible d'ajouter des organismes au groupe, vous ne pouvez qu'ajouter des personnes, salariés, représentants/bénévoles...
+    accessDenied: La ressource à laquelle vous essayez d’accéder n'est pas partagée ou ne dépend pas de votre entité
+    emptyTrash: Votre corbeille est vide.
+    onemailWasSentWithFinalFile: La génération des documents est en cours !<br/>Un mail vous sera envoyé à l'issu contenant un lien vers les fichiers générés.
+    noFileWasGenerated: Erreur, aucun fichier généré
+
+batch:
+    deleteSuccess: La suppression en masse a été effectuée avec succès !
+    noSelectedItemError: Vous devez sélectionner au moins un item pour réaliser cette opération !
+    deleteMassivePersonFormGroupSuccess: Les personnes sélectionnées ont été retirées du groupe avec succès !
+    deleteMassiveRepresentationFromGroupSuccess: Les représentations sélectionnées ont été retirées du groupe avec succès !
+    batchRestoreSuccess: Les élements ont été restaurés avec succès !
+
+genericFields:
+    name: Intitulé
+    actions: Actions
+    isActive: est actif
+    tags: Domaines
+    attachments: Pièces jointes
+    documents: Documents
+    coordinate: Coordonnées
+    isShared: Est partagé
+    isEditableByOtherEntities: Est modifiable par les autres entités
+    email: Adresse email
+    deletedAt: Supprimé le
+
+nav:
+    directory: Annuaire
+    organizations: Organismes
+    organizationTypes : Types d'organisme
+    territoriesTowns: Territoires/Communes
+    territories: Territoires
+    territoryTypes: Types de territoire
+    towns: Communes
+    functionsServices: Fonctions/Services
+    functions: Fonctions
+    services: Services/Commissions
+    additionalFunctions: Complément Fonctions
+    groupsLists: Groupes/Listes
+    personsGroups: Groupes de personne
+    searchList: Liste de recherche
+    settings: Paramétrages
+    printFormat: Formats d'impression
+    profiles: Gestion des profils
+    help: Gestion des aides
+    resultsPerPage: Gestion nombre resultats affichés par page
+    documentTemplate: Modèles de documents
+    mailFooter: Gestion des signatures de mail
+    mailStats: Statistiques d'envoi de mail
+    professions: Gestion des professions
+    tags: Gestion des domaines
+    mandateTypes: Gestion des types de mandats
+    eventsItem: Evénements
+    events: Liste des événements
+    eventTypes: Types d'événements
+    entity: Gestion des entités
+    readerLimitation: Limitations pour le rôle lecteur
+    representations: Representations
+    configuration: Configuration
+    trash: Corbeille
+
+config:
+    labels:
+        massiveMail_module: Module de mail massif
+        event_module: Module Evènement
+        representation_module: Module représentation
+        readerLimitations_module: Module Limitation pour le rôle lecteur
+        multiInstance_module: Module multi-Instance
+        general_config: Configuration générale
+    title: Configuration des modules
+    use_massiveMail: Utiliser le module de mail massif
+    max_email_per_month: Nombre de mail autorisé par mois
+    domains_alowed:  Domaines autorisés pour le module de mail
+    use_event_module: Utiliser le module Evènement
+    use_representation_module: Utiliser le module représentation
+    use_readerLimitations_module: Utiliser le module Limitation pour le rôle lecteur
+    edit_readerLimitations_module: Editer les limitation pour le rôle lecteur
+    show_SharedContents: Voir les contenus partagés par d'autres entités
+    shared_contents: Permettre le partage de certains contenus avec les autres entités
+    default_items_per_page: nombre d'éléments affichés par page par défaut.
+    helps:
+        domains_alowed: lister les domaines séparés par un point virgule.
+
+
+#  /$$$$$$$$             /$$     /$$   /$$     /$$
+# | $$_____/            | $$    |__/  | $$    |__/
+# | $$       /$$$$$$$  /$$$$$$   /$$ /$$$$$$   /$$  /$$$$$$   /$$$$$$$
+# | $$$$$   | $$__  $$|_  $$_/  | $$|_  $$_/  | $$ /$$__  $$ /$$_____/
+# | $$__/   | $$  \ $$  | $$    | $$  | $$    | $$| $$$$$$$$|  $$$$$$
+# | $$      | $$  | $$  | $$ /$$| $$  | $$ /$$| $$| $$_____/ \____  $$
+# | $$$$$$$$| $$  | $$  |  $$$$/| $$  |  $$$$/| $$|  $$$$$$$ /$$$$$$$/
+# |________/|__/  |__/   \___/  |__/   \___/  |__/ \_______/|_______/
+
+
+#AdditionalFunction
+AdditionalFunction:
+    field:
+        name: Intitulé
+
+    list: Liste des compléments de fonctions
+    edit: Edition du complément de fonction
+    new: Ajout d'un nouveau complément de fonction
+
+Attachment:
+    actions:
+        addNewAttachment: Ajouter un nouveau document
+        deleteThisBlock: Supprimer ce bloc
+        download: Télécharger
+# DocumentTemplate
+DocumentTemplate:
+    field:
+        name: Intitulé
+        description: Description
+        subject: Sujet
+        body: Corps
+        mailable: Envoyable par mail
+        marginTop: Marge haute
+        marginBottom: Marge basse
+        marginLeft: Marge gauche
+        marginRight: Marge droite
+        printFooter: Utiliser un pied de page personnalisé
+        footer: Pied de page personnalisé
+        printImage: Afficher une image
+        image: Image
+        isActive: Est actif
+        attachment: Pièce jointe
+        
+
+    message:
+        onlyPngFormatIsAllowed: seul le format PNG est autorisé
+        useOnlyForMassiveEmail: utilisé uniquement lors des envois d'emails massifs
+
+    list: Liste des modèles de documents
+    edit: Edition du modèle de document
+    new: Ajout d'un nouveau model de document
+
+#City
+City:
+    field:
+        insee: Code INSEE
+        name: Intitulé
+        territories : Territoires
+        department: Département
+        zipCode: Code postal
+        country: Pays
+        isActive: Est active
+    list: Liste des communes
+    edit: Edition de la commune
+    new: Ajout d'une nouvelle commune
+
+
+#Civility
+Civility:
+
+#Coordinate
+Coordinate:
+    field:
+        addressLine1: Adresse 1
+        addressLine2: Adresse 2
+        cedex: Cedex
+        phone: Téléphone fixe
+        mobilePhone: Téléphone mobile
+        fax: Fax
+        webSite: Site web
+        city: Commune
+        email: Adresse email
+        organization: Organisme
+        facebookAccount: Compte facebook
+        twitterAccount: Compte twitter
+        phoneCode: Indicatif téléphonique
+    actions:
+        select_one_city: Sélectionnez une commune
+        show-hide-coordinate-bloc: Afficher / masquer le bloc coordonnées
+
+#Email
+Email:
+    field:
+        email: Adresse email
+
+# Entity
+Entity:
+    field:
+        name: Intitulé
+        parent: Sous entité de
+    list: Liste des entités
+    edit: Edition de l'entité
+    new: Ajout d'une nouvelle entité
+    actions:
+        toggleMyEntityAllEntity: Basculer mes entités / toutes les entités
+        newsubEntity : Ajout d'une nouvelle sous entité
+    labels:
+        subEntityOf: sous entité de
+
+#Event
+Event:
+    field:
+        eventType: Type d'événement
+        description: Description de l'événement
+        image: Logo de l'événement
+        nbPlace: Nombre de place
+        frequency: Fréquence
+        organizators: Organisateurs
+        organizations: Organismes
+        organization: Organisme
+        date: date de l'événement
+        duration: durée de l'événement
+        coordinate: coodonnées de l'événement
+    actions:
+        addPersonsToEvent: Ajouter des personnes à l'événement
+        addPfosToEvent: Ajouter des personnes qualifiées à l'événement
+        addRepresentationsToEvent: Ajouter des représentations à l'événement
+        removePerson: Supprimer cette personne de l'événement
+        removePfo: Supprimer cette personne qualifiée de l'événement
+        removeRepresentation: Supprimer cette représentation de l'événement
+    punctual: Ponctuel
+    regular: Régulier
+    listOfParticipants: Liste des participants
+    eventAlerts: Alertes
+    list: Liste des événements
+    edit: Edition de l'événement
+    new: Ajout d'un nouvel événement
+    label: Evènement
+
+#EventType
+EventType:
+    field:
+        name: Intitulé
+    list: Liste des types d'événement
+    edit: Edition du type d'événement
+    new: Ajout d'un nouveau type d'événement
+
+#EventAlert
+EventAlert:
+    field:
+        name: Intitulé
+        gap: Nombre
+        unit: Unité
+        direction: Type de décalage
+        message: Message affiché dans l'alerte
+        recipients: Destinataires
+        isPrintOnInterface: Est affiché dans l'interface
+        isSended: Envoyée
+        event: Evénement associé
+        effectiveDate: Date et heure de lancement
+        mailFooter: Signature de mail
+    actions:
+        backToTheEvent: Retour à l'événement
+        addNew: Ajouter une nouvelle alerte
+    list: Liste des alertes d'événement
+    edit: Edition de l'alerte d'événement
+    new: Ajout d'une alerte d'événement
+    onlyOrganizer: Uniquement l'organisateur de l'événement
+    onlyParticipants: Uniquement les participants
+    outOfDate: Date dépassée
+    yourAlerts: Vos alertes
+
+#Group
+Group:
+    field:
+        name: Intitulé
+        list: Liste des Groupes
+        parent: Sous groupe de
+
+    actions:
+        new: Ajouter un Groupe
+        newSubGroup: Ajouter un sous Groupe
+        listePersonne: Liste des personnes du groupe
+        listeSousGroupePersonne: Liste des personnes du groupe et de ses sous groupes
+        toggleMyGroupsAllGroups: Basculer mes groupes / tous les groupes
+        export: Exporter
+        select_one_group: Sélectionnez un groupe
+
+    list: Liste des groupes
+    edit: Edition du groupe
+    new: Ajout d'un nouveau groupe
+    exportListPerson: Liste des personnes du groupe
+    onlyMyEntityGroups: Uniquement les groupes de mon entité
+
+Homepage:
+    yourSearchLists: Vos listes de recherches
+    yourFuturEvents: Vos Evènements à venir
+    yourFuturEventAlerts: Vos futures alertes
+    quickSearch: Recherche rapide
+    whatsNew: Quoi de neuf ?
+
+#Help
+Help:
+    field:
+        name: Intitulé
+        description: Description
+
+    list: Liste des aides
+    edit: Edition de l'aide
+    new: Ajout d'un nouvel aide
+
+MailFooter:
+    field:
+        name: Intitulé
+        footer: Signature de mail
+
+    list: Liste des signatures de mail
+    edit: Edition de la signature de mail
+    new: Ajout d'une signature de mail
+
+MailStats:
+    label: Statistiques d'envoi de mail
+    detailedStats: Statistiques détaillées
+    yourMailMonthQuota: Votre Quota d'envoi de mail pour ce mois
+    fields:
+        date: Date d'envoi
+        createdBy: Emetteur
+        subject: Sujet
+        nbEmail: Nombre de mails envoyés
+        sender: Expéditeur
+    messages:
+        no_Stats: Aucune statistique à afficher
+
+#Organization
+Organization:
+    field:
+        name: Intitulé organisme
+        abbreviation: Abréviation
+        city: Commune
+        coordinate: Coordonnées
+        organizationType: Type d'organisme
+        observation: Observation
+        description: Description
+        nbAdherent: nb adhérent
+        image: Logo de l'organisme
+        attachments: documents
+
+    list: Liste des organismes
+    edit: Edition de l'organisme
+    new: Ajout d'un nouvel organisme
+    show: Fiche
+    coordinate: Coordonnées de l'organisme
+    personnalList: Liste des salariés de l'organisme
+    noResult: Aucune personne n'est enregistrée dans cet organisme.
+    label: Organisme
+    labels: Organismes
+    subServices: Services/commissions
+    onlyPfoWithPrincipaleFunctionAreShow: Seules les personnes dont la fonction est principale sont listées ici.
+    help:
+        editToAddNewAttachement: Pour ajouter de nouveaux documents, éditer la fiche de l'organisme
+        serviceWithSpecificCoordinate: <button type="button" class="btn btn-info" data-toggle="tooltip" data-html="true" data-placement="right" data-container="body" title="Il vous faut créer un organisme ayant le nom du service <br/>- puis le relier à son organisme 'parent' en tant que service (volet 'organismes liés') <br/>- et relier les personnes salariées/bénévoles à cet organisme nouvellement créé">Service avec coordonnées spécifiques ?</button>
+
+    actions:
+        addPerson: Ajouter une personne salariée
+        show: Voir l'organisme
+        addAnonymous: Ajouter un anonyme
+        addNewRepresentation: Ajouter un représentant/bénévole
+        addPersonToRepresentation: Sélectionner une personne pour la représentation
+        addPfoToRepresentation: Sélectionner une personne qualifiée pour la représentation
+        addBasket:
+            success: L'organisme a été ajouté à votre sélection
+            successMany: Les organismes ont été ajoutés à votre sélection
+            alreadyPresent: Ajout à la sélection impossible car déjà présent.
+    flash:
+        organizationExistingWithSameName:  Organizations présentes dans la base ayant le même intitulé
+
+#OrganizationLink
+OrganizationLink:
+    field:
+        name: Intitulé de la relation
+        linkType: Type de relation
+        organizationLinked: Organisme lié
+    list: Liste des relations entre organismes
+    edit: Edition de la relation
+    new: Ajout d'une nouvelle relation entre organisme
+    linkedOrganizations: Organismes liés
+    vertical: verticale
+    horizontal: horizontale
+    service: verticale (service)
+    actions:
+        addNewLink: Ajouter une nouvelle relation
+        delete: Supprimer la relation
+    helps:
+        organizationLinked: Si relation verticale, indiquer ici l'organisme parent
+
+# OrganizationType
+OrganizationType:
+    field:
+        name: Intitulé
+        parent: Sous type d'organisme de
+    list: Liste des type d'organismes
+    edit: Edition du type d'organisme
+    new: Ajout d'un nouveau type d'organisme
+    actions:
+        toggleMyOrganizationTypeAllOrganizationType: Basculer mes types d'organimes / tous les types d'organismes
+        newsubOrganizationType : Ajout un nouveau sous type d'organisme
+
+#Person
+Person:
+    field:
+        name: Nom
+        firstName: Prénom
+        civility: Civilité
+        coordinate: Coordonnées
+        preferedEmails: Emails préférés
+        observation: Observation
+        profession: Profession
+        birthLocation: Lieu de naissance
+        birthDate: Date de naissance
+        representations: Représentations / Fonctions bénévoles
+        nbMinorChildreen: Nombre d'enfants mineurs
+        nbMajorChildreen: Nombre d'enfants majeurs
+    actions:
+        show: Voir la fiche
+        addGroup:
+            success: La personne a été ajoutée au groupe avec succés.
+            failure: Une erreur est survenue au moment de l'association de la personne au groupe
+        addBasket:
+            success: La personne a été ajoutée à votre sélection
+            alreadyPresent: Ajout à la selection impossible car déjà présent.
+        addPfo: Ajouter une fonction salariée
+        addRepresentation: Ajouter un représentant/bénévole
+    list: L'annuaire
+    edit: Edition de la personne
+    new: Ajout d'une nouvelle personne
+    card: Fiche
+    personalCoordinate: Coordonnées personnelles
+    professionalCoordinate: Coordonnées professionnelles
+    label: Personne
+    labels: Personnes
+    flash:
+        noGroupAssociateAlert : Aucun groupe associé !
+        personExistingWithSameName: Personnes présentes dans la base ayant le même nom
+
+
+#PersonFunction
+PersonFunction:
+    field:
+        name: Intitulé
+        womenName: Intitulé Féminin
+        menParticle: Particule Masculine
+        womenParticle: Particule Féminine
+        notPrintOnCoordinate: non affiché dans les blocs de coordonnées
+
+    list: Liste des fonctions
+    edit: Edition de la fonction
+    new: Ajout d'une nouvelle fonction
+
+#Pfo
+Pfo:
+    field:
+        personFunction: Fonction
+        person: Personne
+        additionalFunction: Complément Fonction
+        service: Service/Commission
+        organization: Organisme
+        phone: Téléphone fixe
+        mobilePhone: Téléphone mobile
+        fax: Fax
+        connectingCity: Commune de rattachement
+        email: Adresse email
+        observation: Observation
+        preferedCoordinateAddress: Adresses d'envoi
+        pfoPersonGroups: Groupes associés
+        coordinate: Coordonnées
+        isMainFunction: est sa fonction principale
+        particleFunction: Particule de la fonction
+        hiringDate: Date de prise de poste
+        representations: Représentations / Fonctions bénévoles au sein de
+    actions:
+        addGroup:
+            success: La personne a été ajoutée au groupe avec succés.
+            failure: Une erreur est survenue au moment de l'association de la personne au groupe
+        addBasket:
+            success: La personne a été ajoutée au groupe avec succés.
+            alreadyPresent: Ajout à la selection impossible car déjà présent.
+            successMany: Les personnes sélectionnées ont été ajoutées à votre sélection
+        addRepresentation: Ajouter une représentation au sein d'un organisme
+    new : Création d'une nouvelle association personne-fonction-organisme
+    edit: Edition de l'association personne-fonction-organisme
+    label: Personne qualifiée
+    labels: Personnes qualifiées
+
+
+#PfoPersonGroup
+PfoPersonGroup:
+    field:
+        person: Personne
+        group: Groupe
+    list: Liste des personnes associées au groupe
+    listSubGroup : et de ses sous groupes
+
+
+#PrintFormat
+PrintFormat:
+    field:
+        name: Intitulé
+        description: Description
+        format: Format
+        orientation: Orientation
+        marginTop: Marge haute
+        marginBottom: Marge basse
+        marginLeft: Marge gauche
+        marginRight: Marge droite
+        numberPerRow: Nombre d'etiquettes par ligne
+        stickerHeight: Hauteur étiquette
+        stickerWidth: Largeur étiquette
+        paddingHorizontalInterSticker: Retrait horizontal inter étiquette
+        paddingVerticalInterSticker: Retrait vertical inter étiquette
+        marginHorizontalInterSticker: Marge horizontale inter étiquette
+        marginVerticalInterSticker: Marge vertical inter étiquette
+        stickerFonts: Police de caractère
+        stickerFontsize: Taille de caractère
+    format:
+        portrait: Portrait
+        landscape: Paysage
+
+    help:
+        millimeters: millimètres
+        fieldsDescription: Description des différents paramètres
+
+    list: Liste des formats d'impression
+    edit: Edition du format d'impression
+    new: Ajout d'un format d'impression
+
+#Profession
+Profession:
+    field:
+        name: Intitulé
+    list: Liste des professions
+    edit: Edition d'une profession
+    new: Ajout d'une nouvelle profession
+
+#Search:
+Search:
+    label: Recherche simple
+    result: Résultat de la recherche simple
+    criteria: Critères de recherche
+    showHideSearchCriteria : Voir/masquer les critères de recherche
+    actions:
+        save_criteria_on_list: Enregister les critères dans la liste
+        create_new_list: Créer une nouvelle liste
+        clear_criteria : Effacer les critères de recherche
+    data-placeholder:
+        filterFullText: Mots clés
+#AdvancedSearch
+AdvancedSearch:
+    label: Recherche avancée
+    searchByExclusion: Recherche par exclusion
+    result: Résultat de la recherche avancée
+    field:
+        function: Fonctions
+        service: Services/Commissions
+        organization: Organismes
+        organizationType: Types d'organisme
+        abbreviation: Abréviations
+        city: Communes
+        territory: Territoires
+        group: Groupes
+        observation: Observation
+        tag: Domaines
+        mandateType: Types de mandat
+        department: Départements
+        profession: Professions
+    data-placeholder:
+        function: Entrez une fonction. Ex Directeur
+        service: entrez une service/commission, Ex Comptabilité
+        organization: Entrez un organisme, Ex Parc du Vercors
+        organizationType: entrez un type d'organisme, Ex Parc naturel
+        abbreviation: Entrez une abréviation, Ex ADEME
+        city: Entrez une ville, Ex GRENOBLE
+        territory: Entrez un territoire. Ex Piémont
+        group: Entrez un groupe. Ex Associations
+        tag: Entrer un domaine, Ex natura 2000
+        mandateType: Entrer un type de mandat, Ex Président
+        department: Enter un département, Ex Isère
+        profession: Entrer une profession
+    subSearch:
+        territory: Rechercher dans les sous-territoires
+        organizationType: Rechercher dans les sous-types d'organismes
+        group: Rechercher dans les sous-groupes
+        mandateType: Rechercher dans les sous-types de mandats
+        includeOrganizationLinked: Inclure les organismes associés
+        includeSubServiceOrganizations: Inclure les organismes de type service associés
+
+
+
+#SearchList
+SearchList:
+    field:
+        name: Intitulé
+        description: Description
+    list: Listes de recherche
+    edit: Edition de la liste de recherche
+    new: Ajout d'une nouvelle liste de recherche
+    showResults: Voir les résultats
+    showCriterias: Voir les critères de recherche
+    actions:
+        addBasket:
+            success: Le résultat de la liste à été ajouté à votre selection
+
+#Service
+Service:
+    field:
+        name: Intitulé
+
+    list: Liste des services/commissions
+    edit: Edition du service/commission
+    new: Ajout d'un service/commission
+
+#Selection
+Selection:
+    list: Ma sélection
+    export:
+        label: Export de votre sélection
+        first_message : Vous êtes sur le point d'exporter <span class="label label-pill label-info">%nbItems%</span> fiche(s).
+        person_options: Pour les personnes
+        organization_options: Pour les organismes
+        pfo_options: Pour les personnes qualifiés
+        coordinate_options: Pour les coordonnées
+        representation_options: Pour les représentations
+        options:
+            use_prefered_address: Utiliser l'adresse préférée pour l'organisme
+        actions:
+            export: Exporter ma sélection
+    document:
+        actions:
+            generateMassiveDocument: Génération massive de documents
+        label: Génération massive de documents
+        documentTemplate: Modèle de document
+        documentModelFile: Modèle de document importé ( .odt ou .docx )
+        exportFormat: Format des fichiers générés
+        exportExplanation: Vos modèles de document peuvent contenir les variables suivantes
+        resultexportMailSubject: génération de vos documents depuis postparc
+        dateFieldDetails: Valeurs de la ligne affichant la date sur le document généré
+        resultexportMailBody: |
+            Bonjour,<br/>            
+            Ceci est un mail automatique envoyé par l'application postparc contenant le résultat de la génération de documents demandé.<br/>            
+            L'ensemble des fichiers se trouvent dans l'archive suivante:<br/><a href="%archive%">%archive%</a>.<br/>
+            Attention, ce fichier ne restera disponible à cette adresse que pendant 24h.
+
+    print:
+        label: Impression d'étiquettes
+        stickerFormat: Format étiquette
+        printOption: Choix des options d'affichage pour les étiquettes
+        CoordinateOption: choix des options pour les blocs adresse
+        options:
+            download_generated_file: Télécharger le fichier généré
+        actions:
+            print: Imprimer les étiquettes
+            showPrintoptions: Voir les options d'affichage pour les étiquettes
+            showCoordinateOptions: Voir les options d'affichage pour les blocs adresse
+        messages:
+            first_message: Vous avez choisis d'imprimer <span class="label label-pill label-info">%nbItems%</span> étiquettes
+    sendMailMassif:
+        label: Mailing Massif
+        to: Pour
+        cc: Copie visible
+        bcc: Copie cachée
+        export_emails: Export emails
+        sendMailMassif_module_access: Accéder au module
+        actions:
+            access: Envoi Email massif
+        messages:
+            send_by_user_soft: Envoi par votre logiciel de messagerie
+            send_by_sendMailMassif_module: Envoi par le module d'envoi de mail massif
+            first_message : Vous avez choisis d'envoyer un mailing massif  à  <span class="label label-pill label-info">%nbItems%</span> personne(s).
+            option_message : Vous pouvez choisir trois options
+            csv_message: Vous pouvez sinon exporter les adresses emails au format csv
+            list_mail: Dans le cas ou vous avez un problème avec votre logiciel de mail ou bien si vous souhaitez utiliser un webmail, voici la liste des emails de votre sélection
+            copy_to_clipboard : Copier ces mails dans le presse papier
+            copy_to_clipboard_success: Les emails ont été copiées dans votre presse papier
+    actions:
+        eraseSelection: Effacer ma sélection
+        addToGroup: Ajouter à un groupe
+        addToEvent: Ajouter à l'évènement
+
+sendMailMassifModule:
+    label: Module d'envoi de mails massif
+    fields:
+        sender: Expéditeur
+        senderName: Nom de l'expéditeur
+        senderEmail: Email de l'expéditeur
+        domain: Domaine
+        subject: Sujet
+        body: Corps
+        mailFooter: Signature
+        attachment: Pièce jointe
+        requestingAReadReceipt: Demander un accusé de réception
+    actions:
+        load_DocumentTemplate: Charger un modèle de document
+    messages:
+        variables_can_be_use_for_this_field: Les variables sont utilisables dans ce champ
+        requestingAReadReceipt: Attention, les accusés de réception ne fonctionneront pas pour la plupart des destinataires. En effet de nombreux clients de messageries désactivent par défaut cette fonctionnalité ou ne la possèdent pas.
+        onlyOneAttachmentIsPossible: Il n'est pas possible d'ajouter plusieurs pièces jointes. Si vous devez envoyer plusieurs documents, vous devez alors le faire avec une archive zip.
+        summuary:
+            subject: Compte rendu envoi via module mail massif postparc
+            bodyStart: Voici le compte rendu de votre envoi de mail massif via postparc
+            nbMailSent: Nombre de mails envoyés
+            nbBadEmails: Nombre d'adresses emails non retenues
+            listMailSent: Liste des adresses emails retenues
+            listBadEmails: Liste des adresses emails non retenues
+            no-reply: Ceci est un mail automatique, merci de ne pas y répondre.
+
+#Service
+Tag:
+    field:
+        name: Intitulé
+        list: Domaines
+        parent: Sous domaine de
+    actions:
+        new: Ajout d'un domaine
+        newsubTag: Ajout d'un sous-domaine
+        toggleMyTagssAllTags: Basculer mes domaines / tous les domaines
+
+    list: Liste des domaines
+    edit: Edition du domaine
+    new: Ajout d'un domaine
+
+#Territory
+Territory:
+    field:
+        name: Intitulé
+        list: Territoires
+        parent: Sous territoire de
+        territoryType: Type de territoire
+    actions:
+        new: Ajout d'un territoire
+        newsubTerritory: Ajout d'un sous-territoire
+        listCities: Liste des villes associées au territoire
+        listeSubTerritoryCities: Liste des villes associées au territoire et à ses sous-territoires
+        confirmMassiveDeleteCities: Etes vous certains de vouloir réaliser cette opération ? Cela dessasociera la ville de tout les territoires auquels elle est rattachée !
+        deleteFromSubTerritory: Retirer de tout les territoires
+        toggleMyTerritoriesAllTerritories: Basculer mes territoires / tous les territoires
+        add_city_to_territory: Ajouter une commune au territoire
+        alreadyPresent: Ajout au territoire impossible car déjà présent.
+    list: Liste des territoires
+    edit: Edition du territoire
+    new: Ajout d'un territoire
+    listCities: Liste des villes associées au territoire
+    listSubTerritory : et de ses sous territoires
+
+# TerritoryType
+TerritoryType:
+    field:
+        name: Intitulé
+        parent: Sous type de territoire de
+    list: Liste des types de territoire
+    edit: Edition du type de territoire
+    new: Ajout d'un nouveau type de territoire
+    actions:
+        toggleMyTerritoryTypeAllTerritoryType: Basculer mes types de territoire / tous les types de territoire
+        newsubTerritoryType : Ajout un nouveau sous type de territoire
+
+#Trash
+Trash:
+    welcome_message : Attention, seuls les contenus de types (Entité, Personne physique, Personne qualifiée, Type de document, Groupe, Territoire, Organisme, Représentation, Liste de recherche, Représentation) peuvent être récupérés via la corbeille. Les autres sont défintivement supprimés.
+    list: Contenu de la corbeille
+    Person: Personnes physiques
+    PrintFormat: Formats d'impression
+    Group: groupes
+    Pfo: Personnes qualifiées
+    Organization: Organismes
+    SearchList: Listes de recherches
+    DocumentTemplate: Modèles de document
+    Territory: Territoires
+    Representation: Representations
+    Entity: Entités
+
+#MandateType
+MandateType:
+    field:
+        name: Intitulé
+        parent: Sous type de mandat de
+    actions:
+        new: Ajout d'un type de mandat
+        toggleMyMandateTypeAllMandateType: Basculer mes types de mandat / tous les types de mandat
+        newsubMandateType : Ajout un nouveau sous type de mandat
+    list: Liste des types de mandats
+    edit: Edition du type de mandat
+    new: Ajout d'un type de mandat
+
+#Representation
+Representation:
+    field:
+        name: Intitulé
+        elected: Élu / désigné
+        beginDate: Date de début
+        mandatDuration: Durée du mandat
+        estimatedTime: Temps dédié estimé
+        estimatedCost: Frais kms estimés
+        periodicity: Périodicité / nombre de réunions
+        mandateType: Type de mandat
+        attachments: Documents
+        specificCoordinate: Coordonnées spécifiques
+        coordinate: Coordonnées
+        nbMonthBeforeAlert: Nombre de mois avant fin du mandant pour envoi alerte
+        alerter: Destinataire de l'alerte
+        sendAlert: Envoi alerte
+        alertDate: date d'envoi de l'alerte de fin de mandat
+        mandatDurationIsUnknown: Durée du mandat inconnue
+        service: Service/Commission
+        observation: Observation
+        person: Personne physique associée
+        pfo: Personne qualifiée associée
+        personFunction: Titre officiel de mandat
+        organization: Organisme
+        civilityFunction: Civilité titre officiel de mandat
+        natureOfRepresentation: Nature de la représentation
+        preferedEmail: Adresse email préférée
+        preferedCoordinateAddress: Adresse postale préférée
+    actions:
+        addRepresentation: Ajouter une représentation
+        addBasket:
+            success: La representation a été ajoutée à votre sélection
+            successPlural: Les representations ont été ajoutées à votre sélection
+            alreadyPresent: Ajout à la selection impossible car déjà présent.
+        removeFromGroup:
+            success: La réprésentation a été retirée du groupe.
+    elected_designated: Élu / désigné
+    no_alert_activated: Aucune alerte active
+    elected: Élu
+    designated: Désigné
+    label : Représentation
+    label_with_volunteer: Représentation/bénévole
+    labels: Représentations
+    labels_with_volunteer: Représentations/bénévoles
+    edit: Édition de la représentation
+
+ReaderLimitation:
+    edit: Edition des limitations pour le rôle lecteur
+    noLimitation: Pas de limitation
+
+Version:
+    label: Liste des versions disponibles
+    modifiedFields : Champs modifiés
+    modificationsCompleted: Modifications effectuées
+    fields: Champs
+    actualValue: Valeur actuelle
+    versionValue: Valeur de la version
+
+Notification:
+    mail:
+        subject: Un de vos contenus a été modifié par une autre personne que vous
+        body: Ce mail vous est destiné afin de vous indiquer que le contenu '%content%' vient d'être modifié par %user%.
+
+
+#  /$$$$$$$$                        /$$   /$$
+# | $$_____/                       | $$  | $$
+# | $$     /$$$$$$   /$$$$$$$      | $$  | $$  /$$$$$$$  /$$$$$$   /$$$$$$
+# | $$$$$ /$$__  $$ /$$_____/      | $$  | $$ /$$_____/ /$$__  $$ /$$__  $$
+# | $$__/| $$  \ $$|  $$$$$$       | $$  | $$|  $$$$$$ | $$$$$$$$| $$  \__/
+# | $$   | $$  | $$ \____  $$      | $$  | $$ \____  $$| $$_____/| $$
+# | $$   |  $$$$$$/ /$$$$$$$/      |  $$$$$$/ /$$$$$$$/|  $$$$$$$| $$
+# |__/    \______/ |_______/        \______/ |_______/  \_______/|__/
+
+
+#User
+User:
+    field:
+        lastName: Nom
+        firstName: Prénom
+        username: Login connexion
+        enabled: Activé
+        roles: Roles
+        wishesToBeInformedOfChanges: Souhaite être averti par mail des modifications
+        entity: Entité
+
+    help:
+        wishesToBeInformedOfChanges: Vous serez informé par mail lorsque quelqu'un modifie un contenu dont vous êtes à l'origine
+
+    roles:
+        viewer: Lecteur
+        ROLE_USER: Lecteur
+        contributor: Contributeur
+        ROLE_CONTRIBUTOR: Contributeur
+        contributor_plus: Contributeur +
+        ROLE_CONTRIBUTOR_PLUS: Contributeur +
+        admin: Administrateur
+        ROLE_ADMIN: Administrateur
+        ROLE_SUPER_ADMIN: Super Administrateur
+
+    errors:
+        not_allowed: <strong>Attention !</strong> Vous n'avez pas le droit d'éditer cet utilisateur.
+
+    new: Nouvel utilisateur
+    list: Liste des utilisateurs
+    edit: Edition de l'utilisateur
+    configurations: Configuration spécifique de votre compte

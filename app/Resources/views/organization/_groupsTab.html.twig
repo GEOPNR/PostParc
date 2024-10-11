@@ -1,0 +1,58 @@
+<div role="tabpanel" class="tab-pane {% if activeTab == 'groups' %}active{% endif %}" id="groups">
+    <h3>Liste des groupes associés</h3>
+    <div class="col-sm-6 col-md-8" >
+        {% if organization.groups|length > 0 %}
+            <table class="table table-stripped table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>{{'Group.field.name'|trans}}</th>
+                            {% if is_granted('ROLE_CONTRIBUTOR') %}
+                            <th>Action</th>
+                            {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in organization.groups %}
+                        {% if (not(group.deletedAt) and ( group.entity.id == app.user.entity.id or ( group.entity.id != app.user.entity.id and group.isShared==1) or is_granted("ROLE_SUPER_ADMIN") )) %}
+                            {% if (group.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                                {% set editable = false %}
+                            {% else %}
+                                {% set editable = true %}
+                            {% endif %}
+                            <tr {% if editable==false %} class="warning"{% endif %}>
+                                <td> {{group.getCompletName}} </td>
+                                {% if (is_granted('ROLE_CONTRIBUTOR') and (editable or ( not(editable) and group.isEditableByOtherEntities) ))%}
+                                    <td>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default btn-xs" href="{{ path('organization_removeFromGroup', { 'id': organization.getId(),'groupId': group.id }) }}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" ><i class="fa-solid fa-trash-alt"></i></a>
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong>{{'Organization.flash.noGroupAssociateAlert'|trans}}</strong>
+            </div>
+
+        {% endif %}
+    </div>
+    <div class="col-sm-6 col-md-4" >
+        {% if is_granted('ROLE_CONTRIBUTOR') %}
+            <form class="form" action="{{ path('organization_addGroup', { 'id': organization.getId() }) }}" method="post" role="form">
+                <div class="form-group inline">
+                    {{ render(controller(
+                    'PostparcBundle:Group:SelectGroups',
+                    { 'personId': null , 'pfoId': null, 'organizationId': organization.getId() }
+                    )) }}
+                </div>
+                <input type="submit" class="btn btn-default" value="Ajouter au groupe">
+            </form>
+        {% endif %}
+    </div>
+</div>
+

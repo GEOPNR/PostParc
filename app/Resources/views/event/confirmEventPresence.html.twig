@@ -1,0 +1,138 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block fos_user_content %}
+    <div id="form-signin">
+        <div class="text-center">
+            {% if eventInscription %}
+                {% if ( (alreadyConfirmed is defined and alreadyConfirmed ) or ( alreadyUnconfirmed is defined and alreadyUnconfirmed ) or ( alreadyRepresentatedBy is defined and alreadyRepresentatedBy ) ) %}
+                    
+                    {% if alreadyConfirmed is defined %}
+                        <h3>{{'warning'|trans()}}!</h3>
+                        <div class="alert alert-danger">
+                            {{'EventConfirmationPresence.messages.alreadyConfirmed'|trans() }}
+                        </div>
+                    {% endif %}    
+                    {% if alreadyUnconfirmed  is defined %}
+                        <h3>{{'warning'|trans()}}!</h3>
+                        <div class="alert alert-danger">
+                            {{'EventConfirmationPresence.messages.alreadyunconfirmed'|trans() }}
+                        </div>
+                    {% endif %}    
+                    {% if alreadyUnconfirmed  is defined %}
+                        <h3>{{'warning'|trans()}}!</h3>
+                        <div class="alert alert-danger">
+                            {{'EventConfirmationPresence.messages.alreadyunconfirmed'|trans() }}
+                        </div>
+                    {% endif %}
+                    {% if alreadyRepresentatedBy  is defined %}
+                        <h3>{{'warning'|trans()}}!</h3>
+                        <div class="alert alert-danger">
+                            {{'EventConfirmationPresence.messages.alreadyunconfirmed'|trans() }}
+                        </div>
+                    {% endif %}                       
+                {% else %}
+                    
+                    {%  if ( ( isConfirmed is defined and isConfirmed ) or ( isUnconfirmed is defined and isUnconfirmed ) or ( isRepresentedBy is defined and isRepresentedBy )) %} 
+                        {%  if isConfirmed is defined %}
+                            <h3>{{'congratulations'|trans()}}</h3>
+                            <div class="alert alert-success">
+                                {{'EventConfirmationPresence.messages.confirmLine1'|trans() }}<br/>
+                                <strong>"{{eventInscription.event}}"</strong><br/>
+                                {{'EventConfirmationPresence.messages.confirmLine2'|trans() }} !
+                            </div>
+                        {% endif %}
+                        {%  if isUnconfirmed is defined %}
+                            <h3>{{'congratulations'|trans()}}</h3>
+                            <div class="alert alert-success">
+                                {{'EventConfirmationPresence.messages.unconfirmLine1'|trans() }}<br/>
+                                <strong>"{{eventInscription.event}}"</strong><br/>
+                                {{'EventConfirmationPresence.messages.confirmLine2'|trans() }} !
+                            </div>
+                        {% endif %}
+                        {%  if isRepresentedBy is defined %}
+                            <h3>{{'congratulations'|trans()}}</h3>
+                            <div class="alert alert-success">
+                                {{'EventConfirmationPresence.messages.unconfirmLine1'|trans() }}<br/>
+                                <strong>"{{eventInscription.event}}"</strong><br/>
+                                {{'EventConfirmationPresence.messages.confirmLine2'|trans() }} !<br>
+                                {{'EventConfirmationPresence.messages.representedByLine3'|trans({'%representedBy%': eventInscription.representedBy  }) }} !
+                            </div>
+                        {% endif %}                        
+                    {% else %}
+                        <h3>{{'hello'|trans()}} {{ participant }}</h3>
+                        <div class="alert alert-info">
+                            {{'EventConfirmationPresence.messages.confirmMessageQuestionLine1'|trans({'%event%': eventInscription.event}) }}
+                            <br/>
+                            {{'EventConfirmationPresence.messages.confirmMessageQuestionLine2'|trans() }}
+                        </div><br/>
+                        <a href="{{ path('confirmEventPresence', {'confirmationToken': confirmationToken}) }}?isConfirmed=true" class="not-represented-by btn btn-primary btn-lg btn-block">{{ 'EventConfirmationPresence.actions.confirmPresence'|trans() }}</a>
+                        <br/>
+                        <form method="post" action="{{ path('confirmEventRepresentedBy', {'confirmationToken': confirmationToken}) }}?isRepresentedBy=true">
+                            
+                            <div id="form-represented-by" class="hide">
+                                <label for="representedBy">{{ 'EventConfirmationPresence.actions.confirmRepresentedBy'|trans() }}</label> 
+                                <input required id="form-represented-by" type="text" class=" form-control" name="representedBy" />                                                               
+                            </div>
+                       
+
+                        <button id="btn-represented-by" class="not-represented-by btn btn-info btn-lg btn-block">{{ 'EventConfirmationPresence.actions.confirmRepresentedBy'|trans() }}</button>
+                        <div id="btn-valid-cancel" class="hide">
+                             <br/>
+                            <button type="submit" class="btn btn-success btn-lg btn-block">{{ 'confirm'|trans() }}</button>
+                            <button id="btn-cancel" class="btn btn-primary btn-lg btn-block">{{ 'actions.cancel'|trans() }}</button>
+                        </div>
+                        </form> 
+                         <br/>
+                        <a href="{{ path('unconfirmEventPresence', {'confirmationToken': confirmationToken}) }}?isUnconfirmed=true" class="not-represented-by btn btn-warning btn-lg btn-block">{{ 'EventConfirmationPresence.actions.unconfirmPresence'|trans() }}</a>
+
+                    {% endif %}
+                {% endif %}
+
+            {% else %}
+                <h1>{{'warning'|trans()}}!</h1>
+                <div class="alert alert-danger">
+                    {{'EventConfirmationPresence.messages.notFindError'|trans() }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+            <script>
+                let inputVisibility = 'hidden';
+                let btn = document.getElementById('btn-represented-by');
+                let btnCancel = document.getElementById('btn-cancel');
+                let input = document.getElementById('form-represented-by');
+                let divBtn = document.getElementById('btn-valid-cancel');
+                
+                btn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    if (input.classList.contains('hide')){
+                        input.classList.remove('hide');
+                        divBtn.classList.remove('hide');
+                        showHideRepresentedByForm('show');
+                        input.focus();
+                    }
+                });
+                
+                btnCancel.addEventListener("click", function(e) {
+                    input.classList.add('hide');
+                    divBtn.classList.add('hide');
+                    e.preventDefault();
+                    showHideRepresentedByForm('hide');
+                });
+                
+                function showHideRepresentedByForm(visibility)
+                {
+                    var elements = document.getElementsByClassName('not-represented-by');
+                    for(var i = 0; i < elements.length; i++) {
+                        if (visibility == 'show'){
+                            elements[i].classList.add('hide');
+                        }
+                        else{
+                            elements[i].classList.remove('hide');
+                        }
+                        
+                    }                    
+                }
+                </script>
+{% endblock %}

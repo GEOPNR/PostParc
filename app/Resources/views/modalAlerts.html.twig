@@ -1,0 +1,28 @@
+{% block content_modal_alert %}    
+    {% if app.session.flashbag.peekAll()|length and app.session.flashbag.has('modalAlertMessages')%}
+                
+        <!-- Modal -->
+        <div class="modal fade" id="modalAlertMessage" tabindex="-1" role="dialog" aria-labelledby="modalAlertMessageLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{'actions.close'|trans()}}"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="memberModalLabel"><i class="fa-solid fa-bell" aria-hidden="true"></i>&nbsp;{{'EventAlert.yourAlerts'|trans()}} !</h4>
+              </div>
+              <div class="modal-body">
+                  {% for flashMessage in app.session.flashbag.get('modalAlertMessages') %}
+                      <div class="bs-callout bs-callout-info">{{ flashMessage|trans|raw}}</div>
+                  {% endfor %}            
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">{{'actions.close'|trans()}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    {% endif %}
+{% endblock content_modal_alert %}
+
+
+

@@ -1,0 +1,103 @@
+{
+   "name": "root/postparc-v2",
+   "license": "proprietary",
+   "type": "project",
+   "autoload": {
+      "psr-4": {
+         "": "src/"
+      },
+      "classmap": [
+         "app/AppKernel.php",
+         "app/AppCache.php"
+      ]
+   },
+   "autoload-dev": {
+      "psr-4": {
+         "Tests\\": "tests/"
+      }
+   },
+   "minimum-stability": "dev",
+   "require": {
+      "php": ">=5.5.9",
+      "symfony/symfony": "3.4.49",
+      "doctrine/orm": "^2.6",
+      "doctrine/doctrine-bundle": "^1.6",
+      "doctrine/doctrine-cache-bundle": "^1.4",
+      "symfony/swiftmailer-bundle": "^2.6",
+      "symfony/monolog-bundle": "^3.1",
+      "sensio/distribution-bundle": "^5.0",
+      "sensio/framework-extra-bundle": "^5.0",
+      "incenteev/composer-parameter-handler": "^2.0",
+      "cocur/slugify": "^3.0",
+      "friendsofsymfony/user-bundle": "~2.0@dev",
+      "symfony/security": "^3.4",
+      "knplabs/knp-paginator-bundle": "^4.1",
+      "lexik/form-filter-bundle": "^5.0",
+      "symfony/doctrine-bridge": "^3.4",
+      "friendsofsymfony/jsrouting-bundle": "^1.6",
+      "whiteoctober/tcpdf-bundle": "^1.1",
+      "twig/extensions": "^1.5",
+      "ci/restclientbundle": "^2.0",
+      "willdurand/js-translation-bundle": "^3.0",
+      "vich/uploader-bundle": "^1.6",
+      "endouble/symfony3-custom-coding-standard": "^2.0@dev",
+      "tecnickcom/tcpdf": "^6.3",
+      "jeroendesloovere/vcard": "dev-master",
+      "mbence/opentbs-bundle": "dev-master",
+      "iio/libmergepdf": "^3.1",
+      "roromix/spreadsheetbundle": "dev-master",
+      "tetranz/select2entity-bundle": "2.*",
+      "html2text/html2text": "dev-master",
+      "friendsofsymfony/rest-bundle": "^2.4@dev",
+      "jms/serializer-bundle": "^2.4",
+      "nelmio/api-doc-bundle": "^3.2@dev",
+      "symfony/property-access": "3.4.49",
+      "sendinblue/api-bundle": "~1",
+      "sensiolabs/ansi-to-html": "^1.1@dev",
+      "symfony/maker-bundle": "^1.0@dev",
+      "knplabs/knp-snappy": "^1.0@dev",
+      "h4cc/wkhtmltopdf-amd64": "dev-master",
+      "gedmo/doctrine-extensions": "~3.0",
+      "endroid/qr-code-bundle": "~4.0"  
+   },
+   "require-dev": {
+      "symfony/phpunit-bridge": "^2.7",
+      "rector/rector": "0.15.20"
+   },
+   "scripts": {
+      "post-install-cmd": [
+         "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+      ],
+      "post-update-cmd": [
+         "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+         "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+      ]
+   },
+   "extra": {
+      "symfony-app-dir": "app",
+      "symfony-bin-dir": "bin",
+      "symfony-var-dir": "var",
+      "symfony-web-dir": "web",
+      "symfony-tests-dir": "tests",
+      "symfony-assets-install": "relative",
+      "incenteev-parameters": {
+         "file": "app/config/parameters.yml"
+      }
+   },
+   "config": {
+      "github-protocols": ["https", "git", "ssh"],
+      "component-dir": "web/assets",
+      "allow-plugins": {
+         "endroid/installer": true
+      }
+   }
+}

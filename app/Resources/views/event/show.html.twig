@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {% if event.eventType %}{{ event.eventType|capitalize }} {% endif %}"{{event}}"
+{% endblock title %}
+
+{% block body %}
+   {% set currentPath = path(app.request.attributes.get('_route'),
+                       app.request.attributes.get('_route_params')) %}
+   <div class="row">
+      <div class="col-md-12 col-sm-12">
+         <div class="row">
+
+            <div class="col-md-9 ">
+               <h1>{% if event.eventType %}{{ event.eventType|capitalize }} {% endif %}"{{event}}"</h1>
+            </div>
+            {% if is_granted('ROLE_CONTRIBUTOR') or  (is_granted('ROLE_USER_PLUS') and event.getFrequency() == 2 and event.getCreatedBy.id == app.user.id ) %}
+               <div class="nav-list-actions col-md-3">
+                  <ul>
+                     <li class="sf_admin_action_new">
+                        <a class="btn btn-primary" href="{{ path('event_edit', {'id': event.id}) }}"><i class="fa-solid fa-pencil-alt"></i><span class="libelle">&nbsp;{{'actions.edit'|trans}}</span></a>
+                     </li>
+                  </ul>
+               </div>
+            {% endif %}
+         </div>
+         <div class="bs-callout bs-callout-info">
+            <div class="row">
+               <div class="col-md-8 col-sm-12">
+                  <ul class="no-type">
+                     <li>
+                        <i class="fa-solid fa-calendar" aria-hidden="true"></i>&nbsp;{{ 'Event.field.date'|trans() }}: {{ event.date|localizeddate() }}
+                        {% if event.duration %}
+                           <i class="fa-solid fa-arrow-right"></i> {{ event.endDate|localizeddate() }}
+                        {% endif %}
+                     </li>
+                     {% if event.coordinate %}
+                        <li>
+                           <i class="fa-solid fa-home"></i>&nbsp;{{event.coordinate.addressLine1}}
+                           {% if event.coordinate.addressLine2 %}
+                              <br/>{{ event.coordinate.addressLine2 }}
+                           {% endif %}
+                           {% if event.coordinate.addressLine3 %}
+                              <br/>{{ event.coordinate.addressLine3 }}
+                           {% endif %}
+                           <br/>
+                           {% if event.coordinate.city %}
+                              {{ event.coordinate.city.zipCode }}
+                           {% endif %}
+                           {% if event.coordinate.city %}
+                              {{ event.coordinate.city.getName() }}
+                           {% endif %}
+                           {% if event.coordinate.cedex %}
+                              {{ event.coordinate.cedex }}
+                           {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-users"></i>&nbsp;{{ 'Event.nbParticipant' | trans }} : {{ event.getNbParticipant }}
+                        </li>
+                        <li>
+                            <i class="fas fa-user-alt"></i>&nbsp;{{ 'Event.nbPresent' | trans }} : {{ event.getNbPresent }} ({{ 'ofWhich'| trans }} <i class="fas fa-user-friends"></i>&nbsp; {{ event.getNbRepresentedBy }} {{ 'Event.wichOFRepresentedBy' | trans() }})
+                        </li>
+                        <li>
+                            <i class="fas fa-user-alt-slash"></i>&nbsp;{{ 'Event.nbAbsent' | trans }} : {{ event.getNbAbsent }}
+                        </li>
+                     {% endif %}
+                     {% if event.organizators|length > 0 %}
+                        <li><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;{{'Event.field.organizators'|trans()}}: {% for organizer in event.organizators %} {{ organizer }}{% if not loop.last %},{% endif %} {% endfor %}</li>
+                        {% endif %}
+                        {% if event.organizations |length > 0 %}
+                        <li><i class="fa-solid fa-users" aria-hidden="true"></i>&nbsp;{{'Event.field.organizations'|trans()}}: {% for organization in event.organizations %} <a href="{{path('organization_show', {'id': organization.id})}}">{{ organization }}</a>{% if not loop.last %},{% endif %} {% endfor %}</li>
+                        {% endif %}
+                     <li><i class="fa-solid fa-user-circle" aria-hidden="true"></i>&nbsp;{{'Event.field.nbPlace'|trans()}}: {{ event.nbPlace }}</li>
+                     <li><span class="label label-info">{%if event.frequency==1 %} {{ 'Event.punctual'|trans() }} {% else %} {{ 'Event.regular'|trans() }} {% endif %}</span></li>
+                        {% if event.getTags() | length %}
+                        <li>
+                           <i class="fa-solid fa-tags" aria-hidden="true"></i> {{event.getTags()|join(', ')}}
+                        </li>
+                     {% endif %}
+
+                  </ul>
+               </div>
+               <div class="col-md-4 col-sm-12">
+                  {% if event.image %}
+                     <img src="{{ asset(event.getwebPath) }}" alt="{{event.image}}"  class="img-responsive"/>
+                  {% endif %}
+
+               </div>
+            </div>
+
+         </div>
+      </div>
+   </div>
+
+
+   <div class="row">
+      <div class="col-sm-12 col-md-12">
+         <ul class="nav nav-tabs" role="tablist">             
+            <li role="presentation" {% if activeTab == 'persons' or activeTab == 'pfos' or activeTab == 'representations'%}class="active"{% endif%}><a href="#participants"  id="participantsTab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa-solid fa-users" aria-hidden="true"></i> {{'Event.listOfParticipants'|trans()}} <span class="label label-pill label-primary" >{{nbElements}}</span></a></li>
+                  {% if (event.entity.id == app.user.entity.id or is_granted("ROLE_SUPER_ADMIN") ) %}
+               <li role="presentation" {% if activeTab == 'eventAlerts'%}class="active"{% endif%}><a href="#eventAlerts" id="eventAlertsTab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa-solid fa-bell" aria-hidden="true"></i> {{'Event.eventAlerts'|trans}} <span class="label label-pill label-primary">{{eventAlerts|length}}</span></a></li>
+                  {% endif %}
+                  {{ render(controller('PostparcBundle:Note:getTabDom',{ 'className': event.getClassName() , 'objectId': event.id })) }}
+         </ul>    
+         <div class="tab-content">
+
+            <div class="tab-pane fade {% if activeTab == 'persons' or activeTab == 'pfos' or activeTab == 'representations'%}active in{% endif %} " id="participants">
+                <div class="row col-md-5 bs-callout bg-warning  form-inline">
+                    <h4> {{ 'Event.filterParticipants'|trans}}</h4>
+                    {{ form_start(filter_form) }}
+                    <div class="form-group">
+                        {{ form_widget(filter_form) }}
+                    </div>   
+                    <div class="form-group">
+                        <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+                        <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+
+                    </div>
+                    {{ form_end(filter_form) }}
+                </div>
+
+               <div class="row col-md-12">
+               <h2>{{'Event.listOfParticipants'|trans()}} ({{nbElements}})</h2>
+
+               <form action="{{path('eventDetails_batch', {'id': event.id})}}" method="post">
+
+                  <div class="sf-admin-batch-actions-choice">
+                     <div class="form-group">
+                        <label for="batch_action">{{'forSelection'|trans}}</label>
+                        <select name="batch_action" class="form-control">
+                           <option value="">{{'chooseAction'|trans}}</option>
+                           <option value="batchAddBasket">{{'actions.addBasket'|trans}}</option>
+                           {% if is_granted('ROLE_CONTRIBUTOR') %}
+                              <option value="removeFromEvent">{{'actions.removeFromEvent'|trans}}</option>
+                           {% endif %}
+                           <option value="batchExport">{{'actions.export'|trans}}</option>
+                        </select>
+                     </div>
+                     <input type="submit" class="btn btn-default" value="ok">
+                     {% include 'default/selectResultsPerPage.html.twig'  %}
+                  </div>
+
+                  <ul class="nav nav-tabs" role="tablist">
+                      {% for tabName in app.session.get('currentEntityConfig').tabsOrder|keys  %}
+                        {% if tabName=='persons'%}
+                            <li role="presentation" {% if activeTab == 'persons' or activeTab == 'eventAlerts'%}class="active"{% endif%}><a href="#persons"  id="personsTab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa-solid fa-home" aria-hidden="true"></i> {{'Person.labels'|trans}} <span class="label label-pill label-info">{{persons.getTotalItemCount()}}</span></a></li>
+                        {% endif %}
+                        {% if tabName=='pfos' %}
+                            <li role="presentation" {% if activeTab == 'pfos'%}class="active"{% endif%}><a href="#pfos" id="pfosTab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa-solid fa-cubes" aria-hidden="true"></i> {{'Pfo.labels'|trans}} <span class="label label-pill label-warning" >{{pfos.getTotalItemCount()}}</span></a></li>
+                        {% endif %}    
+                        {% if tabName=='representations' and app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+                            <li role="presentation" {% if activeTab == 'representations'%}class="active"{% endif%}><a href="#representations" id="representationsTab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa-solid fa-camera-retro" aria-hidden="true"></i> {{'Representation.labels'|trans}} <span class="label label-pill label-danger" >{{representations.getTotalItemCount()}}</span></a></li>
+                        {% endif %}
+                     {% endfor %}
+                  </ul>
+                  <div class="tab-content">
+                     {# Persons TAB #}
+                     <div class="tab-pane fade {% if activeTab == 'persons' or activeTab == 'eventAlerts'%}active in{% endif %} " id="persons">
+                        {% include 'event/personsTab.html.twig' %}
+                     </div>
+                     {# Pfos TAB #}
+                     <div class="tab-pane fade {% if activeTab == 'pfos'%}active in{% endif %}" id="pfos">
+                        {% include 'event/pfosTab.html.twig' %}
+                     </div>
+                     {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+                        {# Representations TAB #}
+                        <div class="tab-pane fade {% if activeTab == 'representations'%}active in{% endif %}" id="representations">
+                           {% include 'event/representationsTab.html.twig' %}
+                        </div>
+                     {% endif %}
+                  </div>
+               </form>
+              </div>  
+            </div>
+
+            <div class="tab-pane fade {% if activeTab == 'eventAlerts'%}active in{% endif %} " id="eventAlerts">
+               {% include 'event/eventAlertsTab.html.twig' %}
+            </div>
+
+            {{ render(controller('PostparcBundle:Note:getTabContentNotes',{ 'className': event.getClassName() , 'objectId': event.id })) }}
+
+
+         </div>
+      </div>
+   </div>
+{% endblock %}
+
+{% block javascripts %}
+   {{ parent() }}
+   {% include 'event/showJs.html.twig' %}
+   {% if (event.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+      <script type="text/javascript">
+         $("#createByOtherEntityMessage").css("display", "block");
+      </script>
+   {% endif %}
+   <script type="text/javascript" src="{{ asset('bundles/postparc/js/attachments.js') }}"></script>
+{% endblock javascripts %}

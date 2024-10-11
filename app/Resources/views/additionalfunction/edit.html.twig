@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{'AdditionalFunction.edit'|trans}} "{{additionalFunction.name}}"
+{% endblock title %}
+
+{% block body %}
+    <h1>{{'AdditionalFunction.edit'|trans}} "{{additionalFunction.name}}"</h1>
+    {% include 'default/updatedByDiv.html.twig' with {'object': additionalFunction} %}
+    {{ form_start(edit_form) }}
+        {{ form_widget(edit_form) }}
+        <div class="btn-group form-actions">
+            <a class="btn btn-default" href="{{path('complement_function_delete', {'id':additionalFunction.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+                <i class="fa-solid fa-trash-alt"></i>
+            </a>
+            <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('complement_function_index')}}">
+                <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+            </a>
+            <input type="submit" class="btn btn-primary" value="{{'actions.edit'|trans()}}">
+        </div>
+    {{ form_end(edit_form) }}
+
+{% endblock %}

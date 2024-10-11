@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+
+{% block title %}
+   {{'MailFooter.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <div class="nav-list-actions col-md-3 pull-right">
+      <ul>
+         <li class="sf_admin_action_new">
+            <a class="btn btn-primary" href="{{path('mailFooter_new')}}"><i class="fa-solid fa-plus"></i><span class="libelle">&nbsp;{{'actions.new'|trans}}</span></a>
+         </li>
+         <li><a class="sf-admin-filters-toggle btn btn-default active"><i class="fa-solid fa-filter"></i><span class="libelle">&nbsp;{{'sorts'|trans}}</span></a></li>
+      </ul>
+   </div>
+
+   <h1>{{'MailFooter.list'|trans}}
+      <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{pagination.getTotalItemCount}}</span> {{'results'|trans}}</small>
+   </h1>
+
+   <div class="sf-admin-filters">
+      {{ form_start(search_form) }}
+      <div class="form-group form-action pull-right">
+         <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+         <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+      </div>
+      {{ form_widget(search_form) }}
+      {{ form_end(search_form) }}
+   </div>
+
+   <form action="{{path('mailFooter_batch')}}" method="post" >
+      <div class="sf-admin-batch-actions-choice">
+         <div class="form-group">
+            <label for="batch_action">{{'forSelection'|trans}}</label>
+            <select name="batch_action" class="form-control">
+               <option value="">{{'chooseAction'|trans}}</option>
+               <option value="batchDelete">{{'actions.delete'|trans}}</option>
+            </select>
+         </div>
+         <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+         {% include 'default/selectResultsPerPage.html.twig'  %}
+
+      </div>
+      <div class="sf_admin_list scrollable_list no-more-tables">
+         <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+               <tr>
+                  <th id="sf_admin_list_batch_actions">
+                     <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                  </th>
+                  <th>{{ knp_pagination_sortable(pagination, 'MailFooter.field.name'|trans(), 'c.name') }}</th>
+                  {%  if is_granted('ROLE_ADMIN') %}
+                     <th>{{ knp_pagination_sortable(pagination, 'MailFooter.field.user'|trans(), 'u.slug') }}</th>
+                  {%  endif  %}
+                  <th id="sf_admin_list_th_actions">{{'actions.actions'|trans}}</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for mailFooter in pagination %}
+                  <tr>
+                     <td><input type="checkbox" name="ids[]" value="{{ mailFooter.id }}" class="sf_admin_batch_checkbox"></td>
+                     <td>{{ mailFooter.name }}</td>
+                     {%  if is_granted('ROLE_ADMIN') %}
+                        <td>{{ mailFooter.user }}</td>
+                     {% endif %}
+                     <td>
+                        <div class="btn-group">
+                           <a class="btn btn-default btn-xs" href="{{ path('mailFooter_edit', {'id': mailFooter.id}) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                              <i class="fa-solid fa-pencil-alt"></i>
+                           </a>
+
+                           <a {{path('mailFooter_delete', {'id': mailFooter.id})}} class="btn btn-default btn-xs delete-ajax-button" data-type="mailFooter" data-id="{{mailFooter.id}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="">
+                              <i class="fa-solid fa-trash-alt"></i>
+                           </a>
+                        </div>
+                     </td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </form>
+
+   <div class="navigation text-center">
+      {{ knp_pagination_render(pagination) }}
+   </div>
+{% endblock %}

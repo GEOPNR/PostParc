@@ -1,0 +1,12 @@
+<div class="tab-pane"  id="map" >
+   {#<h3>{{'map'|trans}}</h3>#}
+   <br/>
+   <div id="mapid" style="height: 500px; width: 100%;" class="img-thumbnail" ></div>
+   <ul class="list-inline">
+      <li><img src="{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-info.svg')}}" width="10px"> {{'Person.personalCoordinate'|trans}} <a href="javascript:void();" class="showHideClassElements" data-classname="personMaker"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></a></li>
+      <li><img src="{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-success.svg')}}" width="10px"> {{'Pfo.labels'|trans}} <a href="javascript:void();" class="showHideClassElements" data-classname="pfoMaker"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></a></li>
+      <li><img src="{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-warning.svg')}}" width="10px"> {{'nav.organizations'|trans}} <a href="javascript:void();" class="showHideClassElements" data-classname="organizationMaker"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></a></li>
+      <li><img src="{{ asset('bundles/postparc/lib/leaflet/images/marker-icon-danger.svg')}}" width="10px"> {{'nav.representations'|trans}} <a href="javascript:void();" class="showHideClassElements" data-classname="representationMaker"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></a></li>
+   </ul>
+</div>
+

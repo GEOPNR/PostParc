@@ -1,0 +1,4 @@
+Rest_Routes :
+  type : rest
+  resource: "@PostparcApiBundle/Resources/config/routing_rest.yml"
+  #name_prefix:  api_

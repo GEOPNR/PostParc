@@ -1,0 +1,26 @@
+<html>
+    <head>
+        {% block stylesheets %}
+            <link href="{{ app.request.scheme ~'://' ~ app.request.httpHost ~ asset('bundles/postparc/css/pdf.css') }}" type="text/css" rel="stylesheet"/>
+        {% endblock stylesheets %}
+    </head>
+    <body>
+        <br/><br/><br/><br/><br/><br/><br/><br/>
+        <table>
+            <tr>
+                <td width="55%"> </td>
+                <td width="40%" class="adresse">{{coordinate|raw}}</td>
+            </tr>
+            <tr class="documentDate">
+                <td width="55%"></td>
+                <td><br/><br/><br/>{{date}}</td>
+            </tr>
+        </table>
+
+        <br/>
+
+        <div id="documentBody">
+            {{ body|raw }}
+        </div>
+    </body>
+</html>

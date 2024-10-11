@@ -1,0 +1,11 @@
+{% if additionalFunctions|length >0 %}
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <p><strong>{{'warning'|trans}} !</strong><br/>{{'AdditionalFunction.flash.additionalFunctionExistingWithSameName'|trans}} :</p>
+    <ul>
+    {% for additionalFunction in additionalFunctions %}
+        <li><a target="_new" href="{{ path('complement_function_edit',{'id': additionalFunction.id}) }}">{{ additionalFunction }}</a>  ( <a href="mailto:{{ additionalFunction.createdBy.email }}">{{ additionalFunction.createdBy }}</a> )</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}

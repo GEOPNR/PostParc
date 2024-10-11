@@ -1,0 +1,53 @@
+<br/>
+{% if ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+   <div class="col-md-6">
+      <div class="form-group form-inline">
+         <label for="addRepresentationsToEvent">{{'Event.actions.addRepresentationsToEvent'|trans}}</label>
+         <select name="addRepresentationsToEvent" class="form-control" id="addRepresentationsToEvent" multiple></select>
+         <button class="btn btn-primary" id="addRepresentationsToEventSubmitButton" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+      </div>
+   </div>
+{% endif %}
+{% if representations|length()>0  %}
+   <div class="sf_admin_list no-more-tables">
+      <table class="table table-striped table-condensed table-responsive table-hover">
+         <thead>
+            <tr>
+               <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+               <th>{{ knp_pagination_sortable(pfos, 'Representation.field.name'|trans(), 'rep.name') }}</th>
+               <th>{{ knp_pagination_sortable(persons, 'EventConfirmationPresence.fields.confirmationDate'|trans(), 'ep.confirmationDate') }}</th>
+               <th>{{'genericFields.actions'|trans}}</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% set originPath =  path('event_show', {'id':event.id, 'activeTab': 'representations' } )%}
+            {% for representation in representations %}
+               {% if (representation.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                  {% set editable = false %}
+               {% else %}
+                  {% set editable = true %}
+               {% endif %}
+               <tr {% if editable==false %} class="warning"{% endif %}>
+                  <td>
+                     <input type="checkbox" name="representationIds[]" value="{{ representation.id }}" class="sf_admin_batch_checkbox">
+                  </td>
+                  <td>{{ representation }} </td>
+                  <td>{{ render(controller('PostparcBundle:Event:getEventRepresentationsConfirmationDate',{'representation': representation, 'event':event})) }}</td>
+                  <td>
+                     <div class="btn-group">
+                        <a href="{{ path('representation_show', {'id': representation.id,'backUrl':currentPath}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Representation.actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                        <a href="{{path('representation_addBasket', {'id':representation.id ,'origin':'event', 'eventId':event.id })}}" class="btn btn-default btn-xs add-to-selection-button"  data-type="representation" data-id="{{representation.id}}" alt="{{'actions.addBasket'|trans}}" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                           {% if ( editable or ( not(editable) and representation.isEditableByOtherEntities) ) and ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and event.createdBy.id == app.user.id ) ) %}
+                           <a href="{{path('event_removeRepresentation', {'id':event.id, 'representationId':representation.id, 'origin': originPath })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Event.actions.removeRepresentation'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                           {% endif %}
+                     </div>
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+   <div class="navigation text-center">
+      {{ knp_pagination_render(representations) }}
+   </div>
+{% endif %}

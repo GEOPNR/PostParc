@@ -1,0 +1,224 @@
+{% if (person.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+    {% set editable = false %}
+{% else %}
+    {% set editable = true %}
+{% endif %}
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+
+{% if currentEntityConfig and currentEntityConfig['personnalFieldsRestriction'] is defined %}
+    {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+
+<br/>
+<ul class="nav nav-pills ">
+    <li role="presentation" class="active" ><a href="#coordInfosPerson"  role="tab" data-toggle="tab"><i class="fa-solid fa-address-card" aria-hidden="true"></i> {{'Person.personalCoordinate'|trans}}</a></li>
+    <li role="presentation"><a href="#groupsInfosPerson"  role="tab" data-toggle="tab"><i class="fa-solid fa-users" aria-hidden="true"></i> {{ 'Pfo.field.pfoPersonGroups'|trans() }} <span class="label label-pill label-info">{{ person.pfoPersonGroups|length }}</span></a></li>
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true and representations is defined %}
+        <li role="presentation"><a href="#representationsInfosPerson"  role="tab" data-toggle="tab"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> {{ 'Representation.labels_with_volunteer'|trans() }} <span class="label label-pill label-info">{{ representations|length }}</span></a></li>
+    {%  endif %}
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_event_module == true %}
+        {{ render(controller('PostparcBundle:Event:getTabDom',{ 'className': person.getClassName() , 'objectId': person.id })) }}
+    {%  endif %}    
+    {{ render(controller('PostparcBundle:Note:getTabDom',{ 'className': person.getClassName() , 'objectId': person.id })) }}
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade active in" data-personId="{{ person.id }}" id="coordInfosPerson">
+        <div class="col-lg-8 col-xl-6" >
+            <h3>{{ 'Person.personalCoordinate'|trans }}</h3>
+            <div class="well">
+                {%  if is_granted('ROLE_CONTRIBUTOR') and person.dontShowCoordinateForReaders() %}
+                    <div class="alert alert-warning"><i class="fa-solid fa-user-shield"></i> {{ 'Person.messages.dontShowCoordinateForReaders'|trans() }}</div>
+                {% endif %} 
+                {%  if person.getDontWantToBeContacted() %}
+                    <div class="alert alert-danger"><i class="fa-solid fa-exclamation-triangle " aria-hidden="true"></i> {{ 'Person.field.dontWantToBeContacted'|trans() }}</div>
+                {% else %}
+                   
+                    {% if(person.coordinate and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) ) %}
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6" >
+                                <ul class="no-type">
+                                    {%  if person.coordinate.getFormatedAddress(personnalFieldsRestriction)|raw|length %}
+                                        <li><i class="fa-solid fa-home"></i> {{ person.coordinate.getFormatedAddress(personnalFieldsRestriction)|raw }}</li>
+                                        {%  endif %}
+                                        {% if person.coordinate and person.coordinate.coordinate|length %}
+                                            {% if app.user.coordinate and app.user.coordinate.coordinate|length > 0 %}
+                                                {% set coordinate = app.user.coordinate.coordinate %}
+                                            {% else %}
+                                                {% set coordinate = app.user.entity.coordinate %}
+                                            {% endif %}
+                                            {% if ( 'geographicalCoordinate' not in personnalFieldsRestriction ) %}
+                                            <li>
+                                                <i class="fa-solid fa-map-marker" aria-hidden="true"></i> &nbsp <span class="coordinate">{{person.coordinate.coordinate}}</span> <a href="javascript;" class="updateCoordinateGeoloc" data-id="{{person.coordinate.id}}"><i class="fa-solid fa-refresh" aria-hidden="true"></i></a>
+                                            </li>
+                                            <li>
+                                                <a  href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{coordinate}}%3B{{person.coordinate.coordinate}}" target=blank"  class="btn btn-primary"><i class="fa-solid fa-map" aria-hidden="true"></i>&nbsp;{{'itinerary'|trans}}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="col-sm-6 col-md-6" >
+                                <ul class="no-type">
+                                    {% if person.getPreferedEmails()|length > 0 %}
+                                        <div class="alert-warning" role="alert"><i class="fa-solid fa-exclamation-circle" aria-hidden="true"></i> {{ 'Pfo.messages.preferedEmailsUsed'|trans() }}</div>   
+                                        {% for mail in person.getPreferedEmails() %}
+                                            <li><a href="mailto:{{mail}}"><i class="fa-solid fa-envelope"></i>&nbsp;{{mail}}</a></li>
+                                            {% endfor %}
+                                        {% else %}   
+                                            {% if (person.coordinate and person.coordinate.email and 'email' not in personnalFieldsRestriction ) %}
+                                            <li><a href="mailto:{{person.coordinate.email}}"><i class="fa-solid fa-envelope"></i>&nbsp;{{person.coordinate.email}}</a></li>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if person.coordinate %}
+                                            {% if (person.coordinate.phone and 'phone' not in personnalFieldsRestriction ) %}
+                                            <li><i class="fa-solid fa-phone"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{person.coordinate.phoneCode}} {{person.coordinate.phone}}</a></li>
+                                            {% endif %}
+                                            {% if (person.coordinate.mobilePhone and 'mobilePhone' not in personnalFieldsRestriction) %}
+                                            <li><i class="fa-solid fa-mobile" aria-hidden="true"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{person.coordinate.phoneCode}} {{person.coordinate.mobilePhone}}</a></li>
+                                            {% endif %}
+                                            {% if (person.coordinate.fax and 'fax' not in personnalFieldsRestriction) %}
+                                            <li><i class="fa-solid fa-fax"></i>&nbsp;{{person.coordinate.fax}}</li>
+                                            {% endif %}
+                                            {% if (person.coordinate.webSite and 'webSite' not in personnalFieldsRestriction ) %}
+                                            <li><a href="{{person.coordinate.webSite}}"><i class="fa-solid fa-desktop"></i>&nbsp;{{person.coordinate.webSite}}</a></li>
+                                            {% endif %}
+                                            {% if (person.coordinate.facebookAccount  and 'facebookAccount' not in personnalFieldsRestriction) %}
+                                            <li><a href="{{person.coordinate.facebookAccount}}"><i class="fa-brands fa-facebook"></i>&nbsp;{{person.coordinate.facebookAccount}}</a></li>
+                                            {% endif %}
+                                            {% if (person.coordinate.twitterAccount  and 'twitterAccount' not in personnalFieldsRestriction) %}
+                                            <li><a href="{{person.coordinate.twitterAccount}}"><i class="fa-brands fa-twitter"></i>&nbsp;{{person.coordinate.twitterAccount}}</a></li>
+                                            {% endif %}
+                                            {%  if qrCodeUri is defined %}
+                                                <li><a class="btn btn-default btn-block" href="{{ path('person_exportVcard', {'id': person.id}) }}"><img src="{{ qrCodeUri }}" class="img-fluid" width="100px"/></a></li>
+                                            {% endif %}
+
+                                        {% endif %}
+                                        {% if (person.getTags() | length  and 'tags' not in personnalFieldsRestriction)%}
+                                        <li><i class="fa-solid fa-tags" aria-hidden="true"></i> {{person.getTags()|join(', ')}}</li>
+                                        {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                <div class="row">
+                    <div class="col-sm-6 col-md-6" >
+                        <a class="btn btn-default btn-block add-to-selection-button"  data-type="person" data-id="{{person.id}}" href="{{ path('person_addBasket', {'id': person.id}) }}"><i class="fa-solid fa-shopping-cart"></i>&nbsp;{{'actions.addBasket'|trans}}</a>
+                    </div>
+                    <div class="col-sm-6 col-md-6" >
+                        <a class="btn btn-default btn-block" href="{{ path('person_exportVcard', {'id': person.id}) }}"><i class="fa-solid fa-address-card" aria-hidden="true"></i></i>&nbsp;{{'actions.exportVcard'|trans}}</a>
+                    </div>
+                </div>
+                {% if (is_granted('ROLE_CONTRIBUTOR') and ( editable or ( not(editable) and person.isEditableByOtherEntities) ) )%}
+                    <br/><a href="{{ path('person_edit', {'id': person.id}) }}" class="btn btn-primary btn-block"><i class="fa-solid fa-pencil-alt"></i><span class="libelle"> Editer les coordonnées personnelles</span></a>
+                        {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-4 col-xl-6" >
+            {% if person.coordinate and person.coordinate.coordinate|length and 'geographicalCoordinate' not in personnalFieldsRestriction and ( not(person.getDontWantToBeContacted) or is_granted("ROLE_ADMIN"))  %}
+                <div  id="map-{{person.id}}" style="margin-top: 60px; height: 300px; width: 100%; "></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="tab-pane fade" data-personId="{{ person.id }}" id="groupsInfosPerson">
+        <h3>{{ 'associateGroups'|trans() }}</h3>
+        <div class="col-sm-6 col-md-8" >
+            {% if person.pfoPersonGroups|length > 0 %}
+                <table class="table table-stripped table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th>{{'Group.field.name'|trans}}</th>
+                                {% if is_granted('ROLE_USER_PLUS') %}
+                                <th>Action</th>
+                                {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ppg in person.pfoPersonGroups %}
+                            {% if (ppg.group and not(ppg.group.deletedAt) and ( ppg.group.entity.id == app.user.entity.id or ( ppg.group.entity.id != app.user.entity.id and ppg.group.isShared==1) or is_granted("ROLE_SUPER_ADMIN")) ) %}
+                                {% if (ppg.group.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                                    {% set editable = false %}
+                                {% else %}
+                                    {% set editable = true %}
+                                {% endif %}
+                                <tr {% if editable==false %} class="warning"{% endif %}>
+                                    <td> {{ ppg.group.getCompletName }} </td>
+                                    {% if (
+                                            ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and ppg.group.createdBy.id == app.user.id ) ) 
+                                            and ( editable or ( not(editable) and ppg.group.isEditableByOtherEntities) ) 
+                                    ) %}
+                                        <td>
+                                            <div class="btn-group">
+                                                <a class="btn btn-default btn-xs" href="{{ path('ppg_delete', { 'id': ppg.getId(),'origin': 'coordPerso' }) }}" data-toggle="tooltip"
+                                                   data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+                                                    <i class="fa-solid fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>{{ 'Person.flash.noGroupAssociateAlert'|trans }}</strong>
+                </div>
+                <br/>
+            {% endif %}
+        </div>
+        {% if is_granted('ROLE_USER_PLUS') %}
+        <div class="col-sm-6 col-md-4" >
+            
+                <form class="form" action="{{ path('person_addGroup', { 'id': person.getId(),'origin': 'coordPerso' }) }}" method="post" role="form">
+                    <div class="form-group inline">
+                        {{ render(controller('PostparcBundle:Group:SelectGroups',{ 'personId': person.id , 'pfoId': null, 'organizationId': null })) }}
+                    </div>
+                    <input type="submit" class="btn btn-default" value="Ajouter au groupe">
+                </form>            
+        </div>
+        {% endif %}            
+    </div>
+
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+        <div class="tab-pane fade" data-personId="{{ person.id }}" id="representationsInfosPerson">
+            <div class="col-sm-12">
+                <hr>
+                <div class="alert alert-success pull-right no-margin collapse" id="success-alert" style="display: none; opacity: 500;">
+                    {{ 'actions.suppressionConfirmed'|trans }}
+                </div>
+                <h3>{{ 'Person.field.representations'|trans }} <a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-29"><i class="fa-solid fa-question-circle"></i></a></h3>
+                        {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '29'})) }}
+                <br>
+                {% if representations is defined and representations|length %}
+                    {% include 'person/representationList.html.twig' with {'representations': representations} %}
+                {% endif %}
+
+                {% if is_granted('ROLE_CONTRIBUTOR') %}
+                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseRepresentation-{{ person.id }}" aria-expanded="false" aria-controls="collapseRepresentation">
+                        {{ 'Representation.actions.addRepresentation'|trans }}
+                    </button>
+                    <br><br>
+                    <div class="collapse" id="collapseRepresentation-{{ person.id }}">
+                        <div class="well">
+                            {{ render(controller('PostparcBundle:Representation:new', { 'personId': person.id , 'pfoId': null } )) }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_event_module == true %}
+        {{ render(controller('PostparcBundle:Event:getTabContentEvents',{ 'className': person.getClassName() , 'objectId': person.id })) }}
+    {% endif %}    
+
+    {{ render(controller('PostparcBundle:Note:getTabContentNotes',{ 'className': person.getClassName() , 'objectId': person.id })) }}
+
+
+</div>
+

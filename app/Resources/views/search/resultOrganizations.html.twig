@@ -1,0 +1,56 @@
+<div class="tab-pane fade {% if activeTab == 'organizations' and not (searchParamsObjects.functions is defined or searchParamsObjects.services is defined ) %} active in {% endif %}" id="organizations">
+
+    <a href="javascript:void(0)" data-content-type="organizations" class="btn btn-warning btn-xs btn-block addTabToSelection">{{'actions.addTabElementsToSelection'|trans}}</a>
+
+    <div class="sf_admin_list no-more-tables">
+        <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+                <tr>
+                    <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+                    <th>{{ knp_pagination_sortable(organizations, 'Organization.label'|trans(), 'o.name') }}</th>
+                    <th>{{ knp_pagination_sortable(organizations, 'Organization.field.organizationType'|trans(), 'ot.name') }}</th>
+                    <th>{{ knp_pagination_sortable(organizations, 'Coordinate.field.city'|trans(), 'city.name') }}</th>
+                    <th>{{'genericFields.actions'|trans}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for organization in organizations %}
+                    {% if (organization.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                        {% set editable = false %}
+                    {% else %}
+                        {% set editable = true %}
+                    {% endif %}
+                    <tr {% if editable==false %} class="warning"{% endif %}>
+                        <td><input type="checkbox" name="organizationIds[]" value="{{ organization.id }}" class="sf_admin_batch_checkbox"></td>
+                        <td><a href="{{path('organization_show', {'id': organization.id})}}">{{organization}}</a></td>
+                        <td>{{organization.organizationType}}</td>
+                        <td>{% if organization.coordinate %}{{organization.coordinate.city}}{% endif %}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{path('organization_show', {'id': organization.id})}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.info'|trans}}">
+                                    <i class="fa-solid fa-info"></i>
+                                </a>
+                                {% if organization.coordinate and organization.coordinate.coordinate|length %}
+                                    <a class="btn btn-default btn-xs" href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{app.user.entity.coordinate}}%3B{{organization.coordinate.coordinate}}" target=blank" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'itinerary'|trans}}"><i class="fa-solid fa-map" aria-hidden="true"></i></a>
+                                    {% endif %}
+                                    {% if (is_granted('ROLE_CONTRIBUTOR') and ( editable == true or ( not(editable) and organization.isEditableByOtherEntities) ) )%}
+                                    <a href="{{path('organization_edit', {'id': organization.id, 'origin':'search' })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                                        <i class="fa-solid fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="{{path('organization_delete', {'id': organization.id, 'origin':'search' })}}" class="btn btn-default btn-xs delete-ajax-button" data-type="organization" data-id="{{organization.id}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}">
+                                        <i class="fa-solid fa-trash-alt"></i>
+                                    </a>
+                                {% endif %}
+                                <a href="{{path('organization_exportVcard', {'id':organization.id })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.exportVcard'|trans}}"><i class="fa-solid fa-address-card"></i></a>
+                                <a href="{{path('organization_addBasket', {'id':organization.id, 'origin':'search' })}}" class="btn btn-default btn-xs add-to-selection-button" data-type="organization" data-id="{{organization.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="navigation text-center">
+        {{ knp_pagination_render(organizations) }}
+    </div>
+</div>

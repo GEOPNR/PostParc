@@ -1,0 +1,323 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Selection.list'|trans}}
+{% endblock title %}
+
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig|keys %}
+   {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+{% block body %}
+   <div class="col-sm-12 col-md-12">
+      <h1>{{'Selection.list'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-13"><i class="fa-solid fa-question-circle"></i></a>
+         <small class="text-info">&nbsp;&nbsp;{{nbElements}} {{'results'|trans}}</small>
+      </h1>
+
+      {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '13'})) }}
+   </div>
+   <div class="col-sm-12 col-md-12">
+      <div id="sf_admin_bar" class="bs-callout bs-callout-info">
+         <div class="row">
+            <div class="col-md-4">
+               <br/>
+               <div class="dropdown">
+                  <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                     <strong>{{ 'Selection.labels.actionsOnSelection'|trans() }}</strong>
+                     <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dLabel">
+                     <li><a data-confirm="{{'actions.deleteAllSelection'|trans}}" href="{{path('selection_removeAll')}}"><i class="fa-solid fa-trash-alt"></i>&nbsp;{{'Selection.actions.eraseSelection'|trans}}</a></li>
+                     <li><a href="{{ path('selection_export') }}"><i class="fa-solid fa-caret-square-down"></i>&nbsp;{{'Selection.export.actions.export'|trans}}</a></li>
+                     <li><a href="{{ path('selection_export_vcard') }}"><i class="fa-solid fa-address-card"></i>&nbsp;{{'Selection.export.actions.exportVcard'|trans}}</a></li>
+                     <li><a href="{{ path('send_email_massif') }}"><i class="fa-solid fa-envelope"></i>&nbsp;{{'Selection.sendMailMassif.actions.access'|trans}}</a></li>
+                     <li><a href="{{ path('print_selection_home') }}"><i class="fa-solid fa-print"></i>&nbsp;{{'Selection.print.actions.print'|trans}}</a></li>
+                     <li><a href="{{ path('generate_massive_document') }}"><i class="fa-solid fa-th" aria-hidden="true"></i>&nbsp;{{'Selection.document.actions.generateMassiveDocument'|trans}}</a></li>
+                        {% if currentEntityConfig.use_sendInBlue_module is defined and currentEntityConfig.use_sendInBlue_module %}
+                        <li><a href="{{ path('sendinBlue_sendSelection_page') }}"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i>&nbsp;{{'Selection.actions.exportToSendInBlueList'|trans}}</a></li></li>
+                        {%  endif %}
+                  </ul>
+               </div>
+            </div>
+            
+            {% if is_granted('ROLE_USER_PLUS') %}      
+                <div class="col-md-8">
+                   <div class="nav-list-actions">
+                      <ul class="list-unstyled">
+                        <li>
+                           <form action="{{path('selection_addToGroup')}}" method="GET" class="form-inline">
+                              <div class="form-group pull-right">
+                                 <select name="groupId" class="form-control {% if is_granted('ROLE_CONTRIBUTOR') %}group-select2-autocomplete{%else%}select2{% endif %}" id="groupId" required>
+                                    <option value="" selected="selected"></option>
+                                    {% if is_granted('ROLE_USER_PLUS') and not is_granted('ROLE_CONTRIBUTOR') %}
+                                        {% for group in app.user.groupsCreatedBy %}
+                                            <option value="{{ group.id }}">{{ group }}</option>
+                                        {% endfor %}    
+                                    {% endif %}    
+                                 </select>
+                                 <input class="btn btn-success" type="submit" value="{{'Selection.actions.addToGroup'|trans}}">
+                              </div>
+                           </form>
+                        </li>
+
+                         {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_event_module == true %}
+                            <li>
+                               <form action="{{path('selection_addToEvent')}}" method="POST" class="form-inline">
+                                  <div class="form-group pull-right">
+                                     <select name="eventId" class="form-control event-select2-autocomplete" id="eventId" required>
+                                        <option value="" selected="selected"></option>
+                                     </select>
+                                     <input class="btn btn-success" type="submit" value="{{'Selection.actions.addToEvent'|trans}}">
+                                  </div>
+                               </form>
+                            </li>
+                         {% endif %}
+                      </ul>
+                   </div>
+                </div>  
+            {%  endif %}      
+
+         </div>
+      </div>
+   </div>
+
+   <div class="col-sm-12 col-md-12">
+      {% if nbElements == 0 %}
+         <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{'flash.emptySelection'|trans}}
+         </div>
+      {% else %}
+         <ul class="nav nav-tabs"  role="tablist">
+            {% for tabName in app.session.get('currentEntityConfig').tabsOrder|keys  %}  
+                {% if tabName=='persons' and  persons|length()>0 %}
+                   <li{% if activeTab == 'persons' %} class="active" {% endif %}>
+                      <a href="#persons" role="tab" data-toggle="tab" >
+                         <i class="fa-solid fa-home"></i> {{'Person.personalCoordinate'|trans}} <span class="label label-pill label-info" >{{persons|length()}}</span></a>
+                   </li>
+                {% endif %}
+                {% if tabName=='pfos' and pfos|length()>0  %}
+                   <li{% if activeTab == 'pfos' or persons|length()==0 %} class="active" {% endif %}>
+                      <a href="#pfos"  role="tab" data-toggle="tab">
+                         <i class="fa-solid fa-cubes"></i> {{'Pfo.labels'|trans}} <span class="label label-pill label-success" >{{pfos|length()}}</span></a>
+                   </li>
+                {% endif %}
+                {% if tabName=='organizations' and organizations|length()>0 %}
+                   <li{% if activeTab == 'organizations' or (persons|length()==0 and pfos|length()==0) %} class="active" {% endif %}>
+                      <a href="#organizations"  role="tab" data-toggle="tab">
+                         <i class="fa-solid fa-users"></i> {{'nav.organizations'|trans}} <span class="label label-pill label-warning" >{{organizations|length()}}</span></a>
+                   </li>
+                {% endif %}
+                {% if tabName=='representations' and representations|length()>0 %}
+                   <li{% if activeTab == 'representations' or (persons|length()==0 and pfos|length()==0 and organizations|length()==0) %} class="active" {% endif %}>
+                      <a href="#representations"  role="tab" data-toggle="tab">
+                         <i class="fa-solid fa-users"></i> {{'nav.representations'|trans}} <span class="label label-pill label-danger" >{{representations|length()}}</span></a>
+                   </li>
+                {% endif %}
+            {% endfor %}
+            <li class="{% if activeTab == 'map'%}active{% endif %}">
+               <a href="#map"  role="tab" data-toggle="tab" id="maplink">
+                  <i class="fa-solid fa-map-marker"></i> {{'map'|trans}} </a>
+            </li>
+         </ul>
+         <div class="tab-content">
+            {% if persons|length()>0 %}
+               <div class="tab-pane fade {% if activeTab == 'persons' %} active in {% endif %}" id="persons">
+                  <div class="sf_admin_list no-more-tables">
+                     <table class="table table-striped table-condensed table-responsive table-hover">
+                        <thead>
+                           <tr>
+                              <th>{{ knp_pagination_sortable(persons, 'genericFields.name'|trans(), 'p.name') }}</th>
+                              {% if ('city' not in personnalFieldsRestriction ) %}
+                                 <th>{{ knp_pagination_sortable(persons, 'Coordinate.field.city'|trans(), 'city.slug') }}</th>
+                              {% endif %}
+                              {% if ('email' not in personnalFieldsRestriction ) %}
+                                 <th>{{ 'genericFields.email'|trans() }}</th>
+                              {% endif %}   
+                              <th>{{'genericFields.actions'|trans}}</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for person in persons %}
+                              <tr {% if person.dontWantToBeContacted == 1 %} class="danger"{%  endif  %}>
+                                 <td>{{person}}</td>
+                                 {% if ('city' not in personnalFieldsRestriction ) %}
+                                    <td>{% if person.coordinate is defined and person.coordinate is not null and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %} {{ person.coordinate.city }} {% endif %}</td>
+                                 {% endif %}
+                                 {% if ('email' not in personnalFieldsRestriction ) %}
+                                    <td>
+                                    {% if person.coordinate is defined and person.coordinate is not null and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %} 
+                                        {% if person.getPreferedEmails()|length %}
+                                            {{ person.getPreferedEmails()|join(';') }}
+                                        {% else %}
+                                            {{person.coordinate.email}}
+                                        {% endif %}    
+                                    {% endif %}
+                                    </td>
+                                 {% endif %}
+                                 <td>
+                                    <div class="btn-group">
+                                       <a href="{{ path('person_show', {'id': person.id}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'Person.actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                                       <span class="sf_admin_action_delete">
+                                          <a href="{{path('selection_remove', {'id':person.id,'modele':'person' })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.removeFromBasket'|trans}}" data-confirm="{{'actions.confirmDeleteSelection'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                                       </span>
+                                    </div>
+                                 </td>
+                              </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                     <div class="row" style="">
+                        <div class="col-sm-12">
+                           <button type="button" class="btn btn-danger btn-xs" disabled="disabled">&nbsp;&nbsp;&nbsp;</button><small> : {{ 'Person.field.dontWantToBeContacted'|trans() }}.</small>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="navigation text-center">
+                     {{ knp_pagination_render(persons) }}
+                  </div>
+               </div>
+            {% endif %}
+            {% if pfos|length()>0 %}
+               <div class="tab-pane fade {% if activeTab == 'pfos' or persons|length()==0 %} active in {% endif %}" id="pfos">
+                  <div class="sf_admin_list no-more-tables">
+                     <table class="table table-striped table-condensed table-responsive table-hover">
+                        <thead>
+                           <tr>
+                              <th>{{ knp_pagination_sortable(pfos, 'genericFields.name'|trans(), 'p.slug') }}</th>
+                              <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.personFunction'|trans(), 'f.slug') }}</th>
+                              <th>{{ knp_pagination_sortable(pfos, 'AdditionalFunction.field.womenName'|trans(), 'af.womenName') }}</th>
+                              <th>{{ 'genericFields.email'|trans() }}</th>
+                              <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.organization'|trans(), 'o.slug') }}</th>
+                              <th>{{ knp_pagination_sortable(pfos, 'Coordinate.field.city'|trans(), 'city.slug') }}</th>
+                              <th>{{'genericFields.actions'|trans}}</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for pfo in pfos %}
+                              <tr>
+                                 <td>{{pfo}}</td>
+                                 <td>{% if pfo.person and pfo.person.civility and pfo.person.civility.isFeminine and pfo.personFunction and pfo.personFunction.womenName %} {{ pfo.personFunction.womenName}} {% else %} {{ pfo.personFunction}} {% endif %}</td>
+                                 <td>{% if pfo.person and pfo.person.civility and pfo.person.civility.isFeminine and pfo.additionalFunction and pfo.additionalFunction.womenName %} {{ pfo.additionalFunction.womenName}} {% else %} {{pfo.additionalFunction}} {% endif %}</td>
+                                 <td>
+                                     {% if pfo.getPreferedEmails()|length %}
+                                         {{ pfo.getPreferedEmails()|join('; ') }} 
+                                     {% else %}
+                                         {{ pfo.email }}
+                                     {% endif %}    
+                                 </td>
+                                 <td>{{pfo.organization}}</td>
+                                 <td>{% if pfo.organization.coordinate is defined and pfo.organization.coordinate is not null %} {{ pfo.organization.coordinate.city }} {% endif %}</td>
+                                 <td>
+                                    <div class="btn-group">
+                                       <a href="{{path('pfo_show', {'id':pfo.id })}}" class="btn btn-default btn-xs" alt="{{'actions.show'|trans}}" title="{{'actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                                       <span class="sf_admin_action_delete">
+                                          <a href="{{path('selection_remove', {'id':pfo.id,'modele':'pfo' })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.removeFromBasket'|trans}}" data-confirm="{{'actions.confirmDeleteSelection'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                                       </span>
+                                       </span>
+                                 </td>
+                              </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+                  <div class="navigation text-center">
+                     {{ knp_pagination_render(pfos) }}
+                  </div>
+               </div>
+            {% endif %}
+            {% if organizations|length()>0 %}
+               <div class="tab-pane fade {% if activeTab == 'organizations' or (persons|length()==0 and pfos|length()==0) %} active in {% endif %}" id="organizations">
+                  <div class="sf_admin_list no-more-tables">
+                     <table class="table table-striped table-condensed table-responsive table-hover">
+                        <thead>
+                           <tr>
+                              <th>{{ knp_pagination_sortable(organizations, 'genericFields.name'|trans(), 'p.name') }}</th>
+                              <th>{{ knp_pagination_sortable(organizations, 'Coordinate.field.city'|trans(), 'city.slug') }}</th>
+                              <th>{{ 'genericFields.email'|trans() }}</th>
+                              <th>{{'genericFields.actions'|trans}}</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for organization in organizations %}
+                              <tr>
+                                 <td>{{organization}}</td>
+                                 <td>{% if organization.coordinate is defined and organization.coordinate is not null %} {{ organization.coordinate.city }} {% endif %}</td>
+                                 <td>{% if organization.coordinate is defined and organization.coordinate is not null %} {{ organization.coordinate.email }} {% endif %}</td>
+                                 <td>
+                                    <div class="btn-group">
+                                       <a href="{{path('organization_show', {'id': organization.id})}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.info'|trans}}"><i class="fa-solid fa-info"></i></a>
+                                       <span class="sf_admin_action_delete">
+                                          <a href="{{path('selection_remove', {'id':organization.id,'modele':'organization' })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.removeFromBasket'|trans}}" data-confirm="{{'actions.confirmDeleteSelection'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                                       </span>
+                                    </div>
+                                 </td>
+                              </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+                  <div class="navigation text-center">
+                     {{ knp_pagination_render(organizations) }}
+                  </div>
+               </div>
+            {% endif %}
+            {% if representations|length()>0 %}
+               {%
+                        set representationElectedLabels = {'0':'Representation.elected'|trans(),'1':'Representation.designated'|trans() }
+               %}
+               <div class="tab-pane fade {% if activeTab == 'representations' or (persons|length()==0 and pfos|length()==0 and organizations|length()==0) %} active in {% endif %}" id="representations">
+                  <div class="sf_admin_list no-more-tables">
+                     <table class="table table-striped table-condensed table-responsive table-hover">
+                        <thead>
+                           <tr>
+                              <th>{{ knp_pagination_sortable(representations, 'genericFields.name'|trans(), 'r.name') }}</th>
+                              <th>{{'genericFields.actions'|trans}}</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for representation in representations %}
+                              <tr>
+                                 <td>{{representation}} ({% if representation.elected|length >0 %}{{representationElectedLabels[representation.elected]}} {% endif %} -> {{ representation.endDate|date("d/m/Y") }})</td>
+                                 <td>
+                                    <div class="btn-group">
+                                       {% if representation.organization %}
+                                          <a href="{{path('organization_show', {'id': representation.organization.id, 'activeTab': 'representations'})}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.info'|trans}}"><i class="fa-solid fa-info"></i></a>
+                                          {% endif %}
+                                       <span class="sf_admin_action_delete">
+                                          <a href="{{path('selection_remove', {'id':representation.id,'modele':'representation' })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.removeFromBasket'|trans}}" data-confirm="{{'actions.confirmDeleteSelection'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                                       </span>
+                                    </div>
+                                 </td>
+                              </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+                  <div class="navigation text-center">
+                     {{ knp_pagination_render(representations) }}
+                  </div>
+               </div>
+            {% endif %}
+            {% include 'search/resultMap.html.twig' %}
+         </div>
+      {% endif %}
+
+   </div>
+{% endblock %}
+
+{% block stylesheets %}
+   {{ parent() }}
+   <link href="{{ asset('bundles/postparc/lib/leaflet/leaflet.css') }}" type="text/css" rel="stylesheet"/>
+   <link href="{{ asset('bundles/postparc/lib/leaflet/markercluster/dist/MarkerCluster.css') }}" type="text/css" rel="stylesheet"/>
+   <link href="{{ asset('bundles/postparc/lib/leaflet/markercluster/dist/MarkerCluster.Default.css') }}" type="text/css" rel="stylesheet"/>
+{% endblock %}
+
+{% block javascripts %}
+   {{ parent() }}
+   <script type="text/javascript" src="{{ asset('bundles/postparc/lib/leaflet/leaflet.js') }}"></script>
+   <script type="text/javascript" src="{{ asset('bundles/postparc/lib/leaflet/markercluster/dist/leaflet.markercluster.js') }}"></script>
+   {% include 'selection/mapjs.html.twig' %}
+{% endblock %}

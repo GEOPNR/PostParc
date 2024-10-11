@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Representations list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Elected</th>
+                <th>Begindate</th>
+                <th>Mandatduration</th>
+                <th>Estimatedtime</th>
+                <th>Estimatedcost</th>
+                <th>Periodicity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for representation in representations %}
+            <tr>
+                <td><a href="{{ path('representation_show', { 'id': representation.id }) }}">{{ representation.id }}</a></td>
+                <td>{% if representation.created %}{{ representation.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if representation.updated %}{{ representation.updated|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if representation.elected %}Yes{% else %}No{% endif %}</td>
+                <td>{% if representation.beginDate %}{{ representation.beginDate|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ representation.mandatDuration }}</td>
+                <td>{{ representation.estimatedTime }}</td>
+                <td>{{ representation.estimatedCost }}</td>
+                <td>{{ representation.periodicity }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('representation_show', { 'id': representation.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('representation_edit', { 'id': representation.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('representation_new') }}">Create a new representation</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,15 @@
+
+<div class="bs-callout bs-callout-info">
+        <h4>{{ 'sendMailMassifModule.yourMonthQuota'|trans() }}</h4>
+        <div class="progress">
+            <div class="progress-bar
+                 {% if consumptionInfos.percentMail > 75 and consumptionInfos.percentMail < 90 %} progress-bar-warning {% endif %}
+                 {% if consumptionInfos.percentMail >= 90  %} progress-bar-alert {% endif %}
+                 "
+                 role="progressbar" aria-valuenow="{{consumptionInfos.percentMail}}" aria-valuemin="0" aria-valuemax="100" style="width: {{consumptionInfos.percentMail}}%;" >
+                {{consumptionInfos.percentMail}}%
+                <span class="sr-only">{{consumptionInfos.percentMail}}%</span>
+            </div>
+        </div>
+        <span class="label label-info">{{consumptionInfos.nbEmail}} / {{consumptionInfos.quota}}</span>
+    </div>

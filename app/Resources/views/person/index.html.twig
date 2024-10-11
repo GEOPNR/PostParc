@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+{% form_theme search_form "PostparcBundle:Form:bootstrap_3_inline_layout.html.twig" %}
+
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig %}
+   {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+{% if app.user.coordinate and app.user.coordinate.coordinate|length > 0 %}
+   {% set coordinate = app.user.coordinate.coordinate %}
+{% else %}
+   {% set coordinate = app.user.entity.coordinate %}
+{% endif %}
+
+{% block title %}
+   {{'Person.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+   <div class="nav-list-actions col-md-3 pull-right">
+      <ul>
+         {% if is_granted('ROLE_CONTRIBUTOR') %}
+            <li class="sf_admin_action_new">
+               <a class="btn btn-primary" href="{{path('person_new')}}"><i class="fa-solid fa-plus"></i><span class="libelle">&nbsp;{{'actions.new'|trans}}</span></a>
+            </li>
+         {% endif %}
+         <li><a class="sf-admin-filters-toggle btn btn-default active"><i class="fa-solid fa-filter"></i><span class="libelle">&nbsp;{{'sorts'|trans}}</span></a></li>
+      </ul>
+   </div>
+
+   <h1>{{'Person.list'|trans}}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-3"><i class="fa-solid fa-question-circle"></i></a>
+      <small class="text-info">&nbsp;&nbsp;<span class="nbResults">{{pagination.getTotalItemCount}}</span> {{'results'|trans}}</small>
+   </h1>
+
+   {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '3'})) }}
+
+   <div class="sf-admin-filters" {% if( app.request.session.has("personFilter") and app.request.session.get("personFilter")|length ) %} style="display:block;" {% endif %}>
+      {{ form_start(search_form) }}
+      <div class="form-group form-action pull-right">
+         <button type="submit" name="filter_action" class="btn btn btn-success pull-right" value="filter">{{'actions.sort'|trans}}</button>
+         <button type="submit" name="filter_action" class="btn btn-link" value="reset">{{'actions.erase'|trans}}</button>
+      </div>
+      {% for child in search_form.children %}
+         {{ form_row(child) }}
+         {% if loop.index is divisible by(3) %}
+            <br/>
+         {% endif %}
+      {% endfor %}
+      {#    {{ form_widget(search_form) }}#}
+      {{ form_end(search_form) }}
+   </div>
+
+   <form action="{{path('person_batch')}}" method="post" >
+      <div class="sf-admin-batch-actions-choice">
+         <div class="form-group">
+            <label for="batch_action">{{'forSelection'|trans}}</label>
+            <select name="batch_action" class="form-control">
+               <option value="">{{'chooseAction'|trans}}</option>
+               {% if is_granted('ROLE_CONTRIBUTOR') %}
+                  <option value="batchDelete">{{'actions.delete'|trans}}</option>
+               {% endif %}
+               <option value="batchAddBasket">{{'actions.addBasket'|trans}}</option>
+               <option value="batchExportVcard">{{'actions.exportVcard'|trans}}</option>
+            </select>
+         </div>
+         <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+
+         {% include 'default/selectResultsPerPage.html.twig'  %}
+
+      </div>
+      <div class="sf_admin_list scrollable_list no-more-tables">
+         <table class="table table-striped table-condensed table-responsive table-hover">
+            <thead>
+               <tr>
+                  <th id="sf_admin_list_batch_actions">
+                     <input id="sf_admin_list_batch_checkbox" type="checkbox" title="Check all" onclick="checkAll();">
+                  </th>
+                  <th style="width:200px;">{{ knp_pagination_sortable(pagination, 'Person.field.name'|trans(), 'p.slug') }}</th>
+                  {% if ('phone' not in personnalFieldsRestriction ) %}
+                     <th>{{ knp_pagination_sortable(pagination, 'Coordinate.field.phone'|trans(), 'c.phone') }}</th>
+                  {% endif %}
+                  {% if ('mobilePhone' not in personnalFieldsRestriction ) %}
+                     <th>{{ knp_pagination_sortable(pagination, 'Coordinate.field.mobilePhone'|trans(), 'c.mobilePhone') }}</th>
+                  {% endif %}
+                  {% if ('email' not in personnalFieldsRestriction ) %}
+                     <th>{{ knp_pagination_sortable(pagination, 'Email.field.email'|trans(), 'e.email') }}</th>
+                  {% endif %}
+                  {% if ('city' not in personnalFieldsRestriction ) %}
+                     <th>{{ knp_pagination_sortable(pagination, 'Coordinate.field.city'|trans(), 'city.name') }}</th>
+                  {% endif %}
+                  <th id="sf_admin_list_th_actions" style="width:170px;">{{'actions.actions'|trans}}</th>
+               </tr>
+            </thead>
+            <tbody>
+
+               {% for key, person in pagination %}
+                  {% if (person.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                     {% set editable = false %}
+                  {% else %}
+                     {% set editable = true %}
+                  {% endif %}
+                  <tr class="{% if editable==false %}warning{% endif %}{% if person.dontWantToBeContacted == 1 %}dontWantToBeContacted{%  endif  %}">
+                     <td><input type="checkbox" name="ids[]" value="{{ person.id }}" class="sf_admin_batch_checkbox"></td>
+                     <td style="min-width:150px;"><a href="{{ path('person_show', {'id': person.id}) }}">{{ person }}</a> {% if person.dontWantToBeContacted == 1 %} <i class="fa-solid fa-mask" title="{{ 'Person.field.dontWantToBeContacted'|trans() }}"></i>{%  endif  %}{% if is_granted('ROLE_CONTRIBUTOR') and person.dontShowCoordinateForReaders == 1 %} <i class="fa-solid fa-user-shield" title="{{ 'Person.messages.dontShowCoordinateForReaders'|trans() }}"></i> {%  endif  %}</td>
+                     {% if ('phone' not in personnalFieldsRestriction )  %}
+                        <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="javascript:;" class="phoneNumber">{% if person.getCoordinate().getPhone() %}{{ person.getCoordinate().getPhoneCode() }}{{ person.getCoordinate().getPhone() }}{% endif %}</a>{% endif %}</td>
+                     {% endif %}
+                     {% if ('mobilePhone' not in personnalFieldsRestriction ) %}
+                        <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="javascript:;" class="phoneNumber">{% if person.coordinate.mobilePhone %}{{ person.getCoordinate().getPhoneCode() }}{{ person.coordinate.mobilePhone }}{% endif %}</a>{% endif %}</td>
+                     {% endif %}
+                     {% if ('email' not in personnalFieldsRestriction ) %}
+                        <td>{% if person.coordinate and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}<a href="mailto:{{person.coordinate.email}}">{{ person.coordinate.email }}</a>{% endif %}</td>
+                     {% endif %}
+                     {% if ('city' not in personnalFieldsRestriction ) %}
+                        <td>{% if person.coordinate and person.coordinate.city and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}{{ person.coordinate.city.name }}{% endif %}</td>
+                     {% endif %}
+                     <td >
+                        <div class="btn-group">
+                           <a href="{{ path('person_show', {'id': person.id}) }}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                              {% if person.coordinate  and person.coordinate.coordinate|length and 'geographicalCoordinate' not in personnalFieldsRestriction and person.dontWantToBeContacted != 1 and ( is_granted('ROLE_CONTRIBUTOR') or not(person.dontShowCoordinateForReaders()) ) %}
+                              <a class="btn btn-default btn-xs" href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{coordinate}}%3B{{person.coordinate.coordinate}}" target=blank" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'itinerary'|trans}}"><i class="fa-solid fa-map" aria-hidden="true"></i></a>
+                              {% endif %}
+
+                           <a href="{{path('person_exportVcard', {'id':person.id })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.exportVcard'|trans}}"><i class="fa-solid fa-address-card"></i></a>
+                              {% if ( is_granted('ROLE_CONTRIBUTOR') and (editable or ( not(editable) and person.isEditableByOtherEntities) ))%}
+                              <a class="btn btn-default btn-xs" href="{{ path('person_edit', {'id': person.id}) }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.edit'|trans}}">
+                                 <i class="fa-solid fa-pencil-alt"></i>
+                              </a>
+                              <a href="{{path('person_delete', {'id':person.id })}}" class="btn btn-default btn-xs delete-ajax-button" data-type="person" data-id="{{person.id}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" data-confirm="{{'actions.confirmDelete'|trans}}" >
+                                 <i class="fa-solid fa-trash-alt"></i>
+                              </a>
+                           {% endif %}
+                           <a href="{{path('person_addBasket', {'id':person.id })}}" class="btn btn-default btn-xs add-to-selection-button"  data-type="person" data-id="{{person.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                           {% include 'default/_favoriteStarBlock.html.twig' with {'object': person} %}
+                        </div>
+                     </td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </form>
+
+   <div class="navigation text-center">
+      {{ knp_pagination_render(pagination) }}
+   </div>
+
+{% endblock %}

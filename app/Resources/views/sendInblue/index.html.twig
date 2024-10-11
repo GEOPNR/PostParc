@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'SendInBlue.index'|trans}}
+{% endblock title %}
+
+
+
+{% block body %}
+   <h1>{{'SendInBlue.index'|trans}}</h1>
+   {%  if result|length %}
+      <div class="bs-callout bs-callout-info">
+         <h3>{{'SendInBlue.messages.exportResults'|trans}}</h3>
+         <ul class="unstyled">
+
+            {% if result.contactEmails is defined %}
+               <li>{{'SendInBlue.messages.nbContactsOnIntialRequest'|trans}}: <span class="label label-pill label-primary">{{ result.contactEmails|length }}</span></li>
+               {%  endif %}
+               {% if result.alreadyassociateEmails is defined %}
+               <li>{{'SendInBlue.messages.nbContactAlreadyPresentInSendinblueAndAssociateToGroup'|trans}}: <span class="label label-pill label-info">{{ result.alreadyassociateEmails|length }}</span></li>
+               {%  endif %}
+               {% if result.existingEmails is defined %}
+               <li>{{'SendInBlue.messages.nbContactAlreadyPresentInSendinblueSoWillBeAssociateToGroup'|trans}}: <span class="label label-pill label-info">{{ result.existingEmails|length }}</span></li>
+               {%  endif %}
+               {% if result.newEmails is defined %}nbContactNotPresentInSendinblueSoWillBeAddedAndAssociateToGroup
+               <li>{{'SendInBlue.messages.nbContactNotPresentInSendinblueSoWillBeAddedAndAssociateToGroup'|trans}}: <span class="label label-pill label-info">{{ result.newEmails|length }}</spam></li>
+               {%  endif %}
+               {% if result.nonSendedEmails is defined %}
+               <li>{{'SendInBlue.messages.NbNonSendedContacts'|trans}}:  <span class="label label-pill label-danger">{{ result.nonSendedEmails|length }}</spam></li>
+               {%  endif %}
+         </ul>
+         {% if result.nonSendedEmails is defined and result.nonSendedEmails|length > 0 %}
+            <p>
+               {{'SendInBlue.messages.NbNonSendedContactsDetails'|trans}}: <br/>
+               {{ result.nonSendedEmails|join(', ') }}
+            </p>
+         {% endif %}
+      </div>
+      <br/>
+      <a href="{{ path('sendinBlue_sendSelection_page') }}" class="btn btn-primary">{{'SendInBlue.messages.NewExport'|trans}}</a>
+
+   {%  else  %}
+      <form method="POST">
+         <div class="form-group">
+            <label for="sendInBlueListsSelector">{{ 'SendInBlue.action.select_list'|trans() }}</label>
+            <select id="sendInBlueListsSelector" class="form-control" name="sendInBlueListsSelector">
+               <option value=""></option>
+               {%  for list in lists.lists %}
+                  <option value="{{ list.id }}">{{ list.name }}</option>
+               {%  endfor %}
+            </select>
+         </div>
+
+         <h4>{{ 'or'|trans() }}</h4>
+
+         <div class="form-group">
+            <label for="newlistName">{{ 'SendInBlue.action.create_new_list'|trans() }}</label>
+            <input class="form-control" type="text" name="newlistName" id="newlistName"/>
+         </div>
+
+         <br/>
+         <input class="btn btn-success" type="submit" value="{{'actions.export'|trans}}">
+         </div>
+      </form>
+   {%  endif %}
+{% endblock body %}

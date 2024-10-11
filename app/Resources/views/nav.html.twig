@@ -1,0 +1,109 @@
+<nav id="nav" class="navbar navbar-inverse" role="navigation">
+   <div class="container">
+      <div class="row">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav">
+               <span class="sr-only">Toggle navigation</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+            </button>
+         </div>
+         <div class="collapse navbar-collapse" id="main-nav">
+            <ul class="nav navbar-nav">
+               <li>
+                  <a href="{{ path('person_index') }}">{{ 'nav.directory'|trans() }}</a>
+               </li>
+               <li class="dropdown">
+                  <a href="#"  class="dropdown-toggle" data-toggle="dropdown" >{{ 'nav.organizations'|trans() }}<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                     <li><a href="{{ path('organization_index') }}"><i class="fa-solid fa-industry"></i> {{ 'nav.organizations'|trans() }}</a></li>
+                        {% if is_granted('ROLE_CONTRIBUTOR_PLUS') %}
+                        <li><a href="{{ path('organizationType_index') }}"><i class="fa-brands fa-elementor"></i> {{ 'nav.organizationTypes'|trans() }}</a></li>
+                        {% endif %}
+                  </ul>
+               </li>
+               {% if is_granted('ROLE_CONTRIBUTOR_PLUS') %}
+                  <li class="dropdown">
+                     <a href="#"  class="dropdown-toggle" data-toggle="dropdown" >{{ 'nav.territoriesTowns'|trans() }}<b class="caret"></b></a>
+                     <ul class="dropdown-menu">
+                        <li><a href="{{path('territory_index')}}"><i class="fa-solid fa-coins"></i> {{'nav.territories'|trans()}}</a></li>
+                        <li><a href="{{path('territoryType_index')}}"><i class="fa-brands fa-elementor"></i> {{'nav.territoryTypes'|trans()}}</a></li>
+                        <li><a href="{{path('city_index')}}"><i class="fa-solid fa-city"></i> {{'nav.towns'|trans()}}</a></li>
+                     </ul>
+                  </li>
+                  <li class="dropdown">
+                     <a href="#"  class="dropdown-toggle" data-toggle="dropdown" >{{ 'nav.functionsServices'|trans() }}<b class="caret"></b></a>
+                     <ul class="dropdown-menu">
+                        <li><a href="{{ path('function_index') }}"><i class="fa-solid fa-user-cog"></i> {{ 'nav.functions'|trans() }}</a></li>
+                        <li><a href="{{ path('service_index') }}"><i class="fa-solid fa-inbox"></i> {{ 'nav.services'|trans() }}</a></li>
+                        <li><a href="{{ path('complement_function_index') }}"><i class="fa-solid fa-users-cog"></i> {{ 'nav.additionalFunctions'|trans() }}</a></li>
+                     </ul>
+                  </li>
+               {% endif %}
+
+               <li class="dropdown">
+                  <a href="#"  class="dropdown-toggle" data-toggle="dropdown" >{{ 'nav.groupsLists'|trans() }}<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                     <li><a href="{{ path('group_index') }}"><i class="fa-solid fa-users"></i> {{ 'nav.personsGroups'|trans() }}</a></li>
+                     <li><a href="{{ path('searchList_index') }}"><i class="fa-brands fa-searchengin"></i> {{ 'nav.searchList'|trans() }}</a></li>
+                  </ul>
+               </li>
+               {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').use_event_module == true %}
+                  <li class="dropdown">
+                     <a href="#"  class="dropdown-toggle" data-toggle="dropdown" >{{ 'nav.eventsItem'|trans() }}<b class="caret"></b></a>
+                     <ul class="dropdown-menu">
+                        <li><a href="{{ path('event_index') }}"><i class="fa-solid fa-calendar-week"></i> {{ 'nav.events'|trans() }}</a></li>
+                           {% if is_granted('ROLE_CONTRIBUTOR_PLUS') %}
+                           <li><a href="{{ path('eventType_index') }}"><i class="fa-brands fa-elementor"></i> {{ 'nav.eventTypes'|trans() }}</a></li>
+                           {% endif %}
+                     </ul>
+                  </li>
+               {% endif %}
+
+            </ul>
+            {% if is_granted('ROLE_USER_PLUS') %}
+               <ul class="nav navbar-nav navbar-right">
+
+                  <li class="dropdown">
+                     <a href="#"  class="dropdown-toggle" data-toggle="dropdown">{{ 'nav.settings'|trans() }}&nbsp;<i class="fa-solid fa-cog"></i></a>
+                     <ul class="dropdown-menu">
+                        {% if is_granted('ROLE_ADMIN') %}
+                           {% if is_granted('ROLE_IMPORT') %}
+                              <li><a href="{{ path('import_index') }}"><i class="fa-solid fa-download"></i>&nbsp;{{ 'Import.index'|trans() }}</a></li>
+                           {%  endif %} 
+                           <li><a href="{{ path('config_module') }}"><i class="fa-solid fa-cogs" aria-hidden="true"></i>&nbsp;{{ 'config.title'|trans() }}</a></li>
+                           <li><a href="{{ path('trash_index') }}"><i class="fa-solid fa-trash-alt"></i>&nbsp;{{ 'nav.trash'|trans() }}</a></li>
+                           <li><a href="{{ path('print_format_index') }}"><i class="fa-solid fa-print" aria-hidden="true"></i>&nbsp;{{ 'nav.printFormat'|trans() }}</a></li>
+                           <li><a href="{{ path('duplicate_index') }}"><i class="fa-solid fa-clone" aria-hidden="true"></i>&nbsp;{{ 'nav.duplicates'|trans() }}</a></li>
+                           <li><a href="{{ path('qrCodeStat_index') }}"><i class="fa-solid fa-line-chart" aria-hidden="true"></i>&nbsp;{{ 'QrCodeStat.list'|trans() }}</a></li>
+                           <li><a href="{{ path('personnalFieldsRestriction_manage') }}"><i class="fa-solid fa-eye-slash"></i>&nbsp;{{ 'config.labels.personnalFieldsRestriction'|trans() }}</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_CONTRIBUTOR_PLUS') %}
+                           <li><a href="{{ path('help_index') }}"><i class="fa-solid fa-question-circle"></i>&nbsp;{{ 'nav.help'|trans() }}</a></li>
+                           <li><a href="{{ path('tag_index') }}"><i class="fa-solid fa-tags" aria-hidden="true"></i>&nbsp;{{ 'nav.tags'|trans() }}</a></li>
+                           <li><a href="{{ path('profession_index') }}"><i class="fa-solid fa-industry" aria-hidden="true"></i>&nbsp;{{ 'nav.professions'|trans() }}</a></li>
+                        {% endif %}
+                        {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').use_representation_module == true and is_granted('ROLE_CONTRIBUTOR') %}
+                           <li><a href="{{ path('mandateType_index') }}"><i class="fa-solid fa-user-graduate"></i>&nbsp;{{ 'nav.mandateTypes'|trans() }}</a></li>
+                        {% endif %}
+                        {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').use_massiveMail == true  and is_granted('ROLE_CONTRIBUTOR') %}
+                           <li><a href="{{ path('mailFooter_index') }}"><i class="fa-solid fa-id-card" aria-hidden="true"></i>&nbsp;{{ 'nav.mailFooter'|trans() }}</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_CONTRIBUTOR') %}
+                           <li><a href="{{ path('user_index') }}"><i class="fa-solid fa-users" aria-hidden="true"></i>&nbsp;{{ 'nav.profiles'|trans() }}</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_USER_PLUS') %}
+                           <li><a href="{{ path('documentTemplate_index') }}"><i class="fa-solid fa-file-text" aria-hidden="true"></i>&nbsp;{{ 'nav.documentTemplate'|trans() }}</a></li>
+                        {% endif %}
+                        {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').use_massiveMail == true  and is_granted('ROLE_USER_PLUS') %}
+                           <li><a href="{{ path('mailStats_index') }}" ><i class="fa-solid fa-line-chart" aria-hidden="true"></i>&nbsp;{{ 'nav.mailStats'|trans() }}</a></li>
+                        {% endif %}
+                     </ul>
+                  </li>
+               </ul>
+            {% endif %}
+         </div>
+      </div>
+   </div>
+</nav>

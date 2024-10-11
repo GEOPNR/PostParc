@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'config.title'|trans()}}
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'User.configurations'|trans()}}</h1>
+
+   <form method="POST" actions="{{path('user_configs')}}" class="">
+      <div class="row">
+         <div class="col-md-6 col-sm-12">
+            <h4><i class="fa-solid fa-cogs" aria-hidden="true"></i>&nbsp;{{'config.labels.general_config'|trans()}}</h4>
+            <div class="well well-sm form-group">
+               <label for="default_items_per_page" >{{'config.default_items_per_page'|trans()}}</label>
+               <input type="number" class="form-control" name="default_items_per_page" value="{{configs.default_items_per_page}}">
+
+               <div class="checkbox ">
+                  <label for="empty_search_on_load">
+                     <input type="checkbox" name="empty_search_on_load" {% if configs.empty_search_on_load %} checked {% endif %}>{{'config.empty_search_on_load'|trans()}}
+                  </label>
+               </div>
+               <br/>
+               <label for="tabsOrder_personalCoordinate" >{{'config.tabsOrder'|trans()}}</label>
+               <div class="row">
+
+                   {% for key, value in configs.tabsOrder %} 
+                       {% if key != 'representations' or (key == 'representations' and app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true)  %}
+                            <div class="col-md-6">
+                                 {{('TabsLabels.'~key)|trans}}
+                            </div>
+                            <div class="col-md-6">
+                                <input type='number' min="1" max="4" class="form-control" name='tabsOrder[{{ key }}]' id='tabsOrder_persons' value='{{ value }}' />
+                            </div>
+                        {% endif %}
+                   {% endfor %}                   
+
+               </div>
+            </div>
+         </div>
+                   
+        <div class="col-md-6 col-sm-12">
+           <h4><i class="fas fa-paper-plane"></i>&nbsp;{{'config.labels.massiveMail_module'|trans()}}</h4>
+           <div class="well well-sm form-group">
+               <div class="checkbox ">
+                  <label for="hideSpecificMessageField">
+                     <input type="checkbox" name="hideSpecificMessageField" {% if configs.hideSpecificMessageField %} checked {% endif %}>{{'config.hideSpecificMessageField'|trans()}}
+                  </label>
+               </div>
+               <div class="checkbox ">
+                  <label for="emptySpecificMessageField">
+                     <input type="checkbox" name="emptySpecificMessageField" {% if configs.emptySpecificMessageField %} checked {% endif %}>{{'config.emptySpecificMessageField'|trans()}}
+                  </label>
+               </div>
+               <div class="checkbox ">
+                  <label for="hideBlocSendWithSendingMailSoftware">
+                     <input type="checkbox" name="hideBlocSendWithSendingMailSoftware" {% if configs.hideBlocSendWithSendingMailSoftware %} checked {% endif %}>{{'config.hideBlocSendWithSendingMailSoftware'|trans()}}
+                  </label>
+               </div>   
+           </div>
+        </div>   
+
+        <div class="col-md-6 col-sm-12">
+           <h4><i class="fa-solid fa-cubes" aria-hidden="true"></i>&nbsp;{{'config.labels.richeTextConfig'|trans()}}</h4>
+           <div class="well well-sm form-group">
+                <label >{{'config.summernote_font_family'|trans()}}</label>
+                <select name="summernote_font-family" class="form-control select2">
+                     <option value=""></option>
+                     {%  for font_family_key,font_family_value in summernote_font_families %}
+                        <option {% if configs.summernote_font_family == font_family_value %} selected {% endif %} value="{{ font_family_value }}">{{ font_family_value }}</option>
+                     {% endfor %}
+                </select>
+                <br/>     
+                <label >{{'config.summernote_font_size'|trans()}}</label>
+                <select name="summernote_font_size" class="form-control select2">
+                     <option value=""></option>
+                     {%  for font_size_key,font_size_value in summernote_font_sizes %}
+                        <option {% if configs.summernote_font_size == font_size_value %} selected {% endif %}  value="{{ font_size_value }}">{{ font_size_value }}</option>
+                     {% endfor %}
+                </select>
+           </div>                     
+        </div>                  
+         {% if isMultiInstance is defined and isMultiInstance == true %}
+            <div class="col-md-6 col-sm-12">
+               <h4><i class="fa-solid fa-cubes" aria-hidden="true"></i>&nbsp;{{'config.labels.multiInstance_module'|trans()}}</h4>
+               <div class="well well-sm form-group">
+                  <div class="checkbox ">
+                     <label for="show_SharedContents">
+                        <input type="checkbox" name="show_SharedContents" {% if configs.show_SharedContents %} checked {% endif %}>{{'config.show_SharedContents'|trans()}}
+                     </label>
+                  </div>
+               </div>
+            </div>
+         {% endif %}
+
+
+         <div class="col-md-12">
+            <hr/> 
+            <button type="submit" class="btn btn-primary btn-lg btn-block">{{'actions.update'|trans()}}</button>
+         </div>
+      </div>
+   </form>
+{% endblock body %}

@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+
+{% if app.user.coordinate and app.user.coordinate.coordinate|length > 0 %}
+   {% set coordinate = app.user.coordinate.coordinate %}
+{% else %}
+   {% set coordinate = app.user.entity.coordinate %}
+{% endif %}
+
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig %}
+   {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% set nbResultsprinted = 0 %}
+{% if persons|length()>0 and not (searchParamsObjects.functions is defined or searchParamsObjects.services is defined or searchParamsObjects.organizations is defined or searchParamsObjects.organizationTypes is defined) %}
+   {% set nbResultsprinted = nbResultsprinted +  persons.getTotalItemCount()%}
+{% endif %}
+{% if pfos|length()>0 %}
+   {% set nbResultsprinted = nbResultsprinted + pfos.getTotalItemCount() %}
+{% endif %}
+{% if organizations|length()>0 and (searchParamsObjects.organizations is defined or searchParamsObjects.organizationTypes is defined or (searchParams.q is defined  and searchParams.q!='')) %}
+   {% set nbResultsprinted = nbResultsprinted +  organizations.getTotalItemCount() %}
+{% endif %}
+{% if representations|length()>0  %}
+   {% set nbResultsprinted = nbResultsprinted +  representations.getTotalItemCount() %}
+{% endif %}
+
+{% block body %}
+   <div class="col-sm-12 col-md-12">
+      <h1>{{title}}
+         <small class="text-info" >&nbsp;&nbsp;{{nbResultsprinted}} {{'results'|trans}}</small>
+      </h1>
+   </div>
+
+   <div class="col-sm-12 col-md-12 ">
+      {% if searchParamsObjects|length or (searchParams.maxUpdatedDate is defined and searchParams.maxUpdatedDate != '') 
+        or (searchParams.observation is defined and searchParams.observation != '') 
+        or (searchParams.q is defined  and searchParams.q!='') %}
+         {% include 'search/searchParamsResume.html.twig' %}
+      {% endif %}
+
+      {% if nbElements == 0 %}
+         <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{'flash.noSearchResult'|trans}}
+         </div>
+      {% else %}
+         <form action="{{path('search_batch')}}" method="post">
+            <div class="sf-admin-batch-actions-choice">
+               <div class="form-group">
+                  <label for="batch_action">{{'forSelection'|trans}}</label>
+                  <select name="batch_action" class="form-control submitFormOnSelect">
+                     <option value="">{{'chooseAction'|trans}}</option>
+                     <option value="batchAddBasket">{{'actions.addBasket'|trans}}</option>
+                     <option value="batchExportVcard">{{'actions.exportVcard'|trans}}</option>
+                  </select>
+               </div>
+               {#<input type="submit" class="btn btn-default" value="ok">#}
+               {% include 'default/selectResultsPerPage.html.twig'  %}
+
+            </div>
+            <ul class="nav nav-pills"  id="resultTabs" role="tablist">
+               {% for tabName in app.session.get('currentEntityConfig').tabsOrder|keys  %} 
+                    {% if tabName=='persons' and persons|length()>0  and not (searchParamsObjects.functions is defined or searchParamsObjects.services is defined or searchParamsObjects.organizations is defined or searchParamsObjects.organizationTypes is defined) %}
+                       <li class="{% if activeTab == 'persons'  %}active{% endif %}">
+                          <a href="#persons" role="tab" data-toggle="tab" >
+                             <i class="fa-solid fa-home"></i> {{'Person.personalCoordinate'|trans}} <span class="label label-pill label-info" >{{ persons.getTotalItemCount() }}</span>
+                          </a>
+                       </li>
+                    {% endif %}
+
+                    {% if tabName=='pfos' and  pfos|length()>0 %}
+                       <li  class="{% if activeTab == 'pfos' or ( activeTab == 'persons' and ( (searchParamsObjects.functions is defined or searchParamsObjects.services is defined or searchParamsObjects.organizations is defined or searchParamsObjects.organizationTypes is defined) or persons|length()==0)) %}active{% endif %}">
+                          <a href="#pfos"  role="tab" data-toggle="tab">
+                             <i class="fa-solid fa-cubes"></i> {{'Pfo.labels'|trans}} <span class="label label-pill label-success" >{{ pfos.getTotalItemCount() }}</span>
+                          </a>
+                       </li>
+                    {% endif %}
+                    {% if tabName=='organizations' and organizations|length()>0  and not (searchParamsObjects.functions is defined or searchParamsObjects.services is defined ) %}
+                       <li class="{% if activeTab == 'organizations' %}active{% endif %}">
+                          <a href="#organizations"  role="tab" data-toggle="tab">
+                             <i class="fa-solid fa-users"></i> {{'nav.organizations'|trans}} <span class="label label-pill label-warning" >{{ organizations.getTotalItemCount() }}</span>
+                          </a>
+                       </li>
+                    {% endif %}
+                    {% if tabName=='representations' and representations|length()>0  %}
+                       <li class="{% if activeTab == 'representations'%}active{% endif %}">
+                          <a href="#representations"  role="tab" data-toggle="tab">
+                             <i class="fa-solid fa-users"></i> {{'Representation.labels_with_volunteer'|trans}} <span class="label label-pill label-danger" >{{ representations.getTotalItemCount() }}</span>
+                          </a>
+                       </li>
+                    {% endif %}
+               {% endfor %}
+               <li class="{% if activeTab == 'map'%}active{% endif %}">
+                  <a href="#map"  role="tab" data-toggle="tab" id="maplink">
+                     <i class="fa-solid fa-map-marker"></i> {{'map'|trans}}
+                  </a>
+               </li>
+            </ul>
+
+            <div class="tab-content">
+
+               {% if persons|length()>0  and not (searchParamsObjects.functions is defined or searchParamsObjects.services is defined or searchParamsObjects.organizations is defined or searchParamsObjects.organizationTypes is defined) %}
+                  {% include 'search/resultPersons.html.twig' %}
+               {% endif %}
+
+               {% if pfos|length()>0 %}
+                  {% include 'search/resultPfos.html.twig' %}
+               {% endif %}
+
+               {% if organizations|length()>0  %}
+                  {% include 'search/resultOrganizations.html.twig' %}
+               {% endif %}
+
+               {% if representations|length()>0  %}
+                  {% include 'search/resultRepresentations.html.twig' %}
+               {% endif %}
+               {% include 'search/resultMap.html.twig' %}
+
+            </div>
+         </form>
+      {% endif %}
+
+
+
+   {% endblock %}
+
+   {% block stylesheets %}
+      {{ parent() }}
+      <link href="{{ asset('bundles/postparc/lib/leaflet/leaflet.css') }}" type="text/css" rel="stylesheet"/>
+      <link href="{{ asset('bundles/postparc/lib/leaflet/markercluster/dist/MarkerCluster.css') }}" type="text/css" rel="stylesheet"/>
+      <link href="{{ asset('bundles/postparc/lib/leaflet/markercluster/dist/MarkerCluster.Default.css') }}" type="text/css" rel="stylesheet"/>
+   {% endblock %}
+
+   {% block javascripts %}
+      {{ parent() }}
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/leaflet/leaflet.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('bundles/postparc/lib/leaflet/markercluster/dist/leaflet.markercluster.js') }}"></script>
+      {% include 'search/mapjs.html.twig' %}
+   {% endblock %}
+
+
+   {% if piwik is defined and piwik.enable==1 %}
+      {% block piwik %}
+
+         <!-- Piwik -->
+         <script type="text/javascript">
+            var _paq = _paq || [];
+            _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+            _paq.push(["setCookieDomain", "{{ app.environment }}.postparc.fr"]);
+            _paq.push(["setDomains", ["{{ app.environment }}.postparc.fr"]]);
+            _paq.push(['setCustomVariable', 1, 'domaine', '{{ app.environment }}', scope = "visit"]);
+            _paq.push(['setCustomVariable', 2, 'entity','{{ app.environment }}{% if isMultiInstance is defined and isMultiInstance == true and app.user.entity.parent %}_{{ app.user.entity.slug|upper }}{% endif %}', scope = "visit"]);
+            {% if searchParams.q is defined and searchParams.q!='' %}
+               var searchCount = {{ nbResultsprinted }};
+               _paq.push(['trackSiteSearch', "{{searchParams.q}}", false, searchCount]);
+               _paq.push(['setCustomUrl', document.URL + '&search_count=' + searchCount]);
+               _paq.push(['trackPageView']);
+            {% endif %}
+               _paq.push(['trackPageView']);
+               _paq.push(['enableLinkTracking']);
+               (function() {
+                  var u = "//{{piwik.piwirlUrl}}/";
+                  _paq.push(['setTrackerUrl', u + 'matomo.php']);
+                  _paq.push(['setSiteId', {{piwik.piwikSiteId}}]);
+                  var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+                  g.type = 'text/javascript';
+                  g.async = true;
+                  g.defer = true;
+                  g.src = u + 'piwik.js';
+                  s.parentNode.insertBefore(g, s);
+               })();
+         </script>
+         <noscript><p><img src="//{{piwik.piwirlUrl}}/matomo.php?idsite={{piwik.piwikSiteId}}&domaine={{ app.environment }}&entity={{ app.environment }}{% if isMultiInstance is defined and isMultiInstance == true and app.user.entity.parent %}_{{ app.user.entity.slug|upper }}{% endif %}" style="border:0;" alt="" /></p></noscript>
+         <!-- End Piwik Code -->
+
+      {% endblock piwik %}
+   {% endif %}

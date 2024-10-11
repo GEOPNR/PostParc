@@ -1,0 +1,78 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+#    parameter_name: value
+
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver: pdo_mysql
+                memory: true
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+    postparc_postUpdate_Listener:
+        class: PostparcBundle\EventListener\UpdateObjectListener
+        arguments: ["@security.token_storage", "@mailer", "@translator" ]
+        tags:
+            - { name: doctrine.event_listener, event: postUpdate, connection: default }
+            - { name: doctrine.event_listener, event: preUpdate, connection: default }
+
+    auth_token_user_provider:
+        class: PostparcApiBundle\Security\AuthTokenUserProvider
+        arguments: ["@auth_token_repository", "@user_repository"]
+        public:    false
+
+    auth_token_repository:
+        class:   Doctrine\ORM\EntityManager
+        factory: ["@doctrine.orm.entity_manager", "getRepository"]
+        arguments: ["PostparcApiBundle:AuthToken"]
+
+    user_repository:
+        class:   Doctrine\ORM\EntityManager
+        factory: ["@doctrine.orm.entity_manager", "getRepository"]
+        arguments: ["PostparcBundle:User"]
+
+    auth_token_authenticator:
+        class:     PostparcApiBundle\Security\AuthTokenAuthenticator
+        arguments: ["@security.http_utils"]
+        public:    false
+    sendinblueapi_configuration:
+       class: SendinBlue\Client\Configuration
+       public: true
+    sendinblueapi_client:
+       class: SendinBlue\Client\ApiClient
+       public: true
+    sendinblue_client_accountApi:
+       class: SendinBlue\Client\Api\AccountApi
+       public: true
+    sendinblue_client_contactsApi:
+       class: SendinBlue\Client\Api\ContactsApi
+       public: true
+    sendinblue_client_emailCampaignsApi:
+       class: SendinBlue\Client\Api\EmailCampaignsApi
+       public: true
+    sendinblue_client_listsApi:
+       class: SendinBlue\Client\Api\ListsApi
+       public: true
+    sendinblue_client_SMSCampaignsApi:
+       class: SendinBlue\Client\Api\SMSCampaignsApi
+       public: true
+    sendinblue_client_processApi:
+       class: SendinBlue\Client\Api\ProcessApi
+       public: true
+    sendinblue_client_smtpApi:
+       class: SendinBlue\Client\Api\SMTPApi
+       public: true
+    sendinblue_client_sendersApi:
+       class: SendinBlue\Client\Api\SendersApi
+       public: true
+    postparc_switchUser:
+       class: PostparcBundle\EventListener\SwitchUserSubscriber
+       public: true
+       

@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{'exceptions.pageNotAllowed.title'|trans()}}{% endblock %}
+{% block body %}
+    <h1>{{'exceptions.pageNotAllowed.title'|trans()}}</h1>
+
+    <div class="alert alert-danger" role="alert">
+        {{'exceptions.pageNotAllowed.text'|trans()}} <a href="{{ path('homepage') }}">{{'exceptions.returnToTheHomepage'|trans()}}</a>.
+    </div>
+{% endblock %}

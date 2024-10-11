@@ -1,0 +1,59 @@
+{% set now = date("now") %}
+{% set startDate = date("05/01/2018") %}
+{% set endDate = date("05/31/2018") %}
+{% set leftDays = 0 %}
+{% set codePromo = "PP052018" %}
+
+{% if now <= endDate %}
+    <div id="promoModal" class="modal fade" aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div class="text-center"><img src="{{ asset('bundles/postparc/images/logo-post-parc.png') }}" /></div>
+                    <h2 id="modalTitle" class="text-center"><a href="http://www.probesys.com" target="_blank">Probesys</a> fête ses 15 ans !</h2>
+                </div>
+
+                <div class="modal-body">
+
+                    {% if now <  startDate %}
+                        {% set difference = startDate.diff(now) %}
+                        {% set leftDays = difference.days %}
+                        {% set message = 'J - ' ~ leftDays ~ ' ...' %}
+                        {%  set classAlert = 'warning' %}
+                    {% else %}
+                        {% set difference = endDate.diff(now) %}
+                        {% set leftDays = difference.days %}
+                        {% set message = 'Plus que ' ~ leftDays ~ ' jours<br/>pour en profiter !' %}
+                        {%  set classAlert = 'info' %}
+                    {% endif %}
+                    <div class="alert alert-{{ classAlert }} text-center" role="alert">
+                        <h1><strong>{{ message|raw }}</strong></h1>
+                    </div>
+                    <br/>
+                    {% if now <  startDate %}
+                        <div class="panel panel-info">
+                            <div class="panel-body">
+                                <p class="lead text-center">Pour ses 15 ans Probesys vous prépare une surprise ...</p>
+                            </div>
+                        </div>
+                        <p class="text-center"><button type="button" class="btn btn-primary" data-dismiss="modal">Accéder à la démo</button></p>
+                    {% else %}
+                        <div class="panel panel-info">
+                            <div class="panel-body">
+                                <p class="lead text-center">Du {{startDate|date('d/m/Y')}} au {{endDate|date('d/m/Y')}}</p>
+                                <p class="text-center">Pour toute nouvelle souscription, l'abonnement mensuel est de</p>
+                                <p class="lead text-center"><s>34€</s>&nbsp; <strong>26€ HT/mois</strong>* <span class="discount">-20%</span></p>
+                                <p class="text-justify">Pour en profiter, contactez nous en nous indiquant le code promo suivant :</p>
+                            </div>
+                        </div>
+                        <p class="text-center"><a href="#" class="btn btn-warning"><strong>{{ codePromo }}</strong></a></p>
+                        <p class="text-center"><a href="mailto:contact@probesys.com?subject=nouvelle souscription postparc code promo {{ codePromo }}" class="btn btn-success">J'en profite !</a>
+                            &nbsp;<button type="button" class="btn btn-primary" data-dismiss="modal">Accéder à la démo</button></p>
+                        <p><br/><small><em>* Hébergement et configuration  sur notre platforme, module de mail, sauvegarde et maintenance inclus. Offre valable sur une durée maximale d'un an à compter de la date de mise en ligne.</em></small></p>
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

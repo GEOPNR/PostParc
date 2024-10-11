@@ -1,0 +1,40 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block fos_user_content %}
+   <div id="form-signin">
+
+      <div class="text-center">
+         {% if person %}
+            {%  if confirmRgpd %}
+               <div class="alert alert-success">
+                  {{ 'rgpdConfirmationMessage'|trans()|raw }}
+                 {% if deleteMyInfos %}
+                    <br/>
+                    {{ 'rgpdDeleteMyInfosConfirmationMessage'|trans()|raw }}
+                 {% endif %}
+               </div>
+            {% else %}
+               <div class="alert alert-info">
+                  <form action="#" method="post">
+                     <h4>{{'hello'|trans()|capitalize}} {{ person  }}</h4>
+                     <input type="hidden" value="1" name ="confirmRgpd">
+                     <p>{{ 'rgpdConfirmationMessageQuestion'|trans()|raw }}</p>
+                     <hr/>
+                     <div class="form-check">
+                        <input type="checkbox" name="deleteMyInfos" id="deleteMyInfos" value="1" class="form-check-input">
+                        <label class="form-check-label" for="deleteMyInfos">{{ 'rgpdDeleteMyInfosLabel'|trans() }}</label>
+                     </div>
+                     <hr/>
+                     <button type="submit" class="btn btn-danger">{{ 'rgpdConfirmationButtonLabel'|trans() }}</button>
+                  </form>
+               </div>
+            {% endif %}
+         {% else %}
+               <div class="alert alert-danger">
+                  <h3>{{'warning'|trans()}}!</h3>
+                  {{'noPersonFound'|trans() }} ...
+               </div>
+         {% endif %}
+      </div>
+   </div>
+{% endblock %}

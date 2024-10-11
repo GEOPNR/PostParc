@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block title %} error {{ status_code }}{% endblock %}
+{% block body %}
+  <div class="alert alert-danger" role="alert">
+    <h1>Oops! {{'exceptions.errorOccured.title'|trans()}}</h1>
+    <h2>Le serveur a retourné une erreur "{{ status_code }} {{ status_text }}".</h2>
+    <div>
+      Une erreur est survenue.<br/>
+      Merci de nous contacter à l'adresse email postparc@probesys.com en nous expliquant comment vous avez obtenu cette erreur.<br/>
+      Nous tâcherons alors de la corriger au plus vite.<br/><br/>
+      Désolé de la gène occasionnée.
+    </div>
+  </div>
+{% endblock %}

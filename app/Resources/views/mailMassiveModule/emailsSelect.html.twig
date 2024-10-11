@@ -1,0 +1,16 @@
+<td>{{ label }}</td>
+<td>
+    <input type="hidden" name="emails[{{type}}][{{id}}]" id="hidden-field-{{randomId}}" value="{{ emails|join(';')}}"/>    
+    <select class="form-control" id="{{randomId}}" multiple>
+        <option value=""></option>
+        {% for email in emails %}
+            <option value="{{ email }}" {% if email.email in selectedValues %} selected {% endif %}>{{ email }}</option>
+        {% endfor %}
+    </select>
+</td>
+<td>
+    <a href="javascript:void(0);" class="validateSelectedEmails"  id="save-button-{{randomId}}" data-selector="{{ randomId }}" data-label="{{ label }}" data-type="{{type}}" data-id="{{id}}"><i class="fa-solid fa-save"></i></a>
+    <a href="javascript:void(0);" data-label="{{ label }}" id="edit-button-{{randomId}}" data-selectedValues="{{ emails|join(';')}}" data-type="{{type}}" data-id="{{id}}" class="changeEmailInMailMassifModule btn btn-default btn-xs hidden">
+      <i class="fa-solid fa-edit"></i>
+    </a>
+</td>

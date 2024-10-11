@@ -1,0 +1,258 @@
+{% if (pfo.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+    {% set editable = false %}
+{% else %}
+    {% set editable = true %}
+{% endif %}
+{%  set nbGroupsAssociate = 0 %}
+{% for ppg in pfo.pfoPersonGroups %}
+    {% if (not(ppg.group.deletedAt) and ( ppg.group.entity.id == app.user.entity.id or ( ppg.group.entity.id != app.user.entity.id and ppg.group.isShared==1) or is_granted("ROLE_SUPER_ADMIN") )) %}
+        {%  set nbGroupsAssociate = nbGroupsAssociate + 1 %}
+    {%  endif %}
+{%  endfor %}
+
+<br/>
+<ul class="nav nav-pills ">
+    <li role="presentation" class="active"><a href="#coordInfosPfo-{{ pfo.id }}"  role="tab" data-toggle="tab"><i class="fa-solid fa-address-card" aria-hidden="true"></i> {{'Person.professionalCoordinate'|trans}}</a></li>
+    <li role="presentation"><a href="#groupsInfosPfo-{{ pfo.id }}"  role="tab" data-toggle="tab"><i class="fa-solid fa-users" aria-hidden="true"></i>  {{ 'Pfo.field.pfoPersonGroups'|trans() }} <span class="label label-pill label-info">{{ nbGroupsAssociate }}</span></a></li>
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+        <li role="presentation"><a href="#representationsInfosPfo-{{ pfo.id }}"  role="tab" data-toggle="tab"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> {{ 'Representation.labels_with_volunteer'|trans() }} <span class="label label-pill label-info">{{ pfo.representations|length }}</span></a></li>
+    {%  endif %}
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_event_module == true %}
+        {{ render(controller('PostparcBundle:Event:getTabDom',{ 'className': pfo.getClassName() , 'objectId': pfo.id })) }}
+    {%  endif %}
+    {{ render(controller('PostparcBundle:Note:getTabDom',{ 'className': pfo.getClassName() , 'objectId': pfo.id })) }}
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" data-pfoId="{{ pfo.id }}" id="coordInfosPfo-{{pfo.id}}">
+        <div class="col-lg-8 col-xl-6" >
+            <h3>{{'Person.professionalCoordinate'|trans}}</h3>
+            <div class="well">
+                <div class="row">
+                    <div class="col-sm-8 col-md-6" >
+                        <ul class="no-type">
+                            {% if (pfo.organization) %}
+                                <li><a href="{{path('organization_show', {'id':pfo.organization.id })}}"><i class="fa-solid fa-cubes"></i> {{ pfo.organization }}</a></li>
+                                    {% endif %}
+                                    {% if (pfo.service) %}
+                                <li><i class="fa-solid fa-users"></i> {{'Pfo.field.service'|trans}} : {{ pfo.service }}</li>
+                                {% endif %}
+                                {% if (pfo.personFunction) %}
+                                    <li><i class="fa-solid fa-users"></i> {{'Pfo.field.personFunction'|trans}} : {% if pfo.person and pfo.person.civility and pfo.person.civility.isFeminine and pfo.personFunction.womenName %} {{ pfo.personFunction.womenName}} {% else %} {{ pfo.personFunction}} {% endif %} 
+                                    {% if pfo.person and pfo.person.civility and pfo.person.civility.isFeminine and pfo.additionalFunction and pfo.additionalFunction.womenName %} {{ pfo.additionalFunction.womenName}} {% else %} {{pfo.additionalFunction}} {% endif %}
+                                    </li>
+                                {% endif %}
+
+                            {% set coordinate = pfo.getCoordinate() %}
+
+                            {% if coordinate %}
+                                {% if pfo.organization and pfo.organization.coordinate and pfo.organization.coordinate.id != coordinate.id %}
+                                    <div class="alert-info" role="alert"><i class="fa-solid fa-info-circle" aria-hidden="true"></i> {{ 'Pfo.messages.preferedCoordinateAddressUsed'|trans() }}</div>
+                                {% endif %}
+                                <li><i class="fa-solid fa-home"></i> {{ coordinate.getFormatedAddress()|raw }}</li>
+                                    {% if coordinate.coordinate|length %}    
+                                    <li>
+                                        <i class="fa-solid fa-map-marker" aria-hidden="true"></i> &nbsp <span class="coordinate">{{coordinate.coordinate}}</span> <a href="javascript;" class="updateCoordinateGeoloc" data-id="{{coordinate.id}}"><i class="fa-solid fa-refresh" aria-hidden="true"></i></a>
+                                    </li>
+                                    <li>
+                                        <a  href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{coordinate}}%3B{{coordinate.coordinate}}" target=blank" class="btn btn-primary"><i class="fa-solid fa-map" aria-hidden="true"></i>&nbsp;{{'itinerary'|trans}}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                    <div class="col-sm-6 col-md-6" >
+                        <ul class="no-type">
+                            {% if (pfo.phone) %}
+                                <li><i class="fa-solid fa-phone"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{pfo.phone}}</a> ({{'directLine'|trans}})</li>
+                                {% endif %}
+                                {% if (pfo.mobilePhone) %}
+                                <li><i class="fa-solid fa-mobile" aria-hidden="true"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{pfo.mobilePhone}}</a> ({{'directLine'|trans}})</li>
+                                {% endif %}
+                                {% if (pfo.fax) %}
+                                <li><i class="fa-solid fa-fax"></i>&nbsp;{{pfo.fax}} ({{'directLine'|trans}})</li>
+                                {% endif %}
+                                {% if (pfo.assistantName and pfo.assistantPhone) %}
+                                <li><i class="fa-solid fa-user"></i>&nbsp;{{ 'Pfo.assistant'|trans() }}:&nbsp;{{pfo.assistantName}}
+                                    <i class="fa-solid fa-phone"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{pfo.assistantPhone}}</a></li>
+                                {% endif %}
+                                {% if pfo.getPreferedEmails()|length > 0 %}
+                                <div class="alert-warning" role="alert"><i class="fa-solid fa-exclamation-circle" aria-hidden="true"></i> {{ 'Pfo.messages.preferedEmailsUsed'|trans() }}</div>   
+                                {% for mail in pfo.getPreferedEmails() %}
+                                    <li><a href="mailto:{{mail}}"><i class="fa-solid fa-envelope"></i>&nbsp;{{mail}}</a></li>
+                                    {% endfor %}
+                                {% else %}
+                                    {% if pfo.getEmail()|length > 0 %}
+                                    <li><a href="mailto:{{pfo.getEmail()}}"><i class="fa-solid fa-envelope"></i>&nbsp;{{pfo.getEmail()}}</a></li>
+                                    {% else %}
+                                        {% if (pfo.organization and pfo.organization.coordinate and pfo.organization.coordinate.email) %}
+                                        <li><a href="mailto:{{pfo.organization.coordinate.email}}"><i class="fa-solid fa-envelope"></i>&nbsp;{{pfo.organization.coordinate.email}}</a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                                {% if pfo.organization and pfo.organization.coordinate %}
+                                    {% if (pfo.organization.coordinate.phone) %}
+                                    <li><i class="fa-solid fa-phone"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{pfo.coordinate.phoneCode}} {{pfo.organization.coordinate.phone}}</a></li>
+                                    {% endif %}
+                                    {% if (pfo.organization.coordinate.mobilePhone) %}
+                                    <li><i class="fa-solid fa-mobile" aria-hidden="true"></i>&nbsp;<a href="javascript:;" class="phoneNumber">{{pfo.coordinate.phoneCode}} {{pfo.organization.coordinate.mobilePhone}}</a></li>
+                                    {% endif %}
+                                    {% if (pfo.organization.coordinate.fax) %}
+                                    <li><i class="fa-solid fa-fax"></i>&nbsp;{{pfo.organization.coordinate.fax}}</li>
+                                    {% endif %}
+                                    {% if (pfo.organization.coordinate.webSite) %}
+                                    <li><a href="{{pfo.organization.coordinate.webSite}}"><i class="fa-solid fa-desktop"></i>&nbsp;{{pfo.organization.coordinate.webSite}}</a></li>
+                                    {% endif %}
+                                    {% if (pfo.organization.coordinate.facebookAccount) %}
+                                    <li><a href="{{pfo.organization.coordinate.facebookAccount}}"><i class="fa-brands fa-facebook"></i>&nbsp;{{pfo.organization.coordinate.facebookAccount}}</a></li>
+                                    {% endif %}
+                                    {% if (pfo.organization.coordinate.twitterAccount) %}
+                                    <li><a href="{{pfo.organization.coordinate.twitterAccount}}"><i class="fa-brands fa-twitter"></i>&nbsp;{{pfo.organization.coordinate.twitterAccount}}</a></li>
+                                    {% endif %}
+                                    
+                                {% endif %}
+                                
+                                {% if pfo.getTags() | length %}
+                                <li><i class="fa-solid fa-tags" aria-hidden="true"></i> {{pfo.getTags()|join(', ')}}</li>
+                                {% endif %}
+                                {%  if pfoQrCodeInfos is defined  and pfoQrCodeInfos[pfo.id] is defined %}
+                                    <li><a class="btn btn-default btn-block" href="{{ path('pfo_exportVcard', {'id': pfo.id}) }}"><img src="{{ pfoQrCodeInfos[pfo.id].uri }}" class="img-fluid" width="100px"/></a></li>
+                                {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-md-6" >
+                        <a class="btn btn-default btn-block add-to-selection-button"  data-type="pfo" data-id="{{pfo.id}}" href="{{ path('pfo_addBasket', {'id': pfo.id}) }}"><i class="fa-solid fa-shopping-cart"></i>&nbsp;{{'actions.addBasket'|trans}}</a>
+                    </div>
+                    <div class="col-sm-6 col-md-6" >
+                        <a class="btn btn-default btn-block" href="{{ path('pfo_exportVcard', {'id': pfo.id}) }}"><i class="fa-solid fa-address-card" aria-hidden="true"></i></i>&nbsp;{{'actions.exportVcard'|trans}}</a>
+                    </div>
+                </div>
+                {% if (is_granted('ROLE_CONTRIBUTOR') and ( editable or ( not(editable) and pfo.isEditableByOtherEntities) ) ) %}
+                    <br/>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6" > 
+                            <a href="{{ path('pfo_edit', {'id': pfo.id}) }}" class="btn btn-primary btn-block"><i class="fa-solid fa-pencil-alt"></i><span class="libelle"> {{'actions.edit'|trans}}</span></a>
+                        </div>
+                        <div class="col-sm-6 col-md-6" >
+                            <a href="{{ path('pfo_delete', {'id': pfo.id}) }}" class="btn btn-warning btn-block" onclick="return confirm('{{'actions.confirmDelete'|trans}}');"><i class="fa-solid fa-trash-alt"></i><span class="libelle"> {{'actions.delete'|trans}}</span></a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 col-xl-6" >
+            {% if coordinate and coordinate.coordinate|length %}
+                <div id="map-{{pfo.id}}" style="margin-top: 60px; height: 300px; width: 100%; "></div>
+            {% endif %}
+            
+        </div>
+    </div>
+
+    <div class="tab-pane fade" data-pfoId="{{ pfo.id }}" id="groupsInfosPfo-{{pfo.id}}">
+
+        <h3>{{ 'associateGroups'|trans() }}</h3>
+        <div class="col-sm-6 col-md-8" >
+            {% if pfo.pfoPersonGroups|length > 0 %}
+                <table class="table table-stripped table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th>{{'Group.field.name'|trans}}</th>
+                                {% if is_granted('ROLE_USER_PLUS') %}
+                                <th>Action</th>
+                                {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ppg in pfo.pfoPersonGroups %}
+                            {% if (not(ppg.group.deletedAt) and ( ppg.group.entity.id == app.user.entity.id or ( ppg.group.entity.id != app.user.entity.id and ppg.group.isShared==1) or is_granted("ROLE_SUPER_ADMIN") )) %}
+                                {% if (ppg.group.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+                                    {% set editable = false %}
+                                {% else %}
+                                    {% set editable = true %}
+                                {% endif %}
+                                <tr {% if editable==false %} class="warning"{% endif %}>
+                                    <td> {{ppg.group.getCompletName}} </td>
+                                    {% if (
+                                        ( is_granted('ROLE_CONTRIBUTOR') or ( is_granted('ROLE_USER_PLUS') and ppg.group.createdBy.id == app.user.id ) )  
+                                        and (editable or ( not(editable) and ppg.group.isEditableByOtherEntities) )
+                                    )%}
+                                        <td>
+                                            <div class="btn-group">
+                                                <a class="btn btn-default btn-xs" href="{{ path('ppg_delete', { 'id': ppg.getId(),'origin': 'coordPfo' }) }}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" ><i class="fa-solid fa-trash-alt"></i></a>
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>{{'Person.flash.noGroupAssociateAlert'|trans}}</strong>
+                </div>
+                <br/>
+            {% endif %}
+        </div>
+        {% if is_granted('ROLE_USER_PLUS') %}
+        <div class="col-sm-6 col-md-4" >
+            
+                <form class="form" action="{{ path('pfo_addGroup', { 'id': pfo.getId(),'origin': 'coordPerso' }) }}" method="post" role="form">
+                    <div class="form-group inline">
+                        {{ render(controller(
+                            'PostparcBundle:Group:SelectGroups',
+                            { 'personId': null , 'pfoId': pfo.getId(), 'organizationId': null }
+                            )) 
+                        }}
+                    </div>
+                    <input type="submit" class="btn btn-default" value="Ajouter au groupe">
+                </form>            
+        </div>
+        {% endif %}            
+    </div>
+
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_representation_module == true %}
+        <div class="tab-pane fade" data-pfoId="{{ pfo.id }}" id="representationsInfosPfo-{{pfo.id}}">
+
+            <div class="col-md-12">
+                <hr>
+                <div class="alert alert-success pull-right no-margin collapse" id="success-alert-{{ pfo.id }}" style="display: none; opacity: 500; margin-top: -15px;">
+                    {{ 'actions.suppressionConfirmed'|trans }}
+                </div>
+                <h3>{{ 'Pfo.field.representations'|trans }} {% if pfo.organization and pfo.organization.getAbbreviation() %} {{ pfo.organization.getAbbreviation() }}
+                {% else %} {{ pfo.organization }} {% endif %} {% if pfo.personFunction %}({{ pfo.personFunction }}){% endif %} <a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-29"><i class="fa-solid fa-question-circle"></i></a></h3>
+
+            {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '29'})) }}
+
+            {% if pfo.representations %}
+                {% include 'person/representationList.html.twig' with {'representations': pfo.representations, 'pfoId': pfo.id} %}
+            {% endif %}
+
+            {% if is_granted('ROLE_CONTRIBUTOR') %}
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseRepresentation-{{ pfo.id }}" aria-expanded="false" aria-controls="collapseRepresentation">
+                    {{ 'Representation.actions.addRepresentation'|trans }}
+                </button>
+                <br><br>
+                <div class="collapse" id="collapseRepresentation-{{ pfo.id }}">
+                    <div class="well">
+                        {{ render(controller('PostparcBundle:Representation:new', { 'personId': null , 'pfoId': pfo.id } )) }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+        
+    {% if app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig').use_event_module == true %}
+        {{ render(controller('PostparcBundle:Event:getTabContentEvents',{ 'className': pfo.getClassName() , 'objectId': pfo.id })) }}
+    {% endif %}    
+
+    {{ render(controller('PostparcBundle:Note:getTabContentNotes',{ 'className': pfo.getClassName() , 'objectId': pfo.id })) }}
+
+    </div>

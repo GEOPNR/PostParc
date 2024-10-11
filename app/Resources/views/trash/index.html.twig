@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{'Trash.list'|trans}}
+{% endblock title %}
+
+{% block body %}
+
+    <h1>{{'Trash.list'|trans}} <small class="text-info">&nbsp;&nbsp;({{totalElements}})</small></h1>
+
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {{ 'Trash.welcome_message'|trans() }}
+    </div>
+    {% if totalElements == 0 %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{'flash.emptyTrash'|trans}}
+        </div>
+    {% else %}
+        <br/>
+        <form action="{{path('trash_batch')}}" method="post" >
+            <div class="sf-admin-batch-actions-choice">
+                <div class="form-group">
+                    <label for="batch_action">{{'forSelection'|trans}}</label>
+                    <select name="batch_action" class="form-control">
+                        <option value="">{{'chooseAction'|trans}}</option>
+                        <option value="batchRestore">{{'actions.restore'|trans}}</option>
+                        <option value="batchDelete">{{'actions.delete'|trans}}</option>
+                    </select>
+                </div>
+                <input class="btn btn-default" type="submit" id="batchFormSubmitButton" value="ok">
+            </div>
+            <div class="sf_admin_list no-more-tables">
+                {% for key, entities in trashed_entities %}                
+                    {% include 'trash/listEntities.html.twig' with {'entities': entities, 'batchVariableName':key} %}                                                           
+                {% endfor %}
+            </div>
+        </form>
+    {% endif %}  
+{% endblock %}
+
+    
+

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   {{'Territory.edit'|trans}} "{{territory.name}}"
+{% endblock title %}
+
+{% block body %}
+   <h1>{{'Territory.edit'|trans}} "{{territory.name}}"</h1>
+   {% include 'default/updatedByDiv.html.twig' with {'object': territory} %}
+   {{ form_start(edit_form) }}
+   
+   {{ form_widget(edit_form) }}
+   <div class="btn-group btn-territory form-actions">
+      <a class="btn btn-default" href="{{path('territory_delete', {'id':territory.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+         <i class="fa-solid fa-trash-alt"></i>
+      </a>
+      <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('territory_index')}}">
+         <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+      </a>
+      <input type="submit" class="btn btn-primary" value="{{'actions.edit'|trans()}}">
+   </div>
+   {{ form_end(edit_form) }}
+{% endblock %}

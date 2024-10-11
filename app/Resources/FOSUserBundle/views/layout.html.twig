@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width">
+        <title>{{app_name}} - {% block title %}{{'welcome'|trans()}}{% endblock %}</title>
+        <link rel="icon" type="image/x-icon" href="{{asset('bundles/postparc/images/favicon.ico') }}">
+        <link href='//fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+        <link href="{{ asset('bundles/postparc/lib/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet"/>
+
+        {% block stylesheets %}
+            <link href="{{ asset('bundles/postparc/lib/jquery-ui/jquery-ui.min.css') }}" type="text/css" rel="stylesheet"/>
+            <link href="{{ asset('bundles/postparc/css/styles.css') }}" type="text/css" rel="stylesheet"/>
+
+            {% if app.environment not in ['dev', 'prod'] %}
+                {% set specificsUrl = 'bundles/postparc/specifics/'~ app.environment ~ '/css/env.css ' %}
+                <link href="{{ asset(specificsUrl) }}" type="text/css" rel="stylesheet"/>
+            {% endif %}
+            {%  set bgUrl = 'bundles/postparc/images/backgroundLogin/bg-'~random(['01', '02', '03', '04', '05','07','08'])~'.jpg' %}
+            <style type="text/css">
+                <!--
+                @media (min-width: 760px) {
+                    body{
+                        background: url({{ asset(bgUrl) }}) no-repeat;
+                        background-size:  100vw 100vh;
+                    }
+                }
+                -->
+                </style>
+
+        {% endblock stylesheets %}
+    </head>
+    <body class="signin" >
+        <div id="brand">
+            <a href="http://www.probesys.com" id="probesys" class="pull-right" target="_blank">PROBESYS - spécialiste opensource Grenoble</a>
+        </div>
+
+        {% if app.request.hasPreviousSession %}
+            {% for type, messages in app.session.flashbag.all() %}
+                {% for message in messages %}
+                    <div class="flash-{{ type }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="container" role="main">
+            <div id="content" class="row" style="margin-top: 20px;">
+                <div>
+                    {% block fos_user_content %}
+                    {% endblock fos_user_content %}
+                </div>
+            </div>
+        </div>
+
+    {% block javascripts %}
+            <script type="text/javascript" src="{{ asset('bundles/postparc/js/jquery-2.2.4.min.js') }}"></script>
+            <script type="text/javascript" src="{{ asset('bundles/postparc/js/jquery.browser.min.js') }}"></script>
+            <script type="text/javascript" src="{{ asset('bundles/postparc/lib/bootstrap3/js/bootstrap.min.js') }}"></script>
+    {% endblock javascripts %}
+
+    </body>
+</html>

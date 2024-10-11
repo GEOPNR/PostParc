@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{'Person.edit'|trans}} {{person}}
+{% endblock title %}
+
+{% set currentEntityConfig = app.session.get('currentEntityConfig') %}
+{% set personnalFieldsRestriction = [] %}
+{% if currentEntityConfig and 'personnalFieldsRestriction' in currentEntityConfig %}
+    {% set personnalFieldsRestriction = currentEntityConfig['personnalFieldsRestriction'] %}
+{% endif %}
+
+{% block body %}
+
+    <h1>{{'Person.edit'|trans}} {{person}}</h1>
+    {%  if person.getDontWantToBeContacted() %}
+        <div class="alert alert-danger"><i class="fa-solid fa-exclamation-triangle " aria-hidden="true"></i> {{ 'Person.field.dontWantToBeContacted'|trans() }}</div>
+    {% endif %}
+    {% include 'default/updatedByDiv.html.twig' with {'object': person} %}
+    {{ form_start(edit_form) }}
+    <div class="row">
+        <div class="col-md-6">
+            <div id="sharedInformationFormOptions" class="bs-callout bs-callout-info">
+                <h4>{{ 'sharedFormOptions'|trans() }}<a class="sf-admin-help" href="#" data-toggle="modal" data-target="#helpModal-33"><i class="fa-solid fa-question-circle"></i></a></h4>
+                        {{ render(controller('PostparcBundle:Default:helpMessage', {'id': '33'})) }}
+                        {{ form_row(edit_form.isShared) }}
+                        {{ form_row(edit_form.isEditableByOtherEntities) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            
+                <div class="bs-callout bs-callout-warning">
+                    {%  if (not(is_granted('ROLE_CONTRIBUTOR_PLUS')) and person.dontWantToBeContacted ) %}<div class="hidden">{% endif %}
+                        {{ form_row(edit_form.dontWantToBeContacted) }}
+                    {%  if (not(is_granted('ROLE_CONTRIBUTOR_PLUS')) and person.dontWantToBeContacted ) %}</div>{% endif %}
+                    {{ form_row(edit_form.dontShowCoordinateForReaders) }}
+                </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(edit_form.civility) }}
+            {{ form_row(edit_form.name) }}
+            {{ form_row(edit_form.firstName) }}
+        </div>
+        <div class="col-md-6">
+            {% if person.image %}
+                <img src="{{ asset(person.getwebPath) }}" alt="{{person.image}}"  class="img-responsive"/><br/>
+                <input type="checkbox" name="deleteImage" value="1"> {{'actions.deleteImage'|trans}}
+            {% endif %}
+            {{ form_row(edit_form.image) }}
+
+        </div>
+    </div>
+    {%  if person.getDontWantToBeContacted() %}
+        <div class="hidden">
+        {%  endif %}
+        {% if 'profession' not in personnalFieldsRestriction %}
+            {{ form_row(edit_form.profession) }}
+        {% endif %}
+        {% if 'birthDate' not in personnalFieldsRestriction %}
+            {{ form_row(edit_form.birthDate) }}
+        {% endif %}
+        {% if 'birthLocation' not in personnalFieldsRestriction %}
+            <div class="form-group">
+                {{ form_label(edit_form.birthLocation) }}
+                {{ form_widget(edit_form.birthLocation) }}
+                <select id="person_birthLocation" name="person[birthLocation]" class="city-select2-autocomplete-all form-control">
+                    {% if person.birthLocation %}
+                        <option value="{{person.birthLocation.id}}">{{person.birthLocation}}</option>
+                    {% endif %}
+                </select>
+            </div>
+        {% endif %}
+        {% if app.environment == 'udaf' %}
+            {% if 'nbMinorChildreen' not in personnalFieldsRestriction %}
+                {{ form_row(edit_form.nbMinorChildreen) }}
+            {% endif %}
+            {% if 'nbMajorChildreen' not in personnalFieldsRestriction %}
+                {{ form_row(edit_form.nbMajorChildreen) }}
+            {% endif %}
+        {% else %}
+            <div class="hidden">
+                {% if 'nbMinorChildreen' not in personnalFieldsRestriction %}
+                    {{ form_row(edit_form.nbMinorChildreen) }}
+                {% endif %}
+                {% if 'nbMajorChildreen' not in personnalFieldsRestriction %}
+                    {{ form_row(edit_form.nbMajorChildreen) }}
+                {% endif %}
+            </div>
+        {% endif %}
+        {{ form_row(edit_form.coordinate) }}
+        {% if 'observation' not in personnalFieldsRestriction %}
+            {{ form_row(edit_form.observation) }}
+        {% endif %}
+        {% if 'preferedEmails' not in personnalFieldsRestriction %}
+            {{ form_row(edit_form.preferedEmails) }}
+        {% else %}
+            <div class="hidden">{{ form_widget(edit_form.preferedEmails) }}</div>
+        {% endif %}
+        {%  if person.getDontWantToBeContacted() %}
+        </div>
+    {%  endif %}
+    {% if 'tags' not in personnalFieldsRestriction %}
+        {{ form_row(edit_form.tags) }}
+    {% endif %}
+
+    <div class="btn-group form-actions addActionsOnTop">
+        <a class="btn btn-default" href="{{path('person_delete', {'id':person.id })}}" data-toggle="tooltip" data-placement="top" title="{{'actions.delete'|trans()}}" data-container="body" onclick="return confirm('{{'actions.confirmDelete'|trans}}');" >
+            <i class="fa-solid fa-trash-alt"></i>
+        </a>
+        <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="
+           {% if origin =='search'%}
+               {{path('search') }}
+           {% else %}
+               {{path('person_index')}}
+           {% endif %}
+           ">
+            <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+        </a>
+        <input type="submit" class="btn btn-primary" value="{{'actions.edit'|trans()}}">
+    </div>
+    {{ form_end(edit_form) }}
+{% endblock %}

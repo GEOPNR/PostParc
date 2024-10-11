@@ -1,0 +1,7 @@
+<label for="groupId">Groupes</label>
+<select name="groupIds[]" class="form-control select2" id="groupId-{{uniqId}}" multiple style="width: 100%;">
+    <option value=""></option>
+    {% for group in groups %}
+        <option value="{{group.id}}">{{group.getCompletName}}</option>
+    {% endfor %}
+</select>

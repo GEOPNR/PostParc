@@ -1,0 +1,268 @@
+services:
+    extension.listener:
+        class: PostparcBundle\Listener\DoctrineExtensionListener
+        calls:
+            - [ setContainer, [ "@service_container" ] ]
+        tags:
+            # translatable sets locale after router processing
+            - { name: kernel.event_listener, event: kernel.request, method: onLateKernelRequest, priority: -10 }
+            # loggable hooks user username if one is in security context
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            # translatable sets locale such as default application locale before command execute
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: -10 }
+    # Doctrine Extension listeners to handle behaviors
+    gedmo.listener.tree:
+        class: Gedmo\Tree\TreeListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.translatable:
+        class: Gedmo\Translatable\TranslatableListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+            - [ setDefaultLocale, [ '%locale%' ] ]
+            - [ setTranslationFallback, [ false ] ]
+
+    gedmo.listener.timestampable:
+        class: Gedmo\Timestampable\TimestampableListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.sluggable:
+        class: Gedmo\Sluggable\SluggableListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.sortable:
+        class: Gedmo\Sortable\SortableListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.loggable:
+        class: Gedmo\Loggable\LoggableListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.blameable:
+        class: Gedmo\Blameable\BlameableListener
+        public: true
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    postparc.manager.help:
+        class: PostparcBundle\Manager\PostManager
+        arguments: ['@doctrine.orm.default_entity_manager', PostparcBundle\Entity\Post]
+        calls:
+            - [setRepositoryLocale, ['@service_container']]
+
+    postparc.locale_listener:
+        class: PostparcBundle\EventListener\LocaleListener
+        arguments: ["%kernel.default_locale%"]
+        tags:
+            - { name: kernel.event_subscriber }
+
+    postparc_updateObjectListener:
+        class: PostparcBundle\EventListener\UpdateObjectListener
+        arguments: ["@security.token_storage", "@mailer", "@translator", "%kernel.environment%"]
+        tags:
+            - { name: doctrine.event_listener, event: postUpdate, connection: default }
+
+    postparc.login_listener:
+        class: PostparcBundle\EventListener\LoginListener
+        tags:
+            - { name: kernel.event_listener, event: security.interactive_login, method: onSecurityInteractiveLogin }
+        arguments: ['@router', '@event_dispatcher', '@doctrine.orm.entity_manager', '@security.token_storage', '@mailer']
+
+    postparc.removed_file_listener:
+        class: PostparcBundle\EventListener\RemovedFileListener
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: kernel.event_listener, event: vich_uploader.post_remove, method: onPostRemove }
+
+    postparc.clean_empty_attachment_EventListener:
+        class: PostparcBundle\EventListener\PostPersistFileListener
+        tags:
+            -  { name: doctrine.event_listener, event: postPersist, method: onPostPersist, connection: default }
+
+#    postparc_editObjectListener:
+#        class: PostparcBundle\EventListener\EditObjectListener
+#        arguments: [ '@translator', '@request_stack', '@security.token_storage']
+#        tags:
+#            - { name: doctrine.event_listener, event: postLoad, connection: default }
+
+    postparc_current_entity_service:
+        class: PostparcBundle\Service\CurrentEntityService
+        arguments: ['@security.token_storage', '@session', '@doctrine.orm.entity_manager']
+        public: true
+
+    postparc_current_reader_limitations:
+        class: PostparcBundle\Service\CurrentReaderLimitationService
+        arguments: ['@security.token_storage', '@session', '@doctrine.orm.entity_manager']
+        public: true
+
+    postparc.check_access:
+        class: PostparcBundle\Service\CheckAccessService
+        arguments: ['@service_container', '@security.authorization_checker']
+        public: true
+
+    postparc.lock_service:
+        class: PostparcBundle\Service\LockService
+        arguments: ['@security.token_storage', '@doctrine.orm.entity_manager', '@security.authorization_checker']
+        public: true
+        
+    postparc.piwik_stats:
+        class: PostparcBundle\Service\PiwikStatsService
+        arguments: ['@service_container']
+        public: true
+
+    postparc_affect_current_entity:
+        class: PostparcBundle\EventListener\AffectEntityListener
+        public: true
+        tags:
+            -  { name: doctrine.event_listener, event: postPersist, method: onPostPersist, connection: default }
+            
+    postparc_qrCodeService:
+        class: PostparcBundle\Service\QrCodeService
+        arguments: ['@service_container', '@router']
+        public: true
+    postparc_user_config_service:
+        class: PostparcBundle\Service\UserConfigService
+#        arguments: ['@service_container', '@router']
+        public: true    
+    # forms as service
+    postparc.form.type.coordinate:
+        class: PostparcBundle\Form\CoordinateType
+        public: true
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.user:
+        class: PostparcBundle\Form\UserType
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.person:
+        class: PostparcBundle\Form\PersonType
+        public: true
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.event:
+        class: PostparcBundle\Form\EventType
+        public: true
+        arguments: ['@doctrine.orm.entity_manager', '@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }
+            
+    postparc.form.type.documentTemplate:
+        class: PostparcBundle\Form\DocumentTemplateType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }            
+
+    postparc.form.type.organizationLink:
+        class: PostparcBundle\Form\OrganizationLinkType
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.representation:
+        class: PostparcBundle\Form\RepresentationType
+        public: true
+        arguments: ['@doctrine.orm.entity_manager', '@service_container']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.pfo:
+        class: PostparcBundle\Form\PfoType
+        public: true
+        arguments: ['@doctrine.orm.entity_manager', '@service_container']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.group:
+        class: PostparcBundle\Form\GroupType
+        public: true
+        arguments: ['@service_container']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.territory:
+        class: PostparcBundle\Form\TerritoryType
+        public: true
+        arguments: ['@service_container']
+        tags:
+            - { name: form.type }
+
+    postparc.formFilter.type.user:
+        class: PostparcBundle\FormFilter\UserFilterType
+        public: true
+        arguments: ['@service_container', '@security.authorization_checker']
+        tags:
+            - { name: form.type }
+
+    postparc.form.type.eventAlert:
+        class: PostparcBundle\Form\EventAlertType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }
+            
+    postparc.form.type.help:
+        class: PostparcBundle\Form\HelpType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }            
+            
+    postparc.form.type.mail_footer:
+        class: PostparcBundle\Form\MailFooterType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }       
+
+    postparc.form.type.mail_massif:
+        class: PostparcBundle\Form\MailMassifModuleType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }              
+        
+    postparc.form.type.note:
+        class: PostparcBundle\Form\NoteType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }  
+            
+    postparc.form.type.organization:
+        class: PostparcBundle\Form\OrganizationType
+        public: true
+        arguments: ['@security.token_storage', '@postparc_user_config_service']
+        tags:
+            - { name: form.type }  

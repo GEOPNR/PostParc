@@ -1,0 +1,67 @@
+<div class="tab-pane fade {% if activeTab == 'pfos' or ( activeTab == 'persons' and ( (searchParamsObjects.functions is defined or searchParamsObjects.services is defined or searchParamsObjects.organizations is defined or searchParamsObjects.organizationTypes is defined) or persons|length()==0)) %}  active in {% endif %}" id="pfos">
+
+  <a href="javascript:void(0)" data-content-type="pfos" class="btn btn-success btn-xs btn-block addTabToSelection">{{'actions.addTabElementsToSelection'|trans}}</a>
+
+  <div class="sf_admin_list no-more-tables">
+    <table class="table table-striped table-condensed table-responsive table-hover">
+      <thead>
+        <tr>
+          <th><input id="sf_admin_list_batch_checkbox" type="checkbox" onclick="checkAllInActiveTab(this);"></th>
+          <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.person'|trans(), 'p.name') }}</th>
+          <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.personFunction'|trans(), 'f.name') }}</th>
+          <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.additionalFunction'|trans(), 'af.name') }}</th>
+          {#<th>{{ knp_pagination_sortable(pfos, 'Pfo.field.service'|trans(), 's.name') }}</th>#}
+          <th>{{ 'Email.field.email'|trans }}</th>
+          <th>{{ knp_pagination_sortable(pfos, 'Pfo.field.organization'|trans(), 'o.name') }}</th>
+          <th>{{ knp_pagination_sortable(pfos, 'Coordinate.field.city'|trans(), 'city.name') }}</th>
+          <th>{{'genericFields.actions'|trans}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pfo in pfos %}
+           {% set listEmail = pfo.email  %}                    
+           {% if pfo.preferedEmails  and pfo.preferedEmails | length > 0 %}
+               {% set listEmail = pfo.preferedEmails | join(', ') %}
+           {% endif %}
+
+          {% if (pfo.entity.id != app.user.entity.id and not(is_granted("ROLE_SUPER_ADMIN")) ) %}
+            {% set editable = false %}
+          {% else %}
+            {% set editable = true %}
+          {% endif %}
+          <tr {% if editable==false %} class="warning"{% endif %}>
+            <td><input type="checkbox" name="pfoIds[]" value="{{ pfo.id }}" class="sf_admin_batch_checkbox"></td>
+            <td>{% if pfo.person is not null  %}
+              {% if pfo.person.deletedAt %}<s>{% endif %}
+                 <a href="{{ path('pfo_show', {'id': pfo.id}) }}">{{pfo.person}}</a>
+                {% if pfo.person.deletedAt %}</s>{% endif %}
+              {% endif %}</td>
+              <td>{% if pfo.person and pfo.person.civility and pfo.person.civility.isFeminine and pfo.personFunction and pfo.personFunction.womenName %} {{ pfo.personFunction.womenName}} {% else %} {{ pfo.personFunction}} {% endif %}</td>
+              <td>{% if pfo.person and pfo.person.civility and pfo.person.civility.isFeminine and pfo.additionalFunction and pfo.additionalFunction.womenName %} {{ pfo.additionalFunction.womenName}} {% else %} {{pfo.additionalFunction}} {% endif %}</td>
+              {#<td>{{pfo.service}}</td>#}
+              <td>{{ listEmail }}</td>
+              <td>{% if pfo.organization %}<a href="{{path('organization_show', {'id': pfo.organization.id})}}">{% if pfo.organization.deletedAt %}<s>{{pfo.organization}}</s> {% else %} {{pfo.organization}}{% endif %}</a>{% endif %}</td>
+              <td>{% if pfo.organization and pfo.organization.coordinate %} {{pfo.organization.coordinate.city}} {% endif %}</td>
+              <td>
+                <div class="btn-group">
+                  <a href="{{path('pfo_show', {'id':pfo.id })}}" class="btn btn-default btn-xs" alt="{{'actions.show'|trans}}" title="{{'actions.show'|trans}}"><i class="fa-solid fa-info"></i></a>
+                    {% if pfo.organization and pfo.organization.coordinate and pfo.organization.coordinate.coordinate|length %}
+                    <a class="btn btn-default btn-xs" href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{coordinate}}%3B{{pfo.organization.coordinate.coordinate}}" target=blank" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'itinerary'|trans}}"><i class="fa-solid fa-map" aria-hidden="true"></i></a>
+                    {% endif %}
+                    {% if (is_granted('ROLE_CONTRIBUTOR') and ( editable == true or ( not(editable) and pfo.isEditableByOtherEntities) ) )%}
+                    <a class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="Modifier" href="{{path('pfo_edit', {'id':pfo.id, 'origin':'search' })}}"><i class="fa-solid fa-pencil-alt"></i></a>
+                    <a href="{{path('pfo_delete', {'id':pfo.id, 'origin':'search' })}}" class="btn btn-default btn-xs delete-ajax-button" data-type="pfo" data-id="{{pfo.id}}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.delete'|trans}}" data-confirm="{{'actions.confirmDelete'|trans}}"><i class="fa-solid fa-trash-alt"></i></a>
+                    {% endif %}
+                  <a href="{{path('pfo_exportVcard', {'id':pfo.id })}}" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" data-container="body" title="{{'actions.exportVcard'|trans}}"><i class="fa-solid fa-address-card"></i></a>
+                  <a href="{{path('pfo_addBasket', {'id':pfo.id, 'origin':'search' })}}" class="btn btn-default btn-xs add-to-selection-button" data-type="pfo" data-id="{{pfo.id}}" alt="{{'actions.addBasket'|trans}}" title="{{'actions.addBasket'|trans}}"><i class="fa-solid fa-shopping-cart"></i></a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="navigation text-center">
+          {{ knp_pagination_render(pfos) }}
+        </div>
+      </div>

@@ -1,0 +1,11 @@
+{% if persons|length >0 %}
+<div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <p><strong>{{'warning'|trans}} !</strong><br/>{{'Person.flash.personExistingWithSameName'|trans}} :</p>
+    <ul>
+    {% for person in persons %}
+        <li><a target="_new" href="{{ path('person_show',{'id': person.id}) }}">{{ person }} {% if person.entity.id != app.user.entity.id %} ({{ person.entity }} / <a href="mailto:{{ person.createdBy.email }}">{{ person.createdBy }}</a> ){% if person.isShared==0 %} <span class="label label-warning">{{ 'notShared'|trans() }}</span> {% endif %}{% endif %}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}

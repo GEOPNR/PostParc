@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{'MandateType.new'|trans}}
+{% endblock title %}
+
+{% block body %}
+    <h1>{{'MandateType.new'|trans}}</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="btn-group form-actions">
+            <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="{{'actions.backToTheList'|trans()}}" data-container="body" href="{{path('mandateType_index')}}">
+                <i class="fa-solid fa-list"></i>&nbsp;<span>{{'actions.backToTheList'|trans()}}</span>
+            </a>
+            <input type="submit" class="btn btn-primary" value="{{'actions.create'|trans()}}">
+            <input type="submit" class="btn btn-info" name="createAndContinue" value="{{'actions.createAndContinue'|trans()}}">
+        </div>
+    {{ form_end(form) }}
+
+{% endblock %}

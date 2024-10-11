@@ -1,0 +1,8 @@
+{% if entityCoordinateDistance %}
+    <br/>
+    <i class="fa-solid fa-map" aria-hidden="true"></i>&nbsp;{{entityCoordinateDistance.distanceText}}
+    <br/>
+    <i class="fa-solid fa-clock" aria-hidden="true"></i>&nbsp;{{entityCoordinateDistance.durationText}}
+    <br/>
+    <a href="https://www.openstreetmap.org/directions?engine=graphhopper_car&route={{entityCoordinateDistance.entity.coordinate}}%3B{{entityCoordinateDistance.coordinate.coordinate}}" target=blank">{{'itinerary'|trans()}}</a>
+{% endif  %}

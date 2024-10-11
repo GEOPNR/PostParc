@@ -1,0 +1,80 @@
+<div class="container">
+   <div id="toolbar" class="row">
+      <div class="col-md-4">
+         <div id="logo"><a href="{{ path('homepage') }}"><span>POST-Parc</span></a></div>
+         <div id="app-name" class="hidden-xs">{{app_name}}</div>
+      </div>
+      <div class="col-md-8 ">
+         <div class="pull-right" id="tools">
+
+            <ul class="nav nav-pills">
+               <!-- global help -->
+               <li>
+                  <a target="_blank" href="{% if is_granted('ROLE_CONTRIBUTOR') %}{{ asset('files/helps/Aide_PostParc_Administrateur.pdf') }}{% else %}{{ asset('files/helps/Aide_PostParc_Lecteur.pdf') }}{% endif %} " data-toggle="tooltip" data-placement="left" title="{{'help'|trans}}">
+                     <i class="fa-solid fa-question-circle" >
+
+                     </i>
+                  </a>
+               </li>
+
+               <!-- change language -->
+               {% if locales|length > 1 %}
+                  <li>
+                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa-solid fa-flag"></i><span class="libelle">&nbsp;{{ app.request.getLocale()|upper }}</span>
+                     </a>
+                     <ul class="dropdown-menu">
+                        {% for locale in locales %}
+                           <li><a href="{{ path('setlocale', {'language': locale}) }}">{{locale|upper}}</a></li>
+                           {% endfor %}
+                     </ul>
+
+                  </li>
+               {% endif %}
+               <!-- search -->
+               <li>
+                  <a href="{{path('search-homepage')}}">
+                     <i class="fa-solid fa-search"></i><span class="libelle">&nbsp;{{'search'|trans}}</span>
+                  </a>
+               </li>
+
+               <li class="basket">
+                  <a href="{{path('selection_show')}}">
+                     {{ render(controller('PostparcBundle:Selection:getNbSelectionElement')) }}
+                     <i class="fa-solid fa-object-group hidden-xs hidden-sm"></i><span class="libelle">&nbsp;{{'my_selection'|trans}}&nbsp;</span>
+                  </a>
+
+               </li>
+               <li class="basket">
+                  {% if app.request.attributes.has('_route') %}
+                     {% set currentPath = path(app.request.attributes.get('_route'),app.request.attributes.get('_route_params')) %}
+                  {% else %}
+                     {% set currentPath = 'homepage' %}
+                  {% endif %}
+                  <a href="{{path('selection_removeAll', {'fromUrl': currentPath})}}" alt="{{'Selection.actions.eraseSelection'|trans}}" title="{{'Selection.actions.eraseSelection'|trans}}" data-confirm="{{'actions.deleteAllSelection'|trans}}">
+                     <i class="fa-solid fa-eraser hidden-xs hidden-sm"></i><span class="libelle">&nbsp;{{'Selection.actions.eraseSelection'|trans}}&nbsp;</span>
+                  </a>
+               </li>
+               <li class="account active pull-right">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                     <i class="fa-solid fa-user"></i><span class="libelle">&nbsp;&nbsp;{{'User.myAccount'|trans()}}</span>&nbsp;<span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                      <li><a href="#">{{app.user}}</a></li>
+                     <li><a href="{{ path('user_configs') }}"><i class="fa-solid fa-cogs" aria-hidden="true"></i> {{'nav.configuration'|trans}}</a></li>
+                     <li><a href="{{ path('user_edit', { 'id': app.user.id }) }}"><i class="fa-solid fa-user" aria-hidden="true"></i> {{'actions.edit_my_account'|trans}}</a></li>
+                     {% if is_granted('ROLE_USER') and app.session.get('currentEntityConfig') is defined and app.session.get('currentEntityConfig') and app.session.get('currentEntityConfig').use_massiveMail == true %}
+                        <li><a href="{{ path('mailFooter_index') }}"><i class="fa-solid fa-id-card" aria-hidden="true"></i>&nbsp;{{ 'nav.mailFooter'|trans() }}</a></li>
+                     {% endif %}
+                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <li><a href="{{ path('homepage', {'_switch_user': '_exit'}) }}"><i class="fa-solid fa-undo-alt"></i> {{'actions.become_original_user'|trans()}}</a></li>
+                     {% endif %}
+                     <li role="presentation" class="divider"></li>
+                     <li class="logout"><a href="{{path('fos_user_security_logout')}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-sign-out-alt"></i> {{'layout.logout'|trans({},'FOSUserBundle') }}</a></li>
+                  </ul>
+               </li>
+            </ul>
+         </div>
+      </div>
+   </div>
+</div>
